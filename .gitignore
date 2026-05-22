@@ -16,6 +16,9 @@ data/
 # Logs
 logs/
 
+# Claude Code
+.claude/
+
 # IDE & Tools
 .mypy_cache/
 .ruff_cache/

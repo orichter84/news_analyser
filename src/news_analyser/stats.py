@@ -35,8 +35,8 @@ def top_techniques(df: pd.DataFrame, n: int = 5) -> pd.Series:
 
 
 def bias_distribution(df: pd.DataFrame) -> dict[str, Any]:
-    """Statistische Kennzahlen der Bias-Scores."""
-    scores = df["bias_score"].astype(float)
+    """Statistische Kennzahlen der Bernays-Scores."""
+    scores = df["bernays_score"].astype(float)
     return {
         "mean":   round(scores.mean(), 3),
         "median": round(scores.median(), 3),
@@ -60,12 +60,12 @@ def sentiment_distribution(df: pd.DataFrame) -> pd.Series:
 
 
 def author_bias(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
-    """Durchschnittlicher Bias-Score pro Autor (mind. 2 Artikel)."""
+    """Durchschnittlicher Bernays-Score pro Autor (mind. 2 Artikel)."""
     if "author" not in df.columns:
         return pd.DataFrame()
     filtered = df[df["author"].notna() & (df["author"] != "")]
     grouped = (
-        filtered.groupby("author")["bias_score"]
+        filtered.groupby("author")["bernays_score"]
         .agg(["mean", "count"])
         .rename(columns={"mean": "bias_avg", "count": "artikel"})
     )
@@ -94,7 +94,7 @@ def print_report(n: int = 5) -> None:
         bar = "█" * count
         print(f"  {technique:<30} {count:>3}x  {bar}")
 
-    print(f"\n⚖️  Bias-Score-Verteilung:")
+    print(f"\n⚖️  Bernays-Score-Verteilung:")
     for label, value in bias_distribution(df).items():
         print(f"  {label:<22} {value}")
 
@@ -108,7 +108,7 @@ def print_report(n: int = 5) -> None:
 
     author_df = author_bias(df, n)
     if not author_df.empty:
-        print(f"\n✍️  Autoren-Bias (mind. 2 Artikel, sortiert):")
+        print(f"\n✍️  Autoren-Bernays (mind. 2 Artikel, sortiert):")
         for author, row in author_df.iterrows():
             bar_val = int(abs(row["bias_avg"]) * 10)
             direction = "←" if row["bias_avg"] < 0 else "→"

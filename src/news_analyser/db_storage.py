@@ -50,7 +50,7 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "author":             analysis.get("author", ""),
         "published_at":       analysis.get("published_at", ""),
         "word_count":         int(analysis.get("word_count", 0)),
-        "bias_score":         float(ft.get("bias_score", 0.0)),
+        "bernays_score":         float(ft.get("bernays_score", 0.0)),
         "main_narrative":     ft.get("main_narrative", ""),
         "target_direction":   ft.get("target_direction", ""),
         "intended_sentiment": ft.get("intended_sentiment", ""),

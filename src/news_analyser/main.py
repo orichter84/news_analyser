@@ -32,7 +32,7 @@ def run(url: str) -> None:
         return
 
     store_result(article.text, result)
-    print(f"[+] Stored. Bias score: {result['framing_target']['bias_score']:.2f}")
+    print(f"[+] Stored. Bernays score: {result['framing_target']['bernays_score']:.2f}")
     print(f"    Techniques: {[t['technique'] for t in result['detected_techniques']]}")
 
 
