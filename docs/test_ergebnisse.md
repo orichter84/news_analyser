@@ -55,9 +55,42 @@ Der Agent bewertet den Text ganzheitlich anhand der erkannten Techniken, der Spr
 
 | Referenz | Score | Bedeutung |
 |---|---|---|
-| NS Berufsbeamtengesetz 1933 | `+1.00` | Theoretisches Maximum — staatliche Staatspropaganda |
-| DDR Aufbaugesetz 1950 | `−0.92` | Theoretisches Minimum — staatliche Staatspropaganda |
-| Wikipedia (Lina E.) | `+0.15` | Praktische Neutralität bei redaktionell geprüftem Inhalt |
+| NS Berufsbeamtengesetz 1933 | `+0.97` | Theoretisches Maximum — staatliche Staatspropaganda |
+| DDR Aufbaugesetz 1950 | `−0.95` | Theoretisches Minimum — staatliche Staatspropaganda |
+| Wikipedia (Lina E.) | `+0.20` | Praktische Neutralität bei redaktionell geprüftem Inhalt |
+
+---
+
+## Der Dunning-Kruger-Index — Erklärung des Index
+
+Der Dunning-Kruger-Index ist eine vom LLM-Agenten vergebene Gleitkommazahl zwischen **0.0** und **1.0**. Er misst die **epistemische Überzeugheit** eines Textes — wie sicher Behauptungen aufgestellt werden, relativ zur evidenziellen Basis.
+
+### Skala
+
+| Bereich | Bedeutung |
+|---|---|
+| `0.0 bis 0.3` | Epistemisch bescheiden — Aussagen qualifiziert, Quellen belegt, Unsicherheit anerkannt |
+| `0.3 bis 0.6` | Moderat überzeugt — gemischte Hedges und Gewissheitsaussagen |
+| `0.6 bis 1.0` | Epistemisch überzeugt — definitive Behauptungen ohne Absicherung |
+
+### Was der Index misst
+
+Der Index bewertet das Verhältnis zwischen der **Sicherheit** mit der Aussagen getroffen werden und ihrer **evidenziellen Grundlage**. Hohe Werte entstehen durch: definitive Formulierungen ohne Quellenangaben, fehlende Hedges ("könnte", "laut", "möglicherweise"), Ignorieren von Gegenargumenten und Komplexitätsleugnung.
+
+### Was der Index nicht misst
+
+- **Faktentreue**: Ein faktisch korrekter Text kann hoch scoring, ein falscher niedrig.
+- **Ideologische Richtung**: Der Index ist orthogonal zum Orwell-Index — jede politische Richtung kann bescheiden oder überheblich argumentieren.
+- **Journalistische Qualität**: Sachberichte können niedrig scoring ohne besonders guten Journalismus zu sein.
+
+### Kalibrierungspunkte aus diesem Test
+
+| Referenz | DK-Index | Bedeutung |
+|---|---|---|
+| NS Berufsbeamtengesetz 1933 | `0.92` | Staatspropaganda mit absolutem Gewissheitsanspruch |
+| danisch.de | `0.92` | Meinungsblog — Thesen ohne systematische Belege |
+| Wikipedia (Lina E.) | `0.12` | Redaktionell geprüft, stark qualifiziert |
+| MDR (Höcke/Wahl) | `0.12` | Reine Faktenberichterstattung (Wahlergebnisse) |
 
 ---
 
@@ -158,23 +191,23 @@ Zwei historische Propagandatexte mit bekannter ideologischer Zuordnung als Anker
 
 ## Gesamtübersicht
 
-| Quelle | Orwell-Index |
-|---|---|
-| NS Berufsbeamtengesetz 1933 | `+1.00` |
-| Junge Freiheit | `+0.85` |
-| danisch.de | `+0.93` |
-| MDR (Lina E. Entlassung) | `+0.30` |
-| Tagesschau (Lina E. investigativ) | `+0.25` |
-| Wikipedia | `+0.15` |
-| MDR (Höcke/Wahl) | `−0.20` |
-| MDR (Ukraine/NATO) | `−0.25` |
-| MDR (Voigt/Plagiat) | `−0.30` |
-| MDR (Lina E. Podcast) | `−0.35` |
-| MDR (Kulturförderung) | `−0.45` |
-| t-online.de | `−0.55` |
-| Tagesschau (USA Wahlrecht) | `−0.75` |
-| nd-aktuell | `−0.82` |
-| DDR Aufbaugesetz 1950 | `−0.92` |
+| Quelle | Orwell-Index | Bernays Score | DK-Index |
+|---|---|---|---|
+| NS Berufsbeamtengesetz 1933 | `+0.97` | 4.49 | **0.92** |
+| danisch.de | `+0.88` | 8.93 | **0.92** |
+| DDR Aufbaugesetz 1950 | `−0.95` | 6.22 | **0.88** |
+| Junge Freiheit | `+0.75` | 15.54 | 0.72 |
+| nd-aktuell | `−0.85` | 10.57 | 0.72 |
+| Tagesschau (USA Wahlrecht) | `−0.65` | 6.00 | 0.62 |
+| t-online.de | `−0.55` | 15.43 | 0.62 |
+| MDR (Voigt/Plagiat) | `−0.30` | 5.01 | 0.55 |
+| MDR (Kulturförderung) | `−0.45` | 6.08 | 0.30 |
+| MDR (Lina E. Podcast) | `−0.45` | 8.47 | 0.25 |
+| MDR (Lina E. Entlassung) | `+0.30` | 6.06 | 0.25 |
+| MDR (Ukraine/NATO) | `−0.30` | 2.39 | 0.20 |
+| Tagesschau (Lina E. investigativ) | `+0.28` | 5.51 | 0.22 |
+| **Wikipedia** | **`+0.20`** | **0.40** | **0.12** |
+| MDR (Höcke/Wahl) | `−0.25` | 3.29 | **0.12** |
 
 ---
 

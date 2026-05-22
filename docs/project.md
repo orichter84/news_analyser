@@ -172,13 +172,15 @@ LLM_PROVIDER=lm_studio
     "main_narrative": "Zentrale Geschichte die der Artikel pusht",
     "target_direction": "Wer/was wird auf- oder abgewertet",
     "intended_sentiment": "Angst | Empörung | Zustimmung | Misstrauen | …",
-    "orwell_index": -0.55
+    "orwell_index": -0.55,
+    "dunning_kruger_index": 0.62
   }
 }
 ```
 
 `orwell_index`: −1.0 = stark linksliberal, 0.0 = neutral, +1.0 = stark rechtskonservativ.  
-`bernays_score`: Manipulationsintensität = Anzahl Techniken / 1000 Wörter (normalisiert).
+`bernays_score`: Manipulationsintensität = Anzahl Techniken / 1000 Wörter (normalisiert).  
+`dunning_kruger_index`: Epistemische Überzeugheit = 0.0 (bescheiden, gut belegt) bis 1.0 (überzeugt ohne Grundlage).
 
 ---
 
@@ -193,6 +195,8 @@ Der Analyse-Prompt liegt als Markdown-Datei unter `src/news_analyser/prompts/sys
 Der Report aggregiert alle gespeicherten Analysen und zeigt:
 
 - **Top N Manipulationstechniken** nach Häufigkeit
-- **Bias-Score-Verteilung** (Mittelwert, Median, Streuung, Zählung links/neutral/rechts)
+- **Orwell-Index-Verteilung** (Mittelwert, Median, Streuung, Zählung links/neutral/rechts)
+- **Bernays-Score-Verteilung** (Mittelwert, Median, Min, Max)
+- **Dunning-Kruger-Index-Verteilung** (Mittelwert, Median, Zählung bescheiden/moderat/überzeugt)
 - **Top N Domains** nach Artikel-Anzahl
 - **Intendierte Emotionen** nach Häufigkeit
