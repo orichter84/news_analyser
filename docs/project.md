@@ -172,12 +172,13 @@ LLM_PROVIDER=lm_studio
     "main_narrative": "Zentrale Geschichte die der Artikel pusht",
     "target_direction": "Wer/was wird auf- oder abgewertet",
     "intended_sentiment": "Angst | Empörung | Zustimmung | Misstrauen | …",
-    "bernays_score": -0.55
+    "orwell_index": -0.55
   }
 }
 ```
 
-`bernays_score`: −1.0 = stark linksliberal, 0.0 = neutral, +1.0 = stark rechtskonservativ.
+`orwell_index`: −1.0 = stark linksliberal, 0.0 = neutral, +1.0 = stark rechtskonservativ.  
+`bernays_score`: Manipulationsintensität = Anzahl Techniken / 1000 Wörter (normalisiert).
 
 ---
 

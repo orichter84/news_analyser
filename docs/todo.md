@@ -34,7 +34,7 @@ Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Appli
 
 #### Frontend
 - [ ] **Dashboard** — Übersichtsseite mit aktuellen Analysen und Kennzahlen
-- [ ] **Quellenvergleich** — Bernays-Score-Vergleich zwischen Domains (Balkendiagramm)
+- [ ] **Quellenvergleich** — Orwell-Index-Vergleich zwischen Domains (Balkendiagramm)
 - [ ] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
 - [ ] **Technik-Heatmap** — Domain × Technik als Matrix
 - [ ] **Artikel-Detailansicht** — Vollständige Analyse mit hervorgehobenen Textzitaten
@@ -46,7 +46,7 @@ Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Appli
 
 #### Knowledge Base
 - [ ] **Technik-Glossar** — Erklärung jeder Manipulationstechnik mit Beispielen (FUD, Framing, Loaded Language, etc.)
-- [ ] **Methodik-Seite** — Wie funktioniert das System, was misst der Bernays Score, welche Limitierungen gibt es
+- [ ] **Methodik-Seite** — Wie funktioniert das System, was misst der Orwell-Index, welche Limitierungen gibt es
 - [ ] **Historischer Kontext** — Bernays, Goebbels, Propaganda-Geschichte als Hintergrundartikel
 - [ ] **Quellen-Steckbriefe** — Pro analysierter Domain eine Zusammenfassung mit Durchschnittswerten
 
@@ -54,7 +54,7 @@ Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Appli
 
 ### Auswertung & Analyse
 
-- [ ] **Quellen-Vergleich** — Bernays-Score-Vergleich zwischen Domains als tabellarische Übersicht (`--stats --compare`)
+- [ ] **Quellen-Vergleich** — Orwell-Index-Vergleich zwischen Domains als tabellarische Übersicht (`--stats --compare`)
 - [ ] **Zeitlicher Verlauf** — Wie verändert sich das Framing eines Themas über Wochen? Plot oder Tabelle pro Domain/Keyword
 - [ ] **Technik-Fingerprinting** — Welche Manipulationstechnik nutzt welche Quelle systematisch? Heatmap Domain × Technik
 - [ ] **Semantische Suche** — `--search "Suchbegriff"` findet thematisch ähnliche gespeicherte Artikel via ChromaDB `query_similar()`

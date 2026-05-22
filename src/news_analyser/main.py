@@ -32,8 +32,12 @@ def run(url: str) -> None:
         return
 
     store_result(article.text, result)
-    print(f"[+] Stored. Bernays score: {result['framing_target']['bernays_score']:.2f}")
-    print(f"    Techniques: {[t['technique'] for t in result['detected_techniques']]}")
+    ft = result["framing_target"]
+    techniques = result["detected_techniques"]
+    word_count = result.get("word_count", 0)
+    bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
+    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:+.2f}  |  Bernays Score: {bernays:.2f}/1000w")
+    print(f"    Techniken: {[t['technique'] for t in techniques]}")
 
 
 def main() -> None:

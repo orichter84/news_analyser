@@ -116,7 +116,7 @@ GET  /api/search?q=NATO+Trump&limit=10
 ## Seiten (HTMX)
 
 ### Dashboard `/`
-- Kennzahlen: Gesamt-Artikel, analysierte Domains, Durchschnitt Bernays Score
+- Kennzahlen: Gesamt-Artikel, analysierte Domains, Durchschnitt Orwell-Index
 - Letzte Analysen (Tabelle, sortierbar)
 - Bernays-Score-Verteilung (Histogramm, Chart.js)
 - Top-5-Techniken (Balkendiagramm)
@@ -128,7 +128,7 @@ GET  /api/search?q=NATO+Trump&limit=10
 ### Artikel-Detail `/article/{id}`
 - Vollständiger Analyse-Output
 - Textzitate hervorgehoben mit Technik-Label
-- Bernays Score visuell auf der Skala (−1 bis +1)
+- Orwell-Index visuell auf der Skala (−1 bis +1)
 
 ### URL-Einreichung `/submit`
 - Formular: URL eingeben → Analyse starten → Ergebnis anzeigen

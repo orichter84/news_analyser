@@ -2,7 +2,7 @@
 
 **Datum:** 22. Mai 2026  
 **System:** news_analyser v0.1 — CLIConnector (claude-sonnet-4-6)  
-**Metrik:** Bernays Score (−1.0 bis +1.0)
+**Metrik:** Orwell-Index (−1.0 bis +1.0)
 
 ---
 
@@ -23,9 +23,9 @@ Folgende Verzerrungen sind in der Auswahl bewusst enthalten:
 
 ---
 
-## Der Bernays Score — Erklärung des Index
+## Der Orwell-Index — Erklärung des Index
 
-Der Bernays Score ist eine vom LLM-Agenten vergebene Gleitkommazahl zwischen **−1.0** und **+1.0**. Er misst die **ideologische Ausrichtung** eines Textes, nicht seine journalistische Qualität.
+Der Orwell-Index ist eine vom LLM-Agenten vergebene Gleitkommazahl zwischen **−1.0** und **+1.0**. Er misst die **ideologische Ausrichtung** eines Textes, nicht seine journalistische Qualität.
 
 ### Skala
 
@@ -66,7 +66,7 @@ Der Agent bewertet den Text ganzheitlich anhand der erkannten Techniken, der Spr
 ### Testdesign
 Erster Funktionstest mit thematisch verwandten Artikeln über NATO und internationale Politik.
 
-| Quelle | Artikel | Bernays Score | Techniken (Anzahl) |
+| Quelle | Artikel | Orwell-Index | Techniken (Anzahl) |
 |---|---|---|---|
 | t-online.de | NATO-Außenminister tagen in Schweden | `−0.55` | 6 |
 | danisch.de | Mafia-Krise Angstpublica | `+0.93` | 9 |
@@ -83,7 +83,7 @@ Erster Funktionstest mit thematisch verwandten Artikeln über NATO und internati
 ### Testdesign
 Vergleich von zentralen (Tagesschau/ARD) und regionalen (MDR) öffentlich-rechtlichen Medien, zunächst mit Außenpolitik-Themen.
 
-| Quelle | Artikel | Bernays Score | Techniken |
+| Quelle | Artikel | Orwell-Index | Techniken |
 |---|---|---|---|
 | Tagesschau (ARD) | USA Wahlrecht & Bürgerrechte | `−0.75` | 9 |
 | MDR | Ukraine/NATO/Trump | `−0.25` | 5 |
@@ -99,7 +99,7 @@ Vergleich von zentralen (Tagesschau/ARD) und regionalen (MDR) öffentlich-rechtl
 ### Testdesign
 Vier MDR-Artikel zu politisch unterschiedlich aufgeladenen Themen, um zu prüfen ob der Score themenabhängig schwankt oder redaktionskulturell stabil ist.
 
-| MDR-Artikel | Thema | Bernays Score | Techniken |
+| MDR-Artikel | Thema | Orwell-Index | Techniken |
 |---|---|---|---|
 | Ukraine/NATO | Außenpolitik (neutral) | `−0.25` | 5 |
 | Mario Voigt/Plagiat | CDU-Politiker | `−0.30` | 6 |
@@ -119,7 +119,7 @@ Vier MDR-Artikel zu politisch unterschiedlich aufgeladenen Themen, um zu prüfen
 ### Testdesign
 Das politisch maximal aufgeladene Thema "Lina E." wurde quer durch alle Quellentypen analysiert — von linksradikal bis rechtskonservativ — um die vollständige ideologische Achse abzubilden. Ergänzt durch Wikipedia als Neutralitäts-Kontrollgruppe.
 
-| Quelle | Lager | Bernays Score | Techniken |
+| Quelle | Lager | Orwell-Index | Techniken |
 |---|---|---|---|
 | nd-aktuell | Linksradikal | `−0.82` | 8 |
 | Tagesschau | ÖR / linksliberal | `+0.25`* | 5 |
@@ -134,7 +134,7 @@ Das politisch maximal aufgeladene Thema "Lina E." wurde quer durch alle Quellent
 - **Fast perfekte Symmetrie**: nd-aktuell bei −0.82, Junge Freiheit bei +0.85 — beide Extreme liefern ähnliche Technikdichten (7–8).
 - **Wikipedia besteht den Neutralitätstest**: +0.15 bei 3 Techniken aus 69.000 Zeichen Text ist das stärkste Signal für Systemvalidität in diesem Test.
 - **Tagesschau-Anomalie**: Der investigative Lina-E.-Artikel (+0.25) weicht deutlich vom Tagesschau-Außenpolitikartikel (−0.75) ab — ein Hinweis darauf dass Format und Autorenschaft innerhalb einer Redaktion stärker variieren als zwischen Redaktionen.
-- **Kernbefund**: Alle Quellen nutzen denselben rhetorischen Werkzeugkasten. Der Bernays Score misst die Richtung, nicht die Existenz von Framing.
+- **Kernbefund**: Alle Quellen nutzen denselben rhetorischen Werkzeugkasten. Der Orwell-Index misst die Richtung, nicht die Existenz von Framing.
 
 ---
 
@@ -143,7 +143,7 @@ Das politisch maximal aufgeladene Thema "Lina E." wurde quer durch alle Quellent
 ### Testdesign
 Zwei historische Propagandatexte mit bekannter ideologischer Zuordnung als Anker für die Extrempunkte der Skala.
 
-| Quelle | Epoche | Lager | Bernays Score | Techniken |
+| Quelle | Epoche | Lager | Orwell-Index | Techniken |
 |---|---|---|---|---|
 | Gesetz zur Wiederherstellung des Berufsbeamtentums | NS 1933 | Rechtsextrem | `+1.00` | 7 |
 | Aufbaugesetz DDR (Präambel) | SED 1950 | Linksextrem | `−0.92` | 7 |
@@ -158,7 +158,7 @@ Zwei historische Propagandatexte mit bekannter ideologischer Zuordnung als Anker
 
 ## Gesamtübersicht
 
-| Quelle | Bernays Score |
+| Quelle | Orwell-Index |
 |---|---|
 | NS Berufsbeamtengesetz 1933 | `+1.00` |
 | Junge Freiheit | `+0.85` |
@@ -186,7 +186,7 @@ Zwei historische Propagandatexte mit bekannter ideologischer Zuordnung als Anker
 Wikipedia als bekannte Neutralitäts-Kontrollgruppe landet nahe der Null, historische Staatspropaganda an den Extremen. Das gibt dem Prompt-Design und dem Modell Glaubwürdigkeit.
 
 **2. Framing ist universell — Richtung ist variabel.**  
-Alle getesteten Quellen, von nd-aktuell bis Junge Freiheit, nutzen denselben rhetorischen Werkzeugkasten (Loaded Language, Framing, Emotional Manipulation). Der Bernays Score misst nicht *ob* Framing stattfindet, sondern *wohin* es zeigt. Neutrale Berichterstattung ist die Ausnahme, nicht die Regel.
+Alle getesteten Quellen, von nd-aktuell bis Junge Freiheit, nutzen denselben rhetorischen Werkzeugkasten (Loaded Language, Framing, Emotional Manipulation). Der Orwell-Index misst nicht *ob* Framing stattfindet, sondern *wohin* es zeigt. Neutrale Berichterstattung ist die Ausnahme, nicht die Regel.
 
 **3. Öffentlich-Rechtliche sind nicht neutral, aber moderater.**  
 MDR und Tagesschau landen konsistent im negativen (linksliberalen) Bereich, aber deutlich entfernt von den ideologischen Extremen. Ihre Finanzierung durch Pflichtgebühren und ihr Neutralitätsanspruch spiegeln sich in moderateren Scores wider — aber nicht in Abwesenheit von Framing.

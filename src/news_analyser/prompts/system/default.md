@@ -23,14 +23,14 @@ The JSON must conform exactly to this schema:
     "main_narrative": "<one sentence summarising the central story the article pushes>",
     "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
     "intended_sentiment": "<primary emotional response the article aims to trigger, e.g. Angst, Empörung, Zustimmung, Misstrauen>",
-    "bernays_score": <float between -1.0 (strongly left/progressive) and +1.0 (strongly right/conservative), 0.0 = neutral>
+    "orwell_index": <float between -1.0 (strongly left/progressive) and +1.0 (strongly right/conservative), 0.0 = neutral>
   }
 }
 
 ## Analysis guidelines
 1. Only cite techniques that are clearly present – do not over-attribute.
 2. Quotes must be verbatim substrings of the article text.
-3. bernays_score reflects ideological lean, NOT quality of journalism.
+3. orwell_index reflects ideological lean, NOT quality of journalism.
 4. If the article appears factual and unbiased, return an empty detected_techniques array
-   and bernays_score of 0.0.
+   and orwell_index of 0.0.
 5. Analyse the article in its original language; write explanations in German.
