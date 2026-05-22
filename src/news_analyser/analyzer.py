@@ -15,9 +15,13 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
     cleaned = re.sub(r"\s*```$", "", cleaned)
     try:
         return json.loads(cleaned)
-    except json.JSONDecodeError as exc:
-        print(f"[analyzer] JSON parse error: {exc}")
-        return None
+    except json.JSONDecodeError:
+        try:
+            from json_repair import repair_json
+            return json.loads(repair_json(cleaned))
+        except Exception as exc:
+            print(f"[analyzer] JSON parse error (auch nach Reparatur): {exc}")
+            return None
 
 
 def analyze_article(article: Article) -> dict[str, Any] | None:
