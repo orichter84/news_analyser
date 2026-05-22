@@ -60,6 +60,22 @@ def bernays_distribution(df: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def dunning_kruger_distribution(df: pd.DataFrame) -> dict[str, Any]:
+    """Statistische Kennzahlen des Dunning-Kruger-Index (epistemische Überzeugheit, 0.0–1.0)."""
+    if "dunning_kruger_index" not in df.columns:
+        return {}
+    scores = df["dunning_kruger_index"].astype(float)
+    return {
+        "mean":              round(scores.mean(), 3),
+        "median":            round(scores.median(), 3),
+        "max":               round(scores.max(), 3),
+        "min":               round(scores.min(), 3),
+        "bescheiden (<0.3)": int((scores < 0.3).sum()),
+        "moderat (0.3–0.6)": int(((scores >= 0.3) & (scores <= 0.6)).sum()),
+        "überzeugt (>0.6)":  int((scores > 0.6).sum()),
+    }
+
+
 def top_domains(df: pd.DataFrame, n: int = 5) -> pd.Series:
     """Domains mit den meisten analysierten Artikeln."""
     return df["domain"].value_counts().head(n)
@@ -112,6 +128,12 @@ def print_report(n: int = 5) -> None:
     print(f"\n🔴 Bernays Score (Manipulationsintensität, Techniken/1000 Wörter):")
     for label, value in bernays_distribution(df).items():
         print(f"  {label:<22} {value}")
+
+    dk_dist = dunning_kruger_distribution(df)
+    if dk_dist:
+        print(f"\n🧠 Dunning-Kruger-Index (epistemische Überzeugheit, 0.0–1.0):")
+        for label, value in dk_dist.items():
+            print(f"  {label:<22} {value}")
 
     print(f"\n🌐 Top {n} Domains:")
     for domain, count in top_domains(df, n).items():

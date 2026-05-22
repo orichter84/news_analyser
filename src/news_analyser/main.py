@@ -36,7 +36,8 @@ def run(url: str) -> None:
     techniques = result["detected_techniques"]
     word_count = result.get("word_count", 0)
     bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
-    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:+.2f}  |  Bernays Score: {bernays:.2f}/1000w")
+    dk = ft.get("dunning_kruger_index", 0.0)
+    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:+.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
     print(f"    Techniken: {[t['technique'] for t in techniques]}")
 
 

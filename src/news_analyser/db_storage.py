@@ -50,15 +50,16 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "author":             analysis.get("author", ""),
         "published_at":       analysis.get("published_at", ""),
         "word_count":         int(analysis.get("word_count", 0)),
-        "orwell_index":       float(ft.get("orwell_index", 0.0)),
-        "main_narrative":     ft.get("main_narrative", ""),
-        "target_direction":   ft.get("target_direction", ""),
-        "intended_sentiment": ft.get("intended_sentiment", ""),
-        "technique_names":    technique_names,
-        "bernays_score":      round(
+        "orwell_index":         float(ft.get("orwell_index", 0.0)),
+        "dunning_kruger_index": float(ft.get("dunning_kruger_index", 0.0)),
+        "main_narrative":       ft.get("main_narrative", ""),
+        "target_direction":     ft.get("target_direction", ""),
+        "intended_sentiment":   ft.get("intended_sentiment", ""),
+        "technique_names":      technique_names,
+        "bernays_score":        round(
             len(techniques) / analysis.get("word_count", 1) * 1000, 2
         ) if analysis.get("word_count", 0) > 0 else 0.0,
-        "analysis_json":      json.dumps(analysis, ensure_ascii=False),
+        "analysis_json":        json.dumps(analysis, ensure_ascii=False),
     }
 
 

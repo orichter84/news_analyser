@@ -23,7 +23,8 @@ The JSON must conform exactly to this schema:
     "main_narrative": "<one sentence summarising the central story the article pushes>",
     "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
     "intended_sentiment": "<primary emotional response the article aims to trigger, e.g. Angst, Empörung, Zustimmung, Misstrauen>",
-    "orwell_index": <float between -1.0 (strongly left/progressive) and +1.0 (strongly right/conservative), 0.0 = neutral>
+    "orwell_index": <float between -1.0 (strongly left/progressive) and +1.0 (strongly right/conservative), 0.0 = neutral>,
+    "dunning_kruger_index": <float between 0.0 (epistemically humble) and 1.0 (epistemically overconfident)>
   }
 }
 
@@ -34,3 +35,9 @@ The JSON must conform exactly to this schema:
 4. If the article appears factual and unbiased, return an empty detected_techniques array
    and orwell_index of 0.0.
 5. Analyse the article in its original language; write explanations in German.
+6. dunning_kruger_index measures epistemic overconfidence: the ratio of definitive claims
+   to their evidential backing. Score HIGH (→1.0) when the article makes bold, certain
+   assertions without sources, hedges, or acknowledgement of complexity. Score LOW (→0.0)
+   when claims are properly qualified ("laut Experten", "möglicherweise", "Studien zeigen"),
+   sources are cited, and uncertainty is acknowledged. This index is independent of
+   ideological direction — a neutral article can score high, a biased one can score low.
