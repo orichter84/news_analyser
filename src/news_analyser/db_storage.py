@@ -43,17 +43,20 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     )
 
     return {
-        "source_url":       analysis.get("source_url", ""),
-        "domain":           analysis.get("domain", ""),
-        "timestamp":        analysis.get("timestamp", ""),
-        "bias_score":       float(ft.get("bias_score", 0.0)),
-        "main_narrative":   ft.get("main_narrative", ""),
-        "target_direction": ft.get("target_direction", ""),
+        "source_url":         analysis.get("source_url", ""),
+        "domain":             analysis.get("domain", ""),
+        "timestamp":          analysis.get("timestamp", ""),
+        "title":              analysis.get("title", ""),
+        "author":             analysis.get("author", ""),
+        "published_at":       analysis.get("published_at", ""),
+        "word_count":         int(analysis.get("word_count", 0)),
+        "bias_score":         float(ft.get("bias_score", 0.0)),
+        "main_narrative":     ft.get("main_narrative", ""),
+        "target_direction":   ft.get("target_direction", ""),
         "intended_sentiment": ft.get("intended_sentiment", ""),
-        "technique_names":  technique_names,           # JSON-encoded list
-        "technique_count":  len(techniques),
-        # Full analysis JSON for later retrieval
-        "analysis_json":    json.dumps(analysis, ensure_ascii=False),
+        "technique_names":    technique_names,
+        "technique_count":    len(techniques),
+        "analysis_json":      json.dumps(analysis, ensure_ascii=False),
     }
 
 

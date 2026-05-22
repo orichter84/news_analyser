@@ -32,7 +32,10 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     input_data = {
         "url": article.url,
         "domain": article.domain,
-        "fetched_at": article.fetched_at,
+        "title": article.title or "",
+        "author": article.author or "",
+        "published_at": article.published_at or article.fetched_at,
+        "word_count": article.word_count,
         "text": article.text,
     }
 
@@ -48,4 +51,10 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         print(f"[analyzer] Connector error: {exc}")
         return None
 
-    return _extract_json(raw)
+    result = _extract_json(raw)
+    if result is not None:
+        result.setdefault("title", article.title or "")
+        result.setdefault("author", article.author or "")
+        result.setdefault("published_at", article.published_at or article.fetched_at)
+        result.setdefault("word_count", article.word_count)
+    return result

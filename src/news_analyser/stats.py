@@ -59,6 +59,24 @@ def sentiment_distribution(df: pd.DataFrame) -> pd.Series:
     return df["intended_sentiment"].value_counts()
 
 
+def author_bias(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
+    """Durchschnittlicher Bias-Score pro Autor (mind. 2 Artikel)."""
+    if "author" not in df.columns:
+        return pd.DataFrame()
+    filtered = df[df["author"].notna() & (df["author"] != "")]
+    grouped = (
+        filtered.groupby("author")["bias_score"]
+        .agg(["mean", "count"])
+        .rename(columns={"mean": "bias_avg", "count": "artikel"})
+    )
+    return (
+        grouped[grouped["artikel"] >= 2]
+        .sort_values("bias_avg")
+        .head(n)
+        .round(3)
+    )
+
+
 def print_report(n: int = 5) -> None:
     df = _load_dataframe()
 
@@ -87,5 +105,13 @@ def print_report(n: int = 5) -> None:
     print(f"\n😤 Intendierte Emotionen:")
     for sentiment, count in sentiment_distribution(df).items():
         print(f"  {sentiment:<25} {count:>3}x")
+
+    author_df = author_bias(df, n)
+    if not author_df.empty:
+        print(f"\n✍️  Autoren-Bias (mind. 2 Artikel, sortiert):")
+        for author, row in author_df.iterrows():
+            bar_val = int(abs(row["bias_avg"]) * 10)
+            direction = "←" if row["bias_avg"] < 0 else "→"
+            print(f"  {author:<35} {row['bias_avg']:+.3f} {direction}  ({int(row['artikel'])} Artikel)")
 
     print(f"\n{'='*50}\n")
