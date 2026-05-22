@@ -1,0 +1,10 @@
+trafilatura>=1.9
+beautifulsoup4>=4.12
+requests>=2.31
+openai>=1.30
+anthropic>=0.28
+PyYAML>=6.0
+chromadb>=0.5
+sentence-transformers>=3.0
+pandas>=2.2
+feedparser>=6.0

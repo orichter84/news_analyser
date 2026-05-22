@@ -1,0 +1,15 @@
+# RSS-Feeds für den News Analyser
+# Eine URL pro Zeile, Kommentare mit # beginnen
+
+# Deutschland
+https://www.spiegel.de/schlagzeilen/tops/index.rss
+https://www.focus.de/rss/
+https://rss.zeit.de/news/index
+https://www.welt.de/feeds/latest.rss
+https://www.faz.net/rss/aktuell/
+
+# Österreich
+https://www.derstandard.at/rss
+
+# Schweiz
+https://www.nzz.ch/recent.rss
