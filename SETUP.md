@@ -24,7 +24,22 @@ LLM_PROVIDER=cli
 OPENAI_MODEL=claude-sonnet-4-6
 ```
 
-Voraussetzung: Claude Code CLI muss installiert und eingeloggt sein (`claude --version`).
+Voraussetzung: Claude Code CLI muss installiert und eingeloggt sein.
+
+Installation (Node.js ≥18 erforderlich):
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Einmalig einloggen (öffnet Browser zur OAuth-Authentifizierung):
+```bash
+claude
+```
+
+Prüfen ob alles funktioniert:
+```bash
+claude --version
+```
 
 ### Option B: Anthropic API
 
