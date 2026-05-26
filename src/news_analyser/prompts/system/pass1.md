@@ -33,15 +33,45 @@ The orwell_index measures RHETORICAL EXTREMISM only — it is direction-neutral.
 A far-left and a far-right article with identical rhetorical intensity should
 receive the same score.
 
-Calibration anchors:
+### Kalibrierungsanker (Few-Shot-Beispiele)
 
-| Score | Bedeutung | Merkmale |
-|-------|-----------|----------|
-| 0.0   | Sachlich  | Quellenangaben, Konjunktiv, keine Feindbilder, ausgewogene Darstellung |
-| 0.3   | Leicht geladen | Einzelne wertende Begriffe, erkennbare Tendenz |
-| 0.6   | Deutlich extrem | Feindbilder, Schwarz-Weiß-Denken, emotionale Appelle |
-| 0.8   | Stark extrem | Apokalyptische Sprache, klare Gut/Böse-Aufteilung, Mobilisierungsrhetorik |
-| 1.0   | Maximum | Totalitärer Anspruch, existenzielle Bedrohungsnarrative, kein Raum für Differenzierung |
+Verwende diese Beispiele als Referenzpunkte. Die politische Richtung der Beispiele
+ist irrelevant — bewertet wird ausschließlich die rhetorische Intensität.
+
+**0.0 — Sachlich, ausgewogen:**
+> „Der Bundestag hat das Haushaltsgesetz mit 412 zu 208 Stimmen verabschiedet.
+> Die Opposition kritisierte einzelne Punkte. Laut Experten sind die Auswirkungen
+> noch nicht vollständig absehbar."
+
+Merkmale: Quellenangaben, Konjunktiv, keine Feindbilder, keine Mobilisierung.
+
+**0.3 — Leicht geladen:**
+> „Die Bundesregierung muss endlich handeln. Experten fordern mehr Investitionen,
+> doch die Politik zögert. Das könnte langfristig Folgen haben."
+
+Merkmale: Einzelne wertende Begriffe, erkennbare Tendenz, aber noch keine Feindbilder.
+
+**0.6 — Deutlich extrem:**
+> „Die Politik versagt auf ganzer Linie. Die Bürger werden im Stich gelassen,
+> während Lobbyisten die Entscheidungen diktieren. So kann es nicht weitergehen."
+
+Merkmale: Klares Feindbild, Schwarz-Weiß-Denken, emotionale Appelle, keine Differenzierung.
+
+**0.8 — Stark extrem:**
+> „Wir kämpfen. Alles steht auf dem Spiel. Parolen werden lauter, aus Worten wird
+> Gewalt, Grenzen verschieben sich. Es liegt an uns, den Unterschied zu machen.
+> Am 4. Juli blockieren wir zusammen."
+
+Merkmale: Apokalyptische Sprache, Mobilisierungsrhetorik, expliziter Handlungsaufruf,
+keine Grautöne.
+
+**1.0 — Maximum, totalitärer Anspruch:**
+> „Gruppe-A unterwandert systematisch unsere Institutionen und verdrängt die
+> einheimische Bevölkerung. Ihr wachsender Einfluss bedroht unsere Kultur.
+> Es wird Zeit, dass die Politik endlich handelt und unsere Werte schützt."
+
+Merkmale: Existenzielle Bedrohungsnarrative, kein Raum für Differenzierung,
+Scapegoating, totaler Anspruch.
 
 ## Analysis guidelines
 1. Only cite techniques that are clearly present – do not over-attribute.
