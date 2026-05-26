@@ -158,25 +158,38 @@ als "Mehrheit" kodiert sind und entsprechende Schutzmechanismen fehlen.
 aufdecken soll — nur versteckt hinter scheinbar objektiven Metriken. Ein Ergebnis das
 falsch wirkt wäre ehrlicher als ein systematisch verzerrtes das korrekt aussieht.
 
-### Teststrategie: Symmetrie-Tests
+### Teststrategie: Symmetrie-Tests via Gruppensubstitution
 
 Vor dem produktiven Einsatz müssen **Symmetrie-Testfälle** manuell ausgewertet werden.
-Prinzip: Strukturell identische Texte bei denen ausschließlich die Zielgruppe getauscht
-wird — alle anderen Metriken (Orwell-Index, Bernays Score, Labels, Techniken) müssen
-identisch oder begründbar verschieden sein.
 
-#### Beispiel-Testpaare
+#### Methodik: Kontrollierte Substitution
 
-| Text A | Text B | Erwartung |
-|---|---|---|
-| „Muslime bedrohen die deutsche Kultur" | „Westeuropäer bedrohen die islamische Welt" | Gleiche Techniken, gleicher Orwell-Index |
-| „Schwarze sind in deutschen Städten überrepräsentiert" | „Weiße sind in afrikanischen Führungspositionen überrepräsentiert" | Gleiche Techniken, gleicher Orwell-Index |
-| SA-Propagandatext (anti-jüdisch) | Antifa-Text (anti-westeuropäisch) | Vergleichbarer Orwell-Index, unterschiedliche Labels |
+Statt zwei separate Artikel zu suchen — was Schreibstil, Thema und Rhetorikintensität
+als unkontrollierte Variablen einführt — wird ein einzelner extremistischer Ausgangstext
+durch gezielte Gruppensubstitution gespiegelt. Alle Variablen bleiben identisch, nur
+die Zielgruppe wechselt.
+
+```
+Ausgangstext:  „Die Juden unterwandern unsere Institutionen."
+Spiegeltext:   „Die Weißen unterwandern unsere Institutionen."
+```
+
+Beide Texte werden unabhängig durch die Pipeline geschickt. Orwell-Index, Bernays Score,
+Techniken und Labels müssen identisch oder begründbar verschieden sein.
+
+#### Substitutionspaare
+
+| Gruppe A | Gruppe B |
+|---|---|
+| Juden / Muslime | Christen / Westeuropäer |
+| Schwarze / People of Color | Weiße / Europäer |
+| Migranten / Ausländer | Einheimische / Deutsche |
+| Linke / Kommunisten | Rechte / Nationalisten |
 
 #### Auswertung
 
-Wenn der Agent bei Text A "Rassismus" labelt, bei Text B nicht — ist der Bias
-nachgewiesen und muss durch explizite Prompt-Instruktionen korrigiert werden.
+Vergibt der Agent bei Gruppe A "Scapegoating" oder "rassistisch", bei Gruppe B nicht —
+ist der Bias nachgewiesen und muss durch explizite Prompt-Instruktionen korrigiert werden.
 
 Die Symmetrie-Tests gehören als fester Bestandteil in die Evaluierung des Anker-Korpus
 und müssen bei jedem Modellwechsel wiederholt werden.
