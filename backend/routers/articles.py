@@ -73,10 +73,17 @@ def get_article(article_id: str) -> dict:
     full = _parse_meta(full)
 
     # Felder aus den Metadaten auf die oberste Ebene heben (für das Frontend)
-    full.setdefault("orwell_index",        float(m.get("orwell_index", 0.0)))
-    full.setdefault("bernays_score",       float(m.get("bernays_score", 0.0)))
+    full.setdefault("orwell_index",         float(m.get("orwell_index", 0.0)))
+    full.setdefault("bernays_score",        float(m.get("bernays_score", 0.0)))
     full.setdefault("dunning_kruger_index", float(m.get("dunning_kruger_index", 0.0)) or None)
-    full.setdefault("technique_names",     m.get("technique_names", []))
-    full.setdefault("intended_sentiment",  m.get("intended_sentiment", ""))
+    full.setdefault("technique_names",      m.get("technique_names", []))
+    full.setdefault("intended_sentiment",   m.get("intended_sentiment", ""))
+    full.setdefault("themenbereich",        m.get("themenbereich", ""))
+    if "manipulation_targets" not in full:
+        raw = m.get("manipulation_targets", "[]")
+        try:
+            full["manipulation_targets"] = json.loads(raw) if isinstance(raw, str) else raw
+        except Exception:
+            full["manipulation_targets"] = []
 
     return full

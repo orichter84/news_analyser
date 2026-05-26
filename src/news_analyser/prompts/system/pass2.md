@@ -11,7 +11,14 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
   "politische_stroemung": ["<label1>", "<label2>"],
   "dunning_kruger_index": <float 0.0 to 1.0>,
   "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
-  "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>"
+  "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>",
+  "manipulation_targets": [
+    {
+      "entity": "<name of person, organisation or group>",
+      "direction": "<positiv | negativ | neutral>",
+      "rolle": "<one of: Sündenbock | Opfer | Held | Feind | Bedrohung | Autorität | Nutznießer | Sonstiges>"
+    }
+  ]
 }
 
 ## Politische Strömung
@@ -63,6 +70,26 @@ Classify the article into exactly one topic area:
 - **Kultur** — arts, media, entertainment
 - **Technologie** — tech, AI, digital policy
 - **Sonstiges** — anything that does not fit the above
+
+## Manipulation Targets
+
+List every person, organisation or group that is a **clear target** of the detected
+manipulation techniques — either as beneficiary or victim.
+
+- **entity**: Use the name as it appears in the article (real names, not placeholders)
+- **direction**: `positiv` = elevated/defended, `negativ` = denigrated/attacked, `neutral` = mentioned without clear framing
+- **rolle**: Choose the most fitting role:
+  - `Sündenbock` — blamed for problems without sufficient evidence
+  - `Opfer` — portrayed as victim deserving sympathy
+  - `Held` — portrayed as saviour or moral authority
+  - `Feind` — framed as active threat or adversary
+  - `Bedrohung` — framed as abstract danger (not necessarily intentional)
+  - `Autorität` — used to lend credibility (Appeal to Authority)
+  - `Nutznießer` — portrayed as benefiting from a situation
+  - `Sonstiges` — none of the above
+
+Only list entities where manipulation techniques are clearly directed at them.
+If no techniques are detected, return an empty array.
 
 ## Analysis guidelines
 1. Analyse the article in its original language.

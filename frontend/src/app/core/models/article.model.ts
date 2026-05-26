@@ -25,12 +25,20 @@ export interface ArticleListItem {
   intended_sentiment?: string;
 }
 
+export interface ManipulationTarget {
+  entity: string;
+  direction: 'positiv' | 'negativ' | 'neutral';
+  rolle: string;
+}
+
 export interface ArticleDetail extends ArticleListItem {
   author: string;
   word_count: number;
   timestamp: string;
   detected_techniques: DetectedTechnique[];
   framing_target: FramingTarget;
+  themenbereich?: string;
+  manipulation_targets?: ManipulationTarget[];
 }
 
 export interface ArticleFilter {

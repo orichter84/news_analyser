@@ -14,7 +14,28 @@ import requests
 from bs4 import BeautifulSoup
 
 
-PAYWALL_MIN_WORDS = 150  # Artikel mit weniger Wörtern gelten als Paywall-Teaser
+PAYWALL_MIN_WORDS = 150  # Fallback: Wortanzahl-Schwelle
+
+# HTML-Marker die auf eine Paywall hinweisen (CSS-Klassen, IDs, Script-Domains)
+_PAYWALL_CLASS_FRAGMENTS = [
+    "paywall", "piano", "paid-content", "premium-content",
+    "subscriber-only", "subscription-wall", "content-wall",
+    "tp-modal", "tp-container",        # Piano/TinyPass
+    "spplus", "sp-paywall",            # Spiegel+
+    "z-paywall", "zp-paywall",         # Zeit+
+    "faz-paywall", "faz-premium",      # FAZ+
+    "hb-paywall",                      # Handelsblatt
+    "c-paywall", "c-piano",            # Focus / Burda
+]
+
+# Script-URLs: wenn diese geladen werden, ist Piano aktiv
+_PAYWALL_SCRIPT_DOMAINS = [
+    "cdn.tinypass.com",
+    "experience.tinypass.com",
+    "sandbox.tinypass.com",
+    "a.piano.io",
+    "buy.piano.io",
+]
 
 @dataclass
 class Article:
@@ -27,6 +48,33 @@ class Article:
     published_at: str | None = None  # ISO-8601 Publikationsdatum laut Artikel
     word_count: int = 0
     is_paywall: bool = False
+
+
+def _detect_paywall_markers(html: str) -> bool:
+    """True wenn bekannte Paywall-Marker im HTML gefunden werden."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Klassen / IDs aller Elemente prüfen
+    for tag in soup.find_all(True):
+        for attr in ("class", "id"):
+            values = tag.get(attr, [])
+            if isinstance(values, str):
+                values = [values]
+            combined = " ".join(values).lower()
+            if any(marker in combined for marker in _PAYWALL_CLASS_FRAGMENTS):
+                return True
+
+    # Piano-Script-Tags prüfen
+    for script in soup.find_all("script", src=True):
+        src = script.get("src", "").lower()
+        if any(domain in src for domain in _PAYWALL_SCRIPT_DOMAINS):
+            return True
+
+    # <tp:contentwall> — Piano custom element
+    if soup.find("tp:contentwall"):
+        return True
+
+    return False
 
 
 def _bs4_fallback(html: str) -> str:
@@ -95,7 +143,7 @@ def fetch_article(url: str, timeout: int = 15) -> Article | None:
 
     text = text.strip()
     words = len(text.split())
-    is_paywall = words < PAYWALL_MIN_WORDS
+    is_paywall = _detect_paywall_markers(html) or words < PAYWALL_MIN_WORDS
 
     return Article(
         url=url,

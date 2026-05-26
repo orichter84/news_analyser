@@ -44,7 +44,39 @@
           <span class="tag">{{ s }}</span>
         }
       </p>
+      @if (a.themenbereich) {
+        <p><strong>Themenbereich:</strong> <span class="tag">{{ a.themenbereich }}</span></p>
+      }
     </section>
+
+    @if (a.manipulation_targets && a.manipulation_targets.length > 0) {
+      <section class="targets">
+        <h2>Manipulations-Targets</h2>
+        <table class="targets-table">
+          <thead>
+            <tr>
+              <th>Entität</th>
+              <th>Richtung</th>
+              <th>Rolle</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of a.manipulation_targets; track t.entity) {
+              <tr>
+                <td class="target-entity">{{ t.entity }}</td>
+                <td>
+                  <span class="target-direction" [class]="'dir-' + t.direction">
+                    {{ t.direction === 'positiv' ? '▲' : t.direction === 'negativ' ? '▼' : '●' }}
+                    {{ t.direction }}
+                  </span>
+                </td>
+                <td class="target-rolle">{{ t.rolle }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
 
     <section class="techniques">
       <h2>Erkannte Techniken ({{ a.detected_techniques.length }})</h2>

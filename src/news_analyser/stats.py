@@ -15,6 +15,17 @@ import pandas as pd
 from .db_storage import _get_collection
 
 
+def _parse_targets(raw: Any) -> list[dict]:
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        try:
+            return json.loads(raw)
+        except Exception:
+            return []
+    return []
+
+
 def _load_dataframe() -> pd.DataFrame:
     """Lädt alle gespeicherten Metadaten aus ChromaDB als DataFrame."""
     collection = _get_collection()
@@ -31,6 +42,10 @@ def _load_dataframe() -> pd.DataFrame:
         )
     if "themenbereich" not in df.columns:
         df["themenbereich"] = "Sonstiges"
+    if "manipulation_targets" in df.columns:
+        df["manipulation_targets"] = df["manipulation_targets"].apply(_parse_targets)
+    else:
+        df["manipulation_targets"] = [[] for _ in range(len(df))]
     return df
 
 
@@ -130,6 +145,43 @@ def domain_averages(df: pd.DataFrame) -> pd.DataFrame:
     })
 
     return agg.sort_values("bernays_avg", ascending=False).round(3)
+
+
+def entity_targeting(df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
+    """Aggregiert Manipulations-Targets: welche Entität wird wie oft positiv/negativ dargestellt."""
+    rows = []
+    for _, article_row in df.iterrows():
+        domain = article_row.get("domain", "")
+        bernays = float(article_row.get("bernays_score", 0.0))
+        for t in article_row["manipulation_targets"]:
+            entity = t.get("entity", "").strip()
+            direction = t.get("direction", "neutral")
+            rolle = t.get("rolle", "Sonstiges")
+            if entity:
+                rows.append({
+                    "entity":    entity,
+                    "direction": direction,
+                    "rolle":     rolle,
+                    "domain":    domain,
+                    "bernays":   bernays,
+                })
+    if not rows:
+        return pd.DataFrame()
+
+    tdf = pd.DataFrame(rows)
+    agg = (
+        tdf.groupby(["entity", "direction"])
+        .agg(
+            anzahl=("entity", "count"),
+            bernays_avg=("bernays", "mean"),
+            domains=("domain", lambda x: ", ".join(sorted(set(x)))),
+        )
+        .reset_index()
+        .sort_values(["anzahl", "entity"], ascending=[False, True])
+        .head(n)
+        .round({"bernays_avg": 2})
+    )
+    return agg
 
 
 def thema_bernays(df: pd.DataFrame) -> pd.DataFrame:
@@ -235,6 +287,18 @@ def print_report(n: int = 5) -> None:
             if has_dk:
                 line += f"  {row['dk_avg']:>6.3f}"
             print(line)
+
+    entity_df = entity_targeting(df)
+    if not entity_df.empty:
+        print(f"\n[E] Manipulations-Targets (Entitaet x Richtung):")
+        print(f"  {'Entitaet':<28} {'Richtung':<10} {'Anzahl':>6}  {'Bernays-Avg':>11}  Portale")
+        print("  " + "-" * 80)
+        for _, row in entity_df.iterrows():
+            print(
+                f"  {str(row['entity']):<28} {str(row['direction']):<10}"
+                f" {int(row['anzahl']):>6}  {float(row['bernays_avg']):>11.2f}"
+                f"  {row['domains']}"
+            )
 
     thema_df = thema_bernays(df)
     if not thema_df.empty:
