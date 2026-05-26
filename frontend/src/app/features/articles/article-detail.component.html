@@ -83,7 +83,10 @@
       @for (t of a.detected_techniques; track t.technique) {
         <div class="technique-card">
           <div class="technique-header">
-            <span class="technique-name">{{ t.technique }}</span>
+            <a class="technique-name technique-link"
+               [routerLink]="['/techniques', toTechniqueId(t.technique)]">
+              {{ t.technique }}
+            </a>
           </div>
           <blockquote class="quote">{{ t.quote }}</blockquote>
           <p class="explanation">{{ t.explanation }}</p>

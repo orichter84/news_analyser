@@ -1,0 +1,396 @@
+"""
+ChromaDB-backed store for manipulation technique definitions.
+
+Serves two purposes:
+  1. Semantic normalization -- LLM free-text output mapped to canonical names
+  2. Knowledge Base data source -- /api/techniques returns all entries
+"""
+
+from pathlib import Path
+from typing import Any
+
+import chromadb
+from chromadb.utils import embedding_functions
+
+_DB_PATH = Path(__file__).parent.parent.parent / "data" / "chroma_db"
+_COLLECTION = "techniques"
+_EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name="all-MiniLM-L6-v2"
+)
+# Cosine distance threshold: < 0.35 -> accept canonical mapping
+_MATCH_THRESHOLD = 0.35
+
+_TECHNIQUES: list[dict[str, Any]] = [
+    {
+        "id": "appeal-to-fear",
+        "name": "Appeal to Fear",
+        "name_de": "Angst-Appell",
+        "category": "Emotional",
+        "description": (
+            "Bedrohungsszenarien werden eingesetzt, um emotionale Abwehrreaktionen "
+            "zu erzeugen. Der Leser soll durch Angst statt durch rationale Argumente "
+            "zu einer Schlussfolgerung gefuehrt werden."
+        ),
+        "example": (
+            "Wenn wir jetzt nicht handeln, werden unsere Kinder "
+            "in einem Land ohne Zukunft aufwachsen."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Angstappell",
+        "doc": "Appeal to Fear Angst-Appell Bedrohungsappell FUD Fear Uncertainty Doubt Angstmache Panik Bedrohung",
+    },
+    {
+        "id": "whataboutism",
+        "name": "Whataboutism",
+        "name_de": "Whataboutismus",
+        "category": "Rhetorisch",
+        "description": (
+            "Ablenkung von einer Kritik durch den Verweis auf ein (angebliches) "
+            "Fehlverhalten der anderen Seite. Die eigentliche Frage wird nicht "
+            "beantwortet, sondern umgelenkt."
+        ),
+        "example": "Was ist mit den Verbrechen der USA? Warum reden wir nicht darueber?",
+        "reference_url": "https://de.wikipedia.org/wiki/Whataboutism",
+        "doc": "Whataboutism Whataboutismus Ablenkung Tu quoque Gegenfrage Seitenwechsel",
+    },
+    {
+        "id": "cherry-picking",
+        "name": "Cherry Picking",
+        "name_de": "Selektive Evidenz",
+        "category": "Logisch",
+        "description": (
+            "Nur Fakten und Studien, die die eigene Position stuetzen, werden "
+            "praesentiert. Widerlegende oder einschraenkende Belege werden "
+            "weggelassen oder ignoriert."
+        ),
+        "example": (
+            "Einen Temperaturrekord hervorheben, waehrend der langfristige "
+            "Trend verschwiegen wird."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Rosinenpicken_(Rhetorik)",
+        "doc": "Cherry Picking Rosinenpicken selektive Evidenz selektive Wahrnehmung Datenauswahl Omission Auslassung",
+    },
+    {
+        "id": "false-dichotomy",
+        "name": "False Dichotomy",
+        "name_de": "Falsche Dichotomie",
+        "category": "Logisch",
+        "description": (
+            "Komplexe Sachverhalte werden auf genau zwei Optionen reduziert, "
+            "obwohl weitere Alternativen existieren. Zwingt den Leser in eine "
+            "kuenstliche Entweder-oder-Entscheidung."
+        ),
+        "example": "Entweder bist du fuer uns oder gegen uns.",
+        "reference_url": "https://de.wikipedia.org/wiki/Falsche_Dichotomie",
+        "doc": "False Dichotomy falsche Dichotomie Entweder-oder Schwarz-Weiss-Denken False Binary false alternative",
+    },
+    {
+        "id": "loaded-language",
+        "name": "Loaded Language",
+        "name_de": "Wertbeladene Sprache",
+        "category": "Rhetorisch",
+        "description": (
+            "Emotional aufgeladene Begriffe werden bewusst statt neutraler "
+            "Beschreibungen eingesetzt, um beim Leser eine vorgewuenschte "
+            "emotionale Reaktion auszuloesen."
+        ),
+        "example": (
+            "Invasoren statt Migranten -- "
+            "Gesinnungsschnueffelei statt Datenschutzpruefung."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Emotiv",
+        "doc": "Loaded Language wertbeladene Sprache emotiv emotionale Sprache Stigmatisierung Weasel Words Konnotation",
+    },
+    {
+        "id": "bandwagon",
+        "name": "Bandwagon",
+        "name_de": "Mitlaeufereffekt",
+        "category": "Emotional",
+        "description": (
+            "Soziale Akzeptanz wird als Argument eingesetzt: Da es alle tun "
+            "oder denken, muss es richtig sein. Nutzt den menschlichen Wunsch, "
+            "zur Mehrheit zu gehoeren."
+        ),
+        "example": "Immer mehr Experten sind sich einig, dass ...",
+        "reference_url": "https://de.wikipedia.org/wiki/Bandwagon_effect",
+        "doc": "Bandwagon Mitlaeufereffekt Herdenmentalitaet Mehrheitsmeinung Konsens Appeal to Popularity",
+    },
+    {
+        "id": "ad-hominem",
+        "name": "Ad Hominem",
+        "name_de": "Angriff auf die Person",
+        "category": "Logisch",
+        "description": (
+            "Die Person, die ein Argument vorbringt, wird angegriffen statt "
+            "das Argument selbst zu widerlegen. Diskreditierung ersetzt "
+            "inhaltliche Auseinandersetzung."
+        ),
+        "example": (
+            "Was weiss ein Politiker, der nie gearbeitet hat, "
+            "schon von Wirtschaft?"
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_hominem",
+        "doc": "Ad Hominem Angriff Person Diskreditierung persoenlicher Angriff Diffamierung",
+    },
+    {
+        "id": "straw-man",
+        "name": "Straw Man",
+        "name_de": "Strohmann-Argument",
+        "category": "Logisch",
+        "description": (
+            "Die Position des Gegners wird verzerrt, vereinfacht oder "
+            "uebertrieben dargestellt -- in einer Form, die leichter angreifbar "
+            "ist als die tatsaechliche Position."
+        ),
+        "example": (
+            "Die Opposition will, dass wir alle Grenzen oeffnen und niemanden "
+            "mehr kontrollieren -- obwohl sie differenziertere Reformen fordert."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Strohmann-Argument",
+        "doc": "Straw Man Strohmann Verzerrung falsche Darstellung Karikatur Uebertreibung",
+    },
+    {
+        "id": "slippery-slope",
+        "name": "Slippery Slope",
+        "name_de": "Dammbruch-Argument",
+        "category": "Logisch",
+        "description": (
+            "Eine Handlung wird als zwangslaefige Ursache einer Kette von "
+            "immer extremeren Folgen dargestellt, ohne dass diese Kausalitaet "
+            "belegt wird."
+        ),
+        "example": (
+            "Wenn wir Tempolimit 130 einfuehren, werden wir bald "
+            "gar kein Auto mehr fahren duerfen."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Slippery_slope",
+        "doc": "Slippery Slope Dammbruch-Argument schiefe Ebene Kettenreaktion Domino-Effekt",
+    },
+    {
+        "id": "scapegoating",
+        "name": "Scapegoating",
+        "name_de": "Suendenbock",
+        "category": "Strukturell",
+        "description": (
+            "Eine Gruppe, Person oder Institution wird fuer komplexe Probleme "
+            "verantwortlich gemacht, die tatsaechlich viele Ursachen haben. "
+            "Vereinfacht und lenkt von systemischen Ursachen ab."
+        ),
+        "example": "Die Migranten sind schuld an der Wohnungsnot.",
+        "reference_url": "https://de.wikipedia.org/wiki/S%C3%BCndenbock",
+        "doc": "Scapegoating Suendenbock Schuldzuweisung Verantwortungszuweisung Suendenbock-Prinzip",
+    },
+    {
+        "id": "euphemism",
+        "name": "Euphemismus",
+        "name_de": "Beschoenigung",
+        "category": "Rhetorisch",
+        "description": (
+            "Negative Sachverhalte werden durch mildere, verharmlosende "
+            "Ausdruecke beschrieben, um die emotionale Wirkung abzuschwaechen "
+            "oder Kritik zu erschweren."
+        ),
+        "example": "Kollateralschaeden statt zivile Todesopfer.",
+        "reference_url": "https://de.wikipedia.org/wiki/Euphemismus",
+        "doc": "Euphemismus Beschoenigung Verharmlosung Abschwaeachung Sprachverhuelling",
+    },
+    {
+        "id": "dysphemism",
+        "name": "Dysphemismus",
+        "name_de": "Abwertende Sprache",
+        "category": "Rhetorisch",
+        "description": (
+            "Sachverhalte werden durch absichtlich negative, abwertende "
+            "Formulierungen beschrieben, um Ablehnung zu erzeugen -- "
+            "das Gegenteil des Euphemismus."
+        ),
+        "example": "Rentner-Rabatte statt Seniorenermaeßigungen.",
+        "reference_url": "https://de.wikipedia.org/wiki/Dysphemismus",
+        "doc": "Dysphemismus abwertende Sprache Abwertung negative Konnotation Diffamierung",
+    },
+    {
+        "id": "agenda-setting",
+        "name": "Agenda Setting",
+        "name_de": "Themensetzung",
+        "category": "Strukturell",
+        "description": (
+            "Durch die selektive Auswahl von Themen wird beeinflusst, welche "
+            "Fragen die Oeffentlichkeit fuer wichtig haelt. Was nicht berichtet "
+            "wird, existiert in der oeffentlichen Wahrnehmung kaum."
+        ),
+        "example": (
+            "Wochenlange Berichterstattung ueber Auslaenderkriminalitaet erhoet "
+            "die wahrgenommene Bedrohung unabhaengig von der Statistik."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Agenda-Setting",
+        "doc": "Agenda Setting Themensetzung Themenauswahl Framing Priming selektive Berichterstattung",
+    },
+    {
+        "id": "framing",
+        "name": "Framing",
+        "name_de": "Deutungsrahmen",
+        "category": "Strukturell",
+        "description": (
+            "Der interpretative Rahmen, in dem ein Thema praesentiert wird, "
+            "steuert, wie es verstanden und bewertet wird -- ohne dass die "
+            "Fakten selbst veraendert werden muessen."
+        ),
+        "example": (
+            "Denselben Steueranstieg als Belastung fuer Familien "
+            "oder als Investition in Bildung zu bezeichnen."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Framing_(Sozialwissenschaften)",
+        "doc": "Framing Deutungsrahmen Perspektive Praesentation Spin narrative Rahmen",
+    },
+    {
+        "id": "false-balance",
+        "name": "False Balance",
+        "name_de": "Falsche Ausgewogenheit",
+        "category": "Strukturell",
+        "description": (
+            "Zwei Positionen werden als gleichwertig dargestellt, obwohl sie "
+            "empirisch oder argumentativ stark unterschiedlich fundiert sind. "
+            "Erzeugt kuenstliche Kontroverse."
+        ),
+        "example": (
+            "Klimawandel-Skeptiker werden gleichwertig neben dem "
+            "wissenschaftlichen Konsens praesentiert."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/False_balance",
+        "doc": "False Balance falsche Ausgewogenheit Bothsidesism falsche Gleichwertigkeit kuenstliche Kontroverse",
+    },
+    {
+        "id": "appeal-to-authority",
+        "name": "Appeal to Authority",
+        "name_de": "Autoritaetsargument",
+        "category": "Rhetorisch",
+        "description": (
+            "Expertenmeinungen oder Autoritaetspersonen werden als Beweis "
+            "statt als Indiz eingesetzt -- besonders problematisch wenn die "
+            "Expertise nicht einschlaeig ist."
+        ),
+        "example": "Laut Experten ist diese Politik die einzig richtige.",
+        "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_verecundiam",
+        "doc": "Appeal to Authority Autoritaetsargument Expertenmeinung Autoritaetsbeweis Namesdropping",
+    },
+    {
+        "id": "repetition",
+        "name": "Repetition",
+        "name_de": "Illusorische Wahrheit",
+        "category": "Strukturell",
+        "description": (
+            "Durch wiederholte Aussagen -- auch unabhaengig von ihrem "
+            "Wahrheitsgehalt -- entsteht der Eindruck von Wahrheit. "
+            "Der Illusorische-Wahrheit-Effekt wirkt auch bei kritischem Publikum."
+        ),
+        "example": (
+            "Eine Schlagzeile, die taeglich variiert wiederholt wird, "
+            "bis sie als Fakt gilt."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Illusorische-Wahrheit-Effekt",
+        "doc": "Repetition Wiederholung illusorische Wahrheit Hammering message repetition",
+    },
+    {
+        "id": "presuppositional-framing",
+        "name": "Presuppositional Framing",
+        "name_de": "Praesuppositions-Framing",
+        "category": "Rhetorisch",
+        "description": (
+            "Behauptungen werden als selbstverstaendliche Praemisse in einen "
+            "Satz eingebettet statt offen ausgesprochen. Der Leser akzeptiert "
+            "die Praemisse unbewusst."
+        ),
+        "example": (
+            "Trotz Waffenruhe: Iran feuert auf US-Drohne -- "
+            "setzt voraus, dass Iran die Waffenruhe verletzt, ohne dies zu belegen."
+        ),
+        "reference_url": "https://de.wikipedia.org/wiki/Pr%C3%A4supposition",
+        "doc": "Presuppositional Framing Praesupposition implizite Annahme Trotz obwohl eingebettete Behauptung",
+    },
+    {
+        "id": "appeal-to-emotion",
+        "name": "Appeal to Emotion",
+        "name_de": "Emotionaler Appell",
+        "category": "Emotional",
+        "description": (
+            "Emotionen werden angesprochen um eine Schlussfolgerung zu stuetzen, "
+            "ohne rationale Argumente oder Belege zu liefern. Kann positiv "
+            "(Hoffnung, Stolz) oder negativ (Empoerung, Ekel) sein."
+        ),
+        "example": "Denk an die Kinder. Kannst du das wirklich verantworten?",
+        "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_passiones",
+        "doc": "Appeal to Emotion emotionaler Appell Gefuehlsappell Mitleid Empoerung Ekel Hoffnung Pathos",
+    },
+]
+
+
+def _get_collection() -> chromadb.Collection:
+    client = chromadb.PersistentClient(path=str(_DB_PATH))
+    return client.get_or_create_collection(
+        name=_COLLECTION,
+        embedding_function=_EMBED_FN,
+        metadata={"hnsw:space": "cosine"},
+    )
+
+
+def _ensure_seeded(col: chromadb.Collection) -> None:
+    if col.count() > 0:
+        return
+    col.upsert(
+        ids=[t["id"] for t in _TECHNIQUES],
+        documents=[t["doc"] for t in _TECHNIQUES],
+        metadatas=[
+            {
+                "id":            t["id"],
+                "name":          t["name"],
+                "name_de":       t["name_de"],
+                "category":      t["category"],
+                "description":   t["description"],
+                "example":       t["example"],
+                "reference_url": t["reference_url"],
+            }
+            for t in _TECHNIQUES
+        ],
+    )
+    print(f"[techniques] {len(_TECHNIQUES)} Techniken in DB gespeichert.")
+
+
+def normalize_technique(name: str) -> str:
+    """Sucht den semantisch naechsten kanonischen Techniken-Namen.
+    Gibt den Original-Namen zurueck wenn keine gute Uebereinstimmung gefunden wird."""
+    col = _get_collection()
+    _ensure_seeded(col)
+
+    results = col.query(
+        query_texts=[name],
+        n_results=1,
+        include=["metadatas", "distances"],
+    )
+    if not results["ids"] or not results["ids"][0]:
+        return name
+
+    distance = results["distances"][0][0]
+    if distance > _MATCH_THRESHOLD:
+        return name
+
+    return results["metadatas"][0][0]["name"]
+
+
+def get_all_techniques() -> list[dict[str, Any]]:
+    """Gibt alle dokumentierten Techniken zurueck (fuer die Knowledge Base API)."""
+    col = _get_collection()
+    _ensure_seeded(col)
+    result = col.get(include=["metadatas"])
+    return sorted(
+        [m for m in (result.get("metadatas") or []) if m],
+        key=lambda m: (m.get("category", ""), m.get("name", "")),
+    )
+
+
+def get_technique(technique_id: str) -> dict[str, Any] | None:
+    """Gibt eine einzelne Technik per ID zurueck."""
+    col = _get_collection()
+    _ensure_seeded(col)
+    result = col.get(ids=[technique_id], include=["metadatas"])
+    if not result["ids"]:
+        return None
+    return result["metadatas"][0]

@@ -436,3 +436,169 @@ td.date { white-space: nowrap; color: var(--muted); }
   height: fit-content;
   margin-top: 0.1rem;
 }
+
+// ── Technique Knowledge Base ────────────────────────────────────────────────
+.technique-category-heading {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.technique-kb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.technique-kb-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.technique-kb-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  strong { font-size: 0.95rem; color: var(--text); }
+}
+.technique-name-de {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.technique-kb-desc {
+  font-size: 0.83rem;
+  color: var(--text-dim, var(--muted));
+  margin: 0;
+  line-height: 1.5;
+}
+.technique-kb-example {
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-left: 3px solid var(--accent-hi);
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+  background: rgba(124,106,247,0.06);
+  border-radius: 0 4px 4px 0;
+}
+.technique-kb-link {
+  font-size: 0.78rem;
+  color: var(--accent-hi);
+  text-decoration: none;
+  margin-top: auto;
+  &:hover { text-decoration: underline; }
+}
+
+// Kategorie-Tags
+.cat-emotional   { background: rgba(224,122,82,0.15);  color: #e07a52; }
+.cat-logisch     { background: rgba(82,224,168,0.15);  color: #52e0a8; }
+.cat-rhetorisch  { background: rgba(124,106,247,0.15); color: var(--accent-hi); }
+.cat-strukturell { background: rgba(224,200,82,0.15);  color: #e0c852; }
+
+// ── Techniques standalone pages ──────────────────────────────────────────────
+.techniques-page, .technique-detail-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.tech-category { margin-bottom: 2rem; }
+.tech-category h2 { margin-bottom: 0.75rem; }
+
+.technique-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+a.technique-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s;
+  &:hover { border-color: var(--accent-hi); }
+}
+.technique-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  strong { font-size: 0.95rem; }
+}
+.technique-card-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.technique-card-more {
+  font-size: 0.78rem;
+  color: var(--accent-hi);
+  margin-top: auto;
+}
+
+// Detail page
+.technique-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+  h1 { margin: 0; }
+}
+.technique-detail-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.technique-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.technique-detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  h2 { font-size: 1rem; margin: 0 0 0.75rem; color: var(--muted); }
+  p { margin: 0; line-height: 1.6; }
+}
+.technique-detail-example {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  border-left: 3px solid var(--accent-hi);
+  font-style: italic;
+  color: var(--muted);
+  background: rgba(124,106,247,0.06);
+  border-radius: 0 4px 4px 0;
+}
+.source-card { display: flex; flex-direction: column; gap: 0.5rem; }
+.wiki-link {
+  color: var(--accent-hi);
+  text-decoration: none;
+  font-size: 0.9rem;
+  &:hover { text-decoration: underline; }
+}
+
+// Klickbare Technik-Namen im Artikel-Detail
+.technique-link {
+  color: var(--accent-hi);
+  text-decoration: none;
+  font-weight: 600;
+  &:hover { text-decoration: underline; }
+}

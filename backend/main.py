@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import articles, analyse, stats, search
+from routers import articles, analyse, stats, search, techniques
 
 app = FastAPI(
     title="News Analyser API",
@@ -21,6 +21,7 @@ app.include_router(articles.router)
 app.include_router(analyse.router)
 app.include_router(stats.router)
 app.include_router(search.router)
+app.include_router(techniques.router)
 
 
 @app.get("/health")

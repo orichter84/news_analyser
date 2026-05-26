@@ -15,6 +15,7 @@ from .connectors import load_connector
 from .keywords import compute_keyword_signal
 from .anonymizer import anonymize
 from .anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
+from .technique_store import normalize_technique
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -86,6 +87,11 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     result1 = _extract_json(raw1)
     if result1 is None:
         return None
+
+    # Techniken auf kanonische Namen normalisieren
+    for t in result1.get("detected_techniques", []):
+        if isinstance(t.get("technique"), str):
+            t["technique"] = normalize_technique(t["technique"])
 
     # ------------------------------------------------------------------
     # Pass 2 — Originaltext → Politische Strömung, DK-Index

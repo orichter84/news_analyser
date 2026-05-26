@@ -22,5 +22,9 @@ export const routes: Routes = [
     path: 'knowledge',
     loadChildren: () => import('./features/knowledge/knowledge.routes').then(m => m.KNOWLEDGE_ROUTES),
   },
+  {
+    path: 'techniques',
+    loadChildren: () => import('./features/techniques/techniques.routes').then(m => m.TECHNIQUES_ROUTES),
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];

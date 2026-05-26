@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { ArticleListItem, ArticleDetail, ArticleFilter } from '../models/article.model';
 import { StatsResponse } from '../models/stats.model';
 import { AnalyseRequest, AnalyseResponse, JobStatus } from '../models/analyse.model';
+import { Technique } from '../models/technique.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -39,5 +40,13 @@ export class ApiService {
   search(q: string, n = 5): Observable<(ArticleListItem & { similarity: number })[]> {
     const params = new HttpParams().set('q', q).set('n', n);
     return this.http.get<(ArticleListItem & { similarity: number })[]>(`${this.base}/search`, { params });
+  }
+
+  getTechniques(): Observable<Technique[]> {
+    return this.http.get<Technique[]>(`${this.base}/techniques`);
+  }
+
+  getTechnique(id: string): Observable<Technique> {
+    return this.http.get<Technique>(`${this.base}/techniques/${id}`);
   }
 }

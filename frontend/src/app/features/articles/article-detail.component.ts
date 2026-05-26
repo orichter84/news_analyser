@@ -18,6 +18,10 @@ export class ArticleDetailComponent implements OnInit {
   loading = signal(true);
   error = signal('');
 
+  toTechniqueId(name: string): string {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
   ngOnInit() {
     const decodedUrl = decodeURIComponent(this.url);
     this.api.getArticle(decodedUrl).subscribe({

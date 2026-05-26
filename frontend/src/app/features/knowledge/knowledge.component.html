@@ -10,7 +10,8 @@
     <a href="#pipeline">3. Die Pipeline</a>
     <a href="#indikatoren">4. Die Indikatoren</a>
     <a href="#limitierungen">5. Limitierungen</a>
-    <a href="#quellen">6. Quellen</a>
+    <a href="#techniken">6. Manipulationstechniken</a>
+    <a href="#quellen">7. Quellen</a>
   </nav>
 
   <!-- ───────────────────────────────── 1 ───────────────────────────────── -->
@@ -338,8 +339,45 @@
   </section>
 
   <!-- ───────────────────────────────── 6 ───────────────────────────────── -->
+  <section id="techniken" class="kb-section">
+    <h2>6. Manipulationstechniken</h2>
+    <p>
+      Das System erkennt die folgenden dokumentierten Techniken und normalisiert
+      Modell-Ausgaben semantisch auf diese kanonischen Namen.
+      Jede Technik ist einer von vier Kategorien zugeordnet:
+      <span class="tag cat-emotional">Emotional</span>
+      <span class="tag cat-logisch">Logisch</span>
+      <span class="tag cat-rhetorisch">Rhetorisch</span>
+      <span class="tag cat-strukturell">Strukturell</span>
+    </p>
+
+    @for (cat of categories(); track cat) {
+      <h3 class="technique-category-heading">
+        <span class="tag" [class]="'cat-' + cat.toLowerCase()">{{ cat }}</span>
+      </h3>
+      <div class="technique-kb-grid">
+        @for (t of techniquesByCategory(cat); track t.name) {
+          <div class="technique-kb-card">
+            <div class="technique-kb-header">
+              <strong>{{ t.name }}</strong>
+              <span class="technique-name-de">{{ t.name_de }}</span>
+            </div>
+            <p class="technique-kb-desc">{{ t.description }}</p>
+            @if (t.example) {
+              <blockquote class="technique-kb-example">{{ t.example }}</blockquote>
+            }
+            <a [href]="t.reference_url" target="_blank" rel="noopener" class="technique-kb-link">
+              Wikipedia &rarr;
+            </a>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- ───────────────────────────────── 7 ───────────────────────────────── -->
   <section id="quellen" class="kb-section">
-    <h2>6. Quellen & Inspiration</h2>
+    <h2>7. Quellen & Inspiration</h2>
 
     <div class="kb-source-grid">
       <div class="kb-source-card">
