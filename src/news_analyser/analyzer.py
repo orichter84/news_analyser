@@ -14,6 +14,7 @@ from .prompts import load_prompt
 from .connectors import load_connector
 from .keywords import compute_keyword_signal
 from .anonymizer import anonymize
+from .anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -34,8 +35,9 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     cfg = LLMConfig.from_env()
     connector = load_connector(cfg.provider)
 
-    kw = compute_keyword_signal(article.text)
-    anon = anonymize(article.text)
+    kw      = compute_keyword_signal(article.text)
+    anon    = anonymize(article.text)
+    anchors = get_similar_anchors(anon["text"])
 
     base_meta = {
         "url": article.url,
@@ -63,9 +65,15 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         "text": anon["text"],
     }
 
+    # Dynamische Anker in Prompt einbetten wenn vorhanden
+    pass1_prompt = load_prompt("system", "pass1")
+    anchor_section = format_anchors_for_prompt(anchors)
+    if anchor_section:
+        pass1_prompt = pass1_prompt + "\n\n" + anchor_section
+
     try:
         raw1 = connector.generate(
-            system_prompt=load_prompt("system", "pass1"),
+            system_prompt=pass1_prompt,
             input_data=pass1_input,
             model=cfg.model,
             temperature=cfg.temperature,
@@ -106,6 +114,9 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     # ------------------------------------------------------------------
     # Ergebnisse zusammenführen
     # ------------------------------------------------------------------
+    stroemung = result2.get("politische_stroemung", ["neutral"])
+    orwell    = result1.get("framing_target", {}).get("orwell_index", 0.0)
+
     result = {
         **base_meta,
         "source_url":          result1.get("source_url", article.url),
@@ -116,7 +127,16 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
             "dunning_kruger_index": result2.get("dunning_kruger_index", 0.0),
             "target_direction":     result2.get("target_direction", ""),
         },
-        "politische_stroemung": result2.get("politische_stroemung", ["neutral"]),
+        "politische_stroemung": stroemung,
     }
+
+    # Artikel als Anker für zukünftige Analysen speichern
+    add_anchor(
+        text=anon["text"],
+        orwell_index=orwell,
+        politische_stroemung=stroemung,
+        domain=article.domain,
+        source_url=article.url,
+    )
 
     return result

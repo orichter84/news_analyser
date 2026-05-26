@@ -33,7 +33,7 @@ Konzept: docs/orwell_index_konzept.md
 - [x] **Symmetrie-Tests** — Erste Testfälle dokumentiert: tests/symmetrie/ergebnisse.md
 - [ ] **Keyword-Listen** — Auf Extremismus-Symmetrie umstellen (beide Extreme statt links/rechts)
 - [ ] **Statistik & Ausgabe** — politische_stroemung in stats.py anzeigen
-- [ ] **RAG-Anker-Korpus** — Kuratierte ChromaDB-Collection `orwell_anchors` aufbauen
+- [x] **RAG-Anker-Korpus** — Lazy-Loading implementiert, anchor_store.py, aktiv ab 5 Ankern
 
 ---
 
