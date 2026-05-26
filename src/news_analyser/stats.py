@@ -86,6 +86,38 @@ def sentiment_distribution(df: pd.DataFrame) -> pd.Series:
     return df["intended_sentiment"].value_counts()
 
 
+def domain_averages(df: pd.DataFrame) -> pd.DataFrame:
+    """Durchschnittliche Kennwerte (Orwell, Bernays, DK) pro Nachrichtenportal."""
+    cols = ["orwell_index", "bernays_score"]
+    if "dunning_kruger_index" in df.columns:
+        cols.append("dunning_kruger_index")
+
+    for col in cols:
+        df[col] = df[col].astype(float)
+
+    agg = (
+        df.groupby("domain")[cols]
+        .agg(["mean", "count"])
+    )
+    # Flatten multi-level columns
+    agg.columns = ["_".join(c) for c in agg.columns]
+
+    # Article count comes from any count column
+    agg = agg.rename(columns={"orwell_index_count": "artikel"})
+    # Drop redundant count columns
+    for col in ["bernays_score_count", "dunning_kruger_index_count"]:
+        if col in agg.columns:
+            agg = agg.drop(columns=[col])
+
+    agg = agg.rename(columns={
+        "orwell_index_mean":         "orwell_avg",
+        "bernays_score_mean":        "bernays_avg",
+        "dunning_kruger_index_mean": "dk_avg",
+    })
+
+    return agg.sort_values("bernays_avg", ascending=False).round(3)
+
+
 def author_orwell(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
     """Durchschnittlicher Orwell-Index pro Autor (mind. 2 Artikel)."""
     if "author" not in df.columns:
@@ -116,38 +148,58 @@ def print_report(n: int = 5) -> None:
     print(f"  NEWS ANALYSER — Statistik ({total} Artikel)")
     print(f"{'='*55}")
 
-    print(f"\n📊 Top {n} Manipulationstechniken:")
+    print(f"\n[>>] Top {n} Manipulationstechniken:")
     for technique, count in top_techniques(df, n).items():
-        bar = "█" * count
+        bar = "#" * count
         print(f"  {technique:<30} {count:>3}x  {bar}")
 
-    print(f"\n🔵 Orwell-Index (ideologische Richtung, −1.0 bis +1.0):")
+    print(f"\n[O] Orwell-Index (ideologische Richtung, -1.0 bis +1.0):")
     for label, value in orwell_distribution(df).items():
         print(f"  {label:<22} {value}")
 
-    print(f"\n🔴 Bernays Score (Manipulationsintensität, Techniken/1000 Wörter):")
+    print(f"\n[B] Bernays Score (Manipulationsintensitaet, Techniken/1000 Woerter):")
     for label, value in bernays_distribution(df).items():
         print(f"  {label:<22} {value}")
 
     dk_dist = dunning_kruger_distribution(df)
     if dk_dist:
-        print(f"\n🧠 Dunning-Kruger-Index (epistemische Überzeugheit, 0.0–1.0):")
+        print(f"\n[DK] Dunning-Kruger-Index (epistemische Ueberzeugheit, 0.0-1.0):")
         for label, value in dk_dist.items():
             print(f"  {label:<22} {value}")
 
-    print(f"\n🌐 Top {n} Domains:")
+    print(f"\n[D] Top {n} Domains:")
     for domain, count in top_domains(df, n).items():
         print(f"  {domain:<35} {count:>3} Artikel")
 
-    print(f"\n😤 Intendierte Emotionen:")
+    print(f"\n[S] Intendierte Emotionen:")
     for sentiment, count in sentiment_distribution(df).items():
         print(f"  {sentiment:<25} {count:>3}x")
 
+    dom_df = domain_averages(df)
+    if not dom_df.empty:
+        has_dk = "dk_avg" in dom_df.columns
+        header = f"  {'Portal':<35} {'Artikel':>7}  {'Orwell-Avg':>10}  {'Bernays-Avg':>11}"
+        if has_dk:
+            header += f"  {'DK-Avg':>6}"
+        print(f"\n[~] Kennwert-Durchschnitt pro Nachrichtenportal:")
+        print(header)
+        print("  " + "-" * (len(header) - 2))
+        for domain, row in dom_df.iterrows():
+            direction = "<" if row["orwell_avg"] < 0 else ">"
+            line = (
+                f"  {domain:<35} {int(row['artikel']):>7}"
+                f"  {row['orwell_avg']:>+10.3f}{direction}"
+                f"  {row['bernays_avg']:>11.2f}"
+            )
+            if has_dk:
+                line += f"  {row['dk_avg']:>6.3f}"
+            print(line)
+
     author_df = author_orwell(df, n)
     if not author_df.empty:
-        print(f"\n✍️  Autoren-Orwell-Index (mind. 2 Artikel, sortiert):")
+        print(f"\n[A] Autoren-Orwell-Index (mind. 2 Artikel, sortiert):")
         for author, row in author_df.iterrows():
-            direction = "←" if row["orwell_avg"] < 0 else "→"
+            direction = "<" if row["orwell_avg"] < 0 else ">"
             print(f"  {author:<35} {row['orwell_avg']:+.3f} {direction}  ({int(row['artikel'])} Artikel)")
 
     print(f"\n{'='*55}\n")

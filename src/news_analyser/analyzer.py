@@ -8,6 +8,7 @@ from .scraper import Article
 from .config import LLMConfig
 from .prompts import load_prompt
 from .connectors import load_connector
+from .keywords import compute_keyword_signal
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -29,6 +30,8 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     connector = load_connector(cfg.provider)
     system_prompt = load_prompt("system")
 
+    kw = compute_keyword_signal(article.text)
+
     input_data = {
         "url": article.url,
         "domain": article.domain,
@@ -36,6 +39,13 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         "author": article.author or "",
         "published_at": article.published_at or article.fetched_at,
         "word_count": article.word_count,
+        "keyword_signal": {
+            "raw_signal": kw["raw_signal"],
+            "left_count": kw["left_count"],
+            "right_count": kw["right_count"],
+            "left_hits": kw["left_hits"],
+            "right_hits": kw["right_hits"],
+        },
         "text": article.text,
     }
 

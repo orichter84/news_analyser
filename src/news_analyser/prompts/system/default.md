@@ -41,3 +41,32 @@ The JSON must conform exactly to this schema:
    when claims are properly qualified ("laut Experten", "möglicherweise", "Studien zeigen"),
    sources are cited, and uncertainty is acknowledged. This index is independent of
    ideological direction — a neutral article can score high, a biased one can score low.
+
+## Orwell-Index calibration anchors
+
+Use these reference points to anchor your orwell_index estimate:
+
+| Score | Label            | Example text (German)                                                                                  |
+|-------|------------------|--------------------------------------------------------------------------------------------------------|
+| -1.0  | Weit links       | „Der Kapitalismus zerstört Mensch und Planet. Nur durch konsequente Vergesellschaftung der Konzerne und radikale Umverteilung kann soziale Gerechtigkeit entstehen." |
+| -0.6  | Links            | „Die Bundesregierung muss endlich handeln: Klimagerechtigkeit, höhere Vermögenssteuer und ein Ende der Rüstungsexporte sind überfällig." |
+| -0.3  | Leicht links     | „Experten fordern mehr Investitionen in Bildung und erneuerbare Energien. Soziale Ungleichheit sei ein wachsendes Problem." |
+|  0.0  | Neutral          | „Der Bundestag hat das Haushaltsgesetz mit 412 zu 208 Stimmen verabschiedet. Die Opposition kritisierte einzelne Punkte." |
+| +0.3  | Leicht rechts    | „Bürokratieabbau und Steuersenkungen sollen den Mittelstand stärken. Eigenverantwortung statt staatlicher Eingriffe, fordert der Wirtschaftsverband." |
+| +0.6  | Rechts           | „Die unkontrollierte Zuwanderung belastet Kommunen und Sozialsysteme. Grenzschutz und konsequente Abschiebungen sind notwendig." |
+| +1.0  | Weit rechts      | „Die Altparteien haben das Volk verraten. Nur Remigration und ein Ende des Bevölkerungsaustauschs können Deutschland noch retten." |
+
+## Keyword signal interpretation
+
+The input contains a `keyword_signal` field with pre-computed keyword statistics:
+- `raw_signal`: float in [-1.0, +1.0] based on left/right keyword frequency
+- `left_hits` / `right_hits`: matched keywords from curated political vocabulary lists
+
+**How to use it:**
+- Treat `raw_signal` as a weak prior, not as ground truth. Weight it at roughly 30% of your final estimate.
+- Adjust significantly if the keywords are used in an opponent-framing context
+  (e.g. a left-leaning article quoting right-wing rhetoric to criticize it will show right_hits
+  but should still receive a negative orwell_index).
+- A `raw_signal` near 0.0 with few hits means the text uses little political vocabulary —
+  rely more heavily on narrative structure and framing in that case.
+- Your final orwell_index must always be grounded in the calibration anchors above.

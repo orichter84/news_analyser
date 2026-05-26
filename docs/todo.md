@@ -13,12 +13,34 @@
 - [x] Manueller und automatischer Feed-Modus (konfigurierbar per Env-Variable)
 - [x] Erweiterte Metadaten: Autor, Titel, Publikationsdatum, Wortanzahl
 - [x] Erster Proof of Concept mit Kalibrierungsergebnissen (docs/test_ergebnisse.md)
+- [x] Keyword-Signal als Extremismus-Vorfilter (keywords.py)
+- [x] Few-Shot-Anker im Systemprompt (Orwell-Skalenkalibrierung)
+- [x] Portal-Durchschnitt im Statistik-Report (domain_averages)
+- [x] Konzept Orwell-Index Stabilisierung (docs/orwell_index_konzept.md)
 
 ---
 
 ## Offen
 
-### Web-Oberfläche (nächste große Ausbaustufe)
+### Indikator-Refactoring (Priorität 1)
+
+Konzept: docs/orwell_index_konzept.md
+
+- [ ] **Orwell-Index** — Umbau auf reinen Extremismus-Indikator (0.0–1.0, richtungsblind)
+- [ ] **Politische Strömung** — Neues Feld als `list[str]` mit benannten Labels
+      (z.B. `["sozialistisch", "nationalistisch"]`), ersetzt die numerische links/rechts-Achse
+- [ ] **Keyword-Listen** — Auf Extremismus-Symmetrie prüfen und anpassen:
+      extreme Rhetorik beider Seiten statt ideologische Richtung
+- [ ] **Few-Shot-Anker** — Im Systemprompt auf neuen Orwell-Index (Extremismus) anpassen
+- [ ] **RAG-Anker-Korpus** — Kuratierte ChromaDB-Collection `orwell_anchors` aufbauen
+      (30–50 Artikel mit validierten Labels, Symmetrie-Testpaare inklusive)
+- [ ] **Symmetrie-Tests** — Testpaare bei denen nur die Zielgruppe getauscht wird,
+      manuelle Validierung der Label-Konsistenz (LLM-Trainingsbias prüfen)
+- [ ] **Statistik & Ausgabe** — Neue Felder in db_storage, stats und CLI-Output
+
+---
+
+### Web-Oberfläche (Priorität 2)
 
 Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Applikation machen.
 
