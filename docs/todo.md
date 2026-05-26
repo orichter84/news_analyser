@@ -26,21 +26,14 @@
 
 Konzept: docs/orwell_index_konzept.md
 
-- [ ] **Orwell-Index** — Umbau auf reinen Extremismus-Indikator (0.0–1.0, richtungsblind)
-- [ ] **Politische Strömung** — Neues Feld als `list[str]` mit benannten Labels
-      (z.B. `["sozialistisch", "nationalistisch"]`), ersetzt die numerische links/rechts-Achse
-- [ ] **Keyword-Listen** — Auf Extremismus-Symmetrie prüfen und anpassen:
-      extreme Rhetorik beider Seiten statt ideologische Richtung
-- [ ] **Few-Shot-Anker** — Im Systemprompt auf neuen Orwell-Index (Extremismus) anpassen
+- [x] **Orwell-Index** — Umbau auf reinen Extremismus-Indikator (0.0–1.0, richtungsblind)
+- [x] **Politische Strömung** — Neues Feld als `list[str]` mit benannten Labels
+- [x] **Few-Shot-Anker** — pass1.md mit Extremismus-Ankern (0.0–1.0)
+- [x] **Anonymisierungs-Preprocessing** — Zwei-Pass-Architektur, spaCy de_core_news_md
+- [x] **Symmetrie-Tests** — Erste Testfälle dokumentiert: tests/symmetrie/ergebnisse.md
+- [ ] **Keyword-Listen** — Auf Extremismus-Symmetrie umstellen (beide Extreme statt links/rechts)
+- [ ] **Statistik & Ausgabe** — politische_stroemung in stats.py anzeigen
 - [ ] **RAG-Anker-Korpus** — Kuratierte ChromaDB-Collection `orwell_anchors` aufbauen
-      (30–50 Artikel mit validierten Labels, Symmetrie-Testpaare inklusive)
-- [ ] **Symmetrie-Tests** — Testpaare bei denen nur die Zielgruppe getauscht wird,
-      manuelle Validierung der Label-Konsistenz (LLM-Trainingsbias prüfen)
-      → Erster Testfall dokumentiert: tests/symmetrie/ergebnisse.md
-- [ ] **Anonymisierungs-Preprocessing** — Zwei-Pass-Architektur: Pass 1 anonymisiert
-      (Orwell, Bernays, Techniken bias-frei), Pass 2 original (Politische Strömung).
-      NER-Kandidat: spaCy de_core_news_lg oder LLM-Vorpass
-- [ ] **Statistik & Ausgabe** — Neue Felder in db_storage, stats und CLI-Output
 
 ---
 

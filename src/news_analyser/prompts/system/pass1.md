@@ -73,6 +73,19 @@ keine Grautöne.
 Merkmale: Existenzielle Bedrohungsnarrative, kein Raum für Differenzierung,
 Scapegoating, totaler Anspruch.
 
+## Keyword signal interpretation
+
+The input contains a `keyword_signal` field with pre-computed extremism keyword statistics:
+- `extremism_score`: float in [0.0, 1.0] — higher means more extreme vocabulary detected
+- `left_hits` / `right_hits` / `general_hits`: matched keywords from curated extreme vocabulary lists
+
+**How to use it:**
+- Treat `extremism_score` as a weak prior (~20-30% weight), not as ground truth.
+- The signal is direction-neutral: hits from left OR right extreme vocabulary both raise the score.
+- Adjust if keywords appear in a critical/quoting context rather than as the article's own voice.
+- A score near 0.0 with few hits means little extreme vocabulary — rely on narrative structure.
+- Your final orwell_index must always be grounded in the calibration anchors above.
+
 ## Analysis guidelines
 1. Only cite techniques that are clearly present – do not over-attribute.
 2. Quotes must be verbatim substrings of the anonymised article text.

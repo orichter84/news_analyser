@@ -25,6 +25,10 @@ def _load_dataframe() -> pd.DataFrame:
 
     df = pd.DataFrame(result["metadatas"])
     df["technique_names"] = df["technique_names"].apply(json.loads)
+    if "politische_stroemung" in df.columns:
+        df["politische_stroemung"] = df["politische_stroemung"].apply(
+            lambda x: json.loads(x) if isinstance(x, str) else ["neutral"]
+        )
     return df
 
 
@@ -74,6 +78,14 @@ def dunning_kruger_distribution(df: pd.DataFrame) -> dict[str, Any]:
         "moderat (0.3–0.6)": int(((scores >= 0.3) & (scores <= 0.6)).sum()),
         "überzeugt (>0.6)":  int((scores > 0.6).sum()),
     }
+
+
+def top_stroemungen(df: pd.DataFrame, n: int = 10) -> pd.Series:
+    """Häufigste politische Strömungen über alle Artikel."""
+    if "politische_stroemung" not in df.columns:
+        return pd.Series(dtype=int)
+    all_labels = [label for row in df["politische_stroemung"] for label in row]
+    return pd.Series(Counter(all_labels)).sort_values(ascending=False).head(n)
 
 
 def top_domains(df: pd.DataFrame, n: int = 5) -> pd.Series:
@@ -153,7 +165,7 @@ def print_report(n: int = 5) -> None:
         bar = "#" * count
         print(f"  {technique:<30} {count:>3}x  {bar}")
 
-    print(f"\n[O] Orwell-Index (ideologische Richtung, -1.0 bis +1.0):")
+    print(f"\n[O] Orwell-Index (Extremismus, 0.0 bis 1.0):")
     for label, value in orwell_distribution(df).items():
         print(f"  {label:<22} {value}")
 
@@ -166,6 +178,13 @@ def print_report(n: int = 5) -> None:
         print(f"\n[DK] Dunning-Kruger-Index (epistemische Ueberzeugheit, 0.0-1.0):")
         for label, value in dk_dist.items():
             print(f"  {label:<22} {value}")
+
+    stroemungen = top_stroemungen(df)
+    if not stroemungen.empty:
+        print(f"\n[P] Politische Stroemungen (alle Artikel):")
+        for label, count in stroemungen.items():
+            bar = "#" * count
+            print(f"  {label:<30} {count:>3}x  {bar}")
 
     print(f"\n[D] Top {n} Domains:")
     for domain, count in top_domains(df, n).items():
@@ -185,10 +204,9 @@ def print_report(n: int = 5) -> None:
         print(header)
         print("  " + "-" * (len(header) - 2))
         for domain, row in dom_df.iterrows():
-            direction = "<" if row["orwell_avg"] < 0 else ">"
             line = (
                 f"  {domain:<35} {int(row['artikel']):>7}"
-                f"  {row['orwell_avg']:>+10.3f}{direction}"
+                f"  {row['orwell_avg']:>10.3f}"
                 f"  {row['bernays_avg']:>11.2f}"
             )
             if has_dk:

@@ -1,88 +1,88 @@
 """
-Pre-signal computation for the Orwell-Index.
+Pre-signal computation for the Orwell-Index (extremism).
 
-Counts politically loaded keywords (left/right) and returns a raw directional
-signal that the LLM uses as one of two inputs alongside few-shot anchor examples.
+Counts rhetorically extreme keywords from both ends of the political spectrum
+and returns a signal for overall extremism intensity — direction-neutral.
 
-The signal is intentionally naive — it cannot distinguish "pro" vs. "contra"
-usage, which is why the LLM remains the final arbiter.
+The signal is passed to Pass 1 (anonymised) as a weak prior (~20-30% weight).
+The LLM remains the final arbiter.
 """
 
 from typing import TypedDict
 
 
-LEFT_KEYWORDS: list[str] = [
-    # Gesellschaft & Gerechtigkeit
-    "soziale gerechtigkeit", "solidarität", "umverteilung", "soziale ungleichheit",
-    "armutsbekämpfung", "gemeinwohl", "vergesellschaftung", "klassenkampf",
-    "ausbeutung", "kapitalismuskritik", "konzernmacht", "rüstungskonzerne",
-    # Identität & Rechte
-    "diversität", "inklusion", "antirassismus", "feminismus", "diskriminierung",
-    "marginalisierte", "privilegien", "patriarchat", "gleichstellung",
-    "minderheitenschutz", "emanzipation", "queere", "lgbtq",
-    # Migration & Weltoffenheit
-    "weltoffenheit", "flüchtlingsschutz", "asylrecht", "willkommenskultur",
-    "menschenrechte", "seenotrettung",
-    # Klima & Umwelt
-    "klimaschutz", "klimagerechtigkeit", "energiewende", "dekarbonisierung",
-    "erneuerbare energien", "fossil",
-    # Wirtschaft
-    "progressive", "reiche zur kasse", "vermögenssteuer", "mindestlohn erhöhung",
-    "waffenexporte", "rüstungsexporte",
+# Extreme Rhetorik — linkes Spektrum
+EXTREME_LEFT: list[str] = [
+    # Kampf & Mobilisierung
+    "klassenkampf", "revolution", "widerstand", "aufstand", "mobilisierung",
+    "blockade", "sabotage", "systemsturz", "enteignung",
+    # Feindbilder
+    "kapitalisten", "konzernherrschaft", "ausbeutung", "faschisten",
+    "unterdrücker", "herrschende klasse", "bourgeoisie",
+    # Apokalyptische Sprache
+    "kapitalismus zerstört", "system überwinden", "alles steht auf dem spiel",
+    "kein kompromiss", "kampf ums überleben",
+    # Totalitärer Anspruch
+    "vergesellschaftung", "diktatur des proletariats", "klassenjustiz",
 ]
 
-RIGHT_KEYWORDS: list[str] = [
-    # Nation & Identität
-    "heimat", "leitkultur", "tradition", "nationale identität", "abendland",
-    "deutsche werte", "patriotismus", "deutschtum", "völkisch",
-    # Sicherheit & Ordnung
-    "ordnung", "grenzschutz", "innere sicherheit", "law and order",
-    "null toleranz", "null-toleranz", "recht und ordnung",
-    # Migration (negativ geframt)
-    "abschiebung", "remigration", "bevölkerungsaustausch", "überfremdung",
-    "islamisierung", "asylmissbrauch", "wirtschaftsflüchtlinge",
-    "kriminalitätszuwanderer", "masseneinwanderung",
-    # Medien & Establishment
-    "mainstream-medien", "lügenpresse", "staatsfunk", "meinungsdiktatur",
-    "altparteien", "volksverrat", "systemmedien", "politkaste",
-    # Ideologiekritik (rechts)
-    "woke", "genderideologie", "genderwahn", "klimawahn", "ökodiktatur",
-    "frühsexualisierung", "links-grün",
-    # Wirtschaft (konservativ)
-    "leistungsgesellschaft", "eigenverantwortung", "steuerverschwendung",
-    "bürokratieabbau", "wirtschaftsfreiheit", "mittelstand stärken",
+# Extreme Rhetorik — rechtes Spektrum
+EXTREME_RIGHT: list[str] = [
+    # Kampf & Mobilisierung
+    "volksverrat", "remigration", "bevölkerungsaustausch", "endkampf",
+    "widerstand", "reconquista", "abendland verteidigen",
+    # Feindbilder
+    "lügenpresse", "systemmedien", "globalisten", "überfremdung",
+    "islamisierung", "bevölkerungsaustausch", "politkaste", "altparteien",
+    # Apokalyptische Sprache
+    "deutschland wird abgeschafft", "großer austausch", "volkstod",
+    "existenzielle bedrohung", "letzte chance",
+    # Totalitärer Anspruch
+    "völkisch", "rassenrein", "blut und boden", "lebensraum",
+    "führerprinzip",
+]
+
+# Allgemeine Extremismus-Indikatoren (richtungsunabhängig)
+EXTREME_GENERAL: list[str] = [
+    "menschenverachtend", "vernichten", "ausrotten", "säuberung",
+    "todfeind", "parasiten", "untermenschen", "verräter",
+    "kollaborateur", "feinde des volkes",
 ]
 
 
 class KeywordSignal(TypedDict):
-    raw_signal: float       # -1.0 (links) bis +1.0 (rechts)
+    extremism_score: float    # 0.0 (keine Treffer) bis 1.0 (viele Treffer)
     left_count: int
     right_count: int
-    left_hits: list[str]    # gematchte Begriffe (max 10 als Stichprobe)
+    general_count: int
+    left_hits: list[str]
     right_hits: list[str]
+    general_hits: list[str]
 
 
 def compute_keyword_signal(text: str) -> KeywordSignal:
-    """Return a directional keyword signal for the given article text.
+    """Return an extremism keyword signal for the given article text.
 
-    raw_signal = (right - left) / (right + left)  ∈ [-1.0, +1.0]
-    Returns 0.0 if no political keywords are found.
+    extremism_score = total_hits / (total_hits + dampening)
+    Asymptotically approaches 1.0, never reaches it.
+    Returns 0.0 if no extreme keywords are found.
     """
     text_lower = text.lower()
 
-    left_hits = [kw for kw in LEFT_KEYWORDS if kw in text_lower]
-    right_hits = [kw for kw in RIGHT_KEYWORDS if kw in text_lower]
+    left_hits    = [kw for kw in EXTREME_LEFT    if kw in text_lower]
+    right_hits   = [kw for kw in EXTREME_RIGHT   if kw in text_lower]
+    general_hits = [kw for kw in EXTREME_GENERAL if kw in text_lower]
 
-    left_count = len(left_hits)
-    right_count = len(right_hits)
-    total = left_count + right_count
-
-    raw_signal = round((right_count - left_count) / total, 3) if total > 0 else 0.0
+    total = len(left_hits) + len(right_hits) + len(general_hits)
+    # Dampening=5: score bei 1 Treffer=0.17, bei 5=0.5, bei 15=0.75
+    extremism_score = round(total / (total + 5), 3) if total > 0 else 0.0
 
     return KeywordSignal(
-        raw_signal=raw_signal,
-        left_count=left_count,
-        right_count=right_count,
+        extremism_score=extremism_score,
+        left_count=len(left_hits),
+        right_count=len(right_hits),
+        general_count=len(general_hits),
         left_hits=left_hits[:10],
         right_hits=right_hits[:10],
+        general_hits=general_hits[:10],
     )

@@ -52,11 +52,13 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     pass1_input = {
         **base_meta,
         "keyword_signal": {
-            "raw_signal": kw["raw_signal"],
-            "left_count": kw["left_count"],
-            "right_count": kw["right_count"],
-            "left_hits": kw["left_hits"],
-            "right_hits": kw["right_hits"],
+            "extremism_score": kw["extremism_score"],
+            "left_count":      kw["left_count"],
+            "right_count":     kw["right_count"],
+            "general_count":   kw["general_count"],
+            "left_hits":       kw["left_hits"],
+            "right_hits":      kw["right_hits"],
+            "general_hits":    kw["general_hits"],
         },
         "text": anon["text"],
     }
