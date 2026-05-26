@@ -194,6 +194,64 @@ ist der Bias nachgewiesen und muss durch explizite Prompt-Instruktionen korrigie
 Die Symmetrie-Tests gehören als fester Bestandteil in die Evaluierung des Anker-Korpus
 und müssen bei jedem Modellwechsel wiederholt werden.
 
+Erster dokumentierter Testfall: tests/symmetrie/ergebnisse.md (2026-05-26) —
+Bias nachgewiesen, Differenz Orwell-Index: -0.20, Bernays: -20.41.
+
+---
+
+### Lösungsansatz: Anonymisierungs-Preprocessing (Zwei-Pass-Architektur)
+
+Statt den Bias durch Prompt-Instruktionen zu korrigieren — was ihn mildert aber nicht
+eliminiert — wird er strukturell ausgeschlossen:
+
+**Grundprinzip:** Alle Gruppenidentifikatoren (Ethnien, Religionen, politische Bewegungen,
+historische Figuren die Gruppen repräsentieren) werden vor der Analyse durch neutrale
+Platzhalter ersetzt. Das LLM bewertet ausschließlich die rhetorische Struktur.
+
+```
+„Muslime unterwandern unsere Institutionen."
+        ↓  Preprocessing
+„Gruppe-A unterwandern unsere Institutionen."
+```
+
+**Zwei-Pass-Architektur:**
+
+```
+Original-Text
+    │
+    ├── [Pass 1] Anonymisiert → Orwell-Index, Bernays Score, Techniken  (strukturell, bias-frei)
+    │
+    └── [Pass 2] Original     → Politische Strömung (Labels)            (mit Symmetrie-Instruktion)
+    │
+    └── [Direkt] Original     → DK-Index                                (gruppenblind, kein Preprocessing nötig)
+```
+
+Pass 1 liefert die quantitativen Metriken vollständig unabhängig von der Zielgruppe.
+Pass 2 ist auf die Label-Vergabe reduziert — das macht eine gezielte Bias-Korrektur
+im Prompt einfacher und überprüfbarer.
+
+**DK-Index als Sonderfall:** Symmetrie-Tests (tests/symmetrie/ergebnisse.md) haben
+gezeigt dass der DK-Index über alle Testfälle hinweg stabil bleibt — unabhängig davon
+ob Original- oder anonymisierter Text analysiert wird. Das ist konzeptuell begründet:
+epistemische Überzeugheit manifestiert sich in Satzkonstruktion und Modalverben, nicht
+in der Identität der Zielgruppe. Der DK-Index ist von Natur aus gruppenblind und
+braucht das Anonymisierungs-Preprocessing nicht. Er wird direkt am Originaltext
+gemessen und spart damit einen LLM-Call.
+
+**Technische Herausforderung:** Ein zuverlässiger Named Entity Recognizer (NER) für
+Gruppenidentifikatoren — Ethnien, Religionen, politische Bewegungen, aber auch
+historische Figuren wie "Hitler" oder "Stalin" die implizit Gruppen repräsentieren.
+Kandidaten: spaCy (de_core_news_lg) oder ein dedizierter LLM-Vorpass zur Extraktion.
+
+**Entscheidender Vorteil gegenüber Prompt-Korrekturen:** Die Lösung ist
+**modellunabhängig**. Prompt-Instruktionen zur Bias-Korrektur sind auf ein bestimmtes
+Modell kalibriert und müssen bei jedem Modellwechsel neu validiert werden. Das
+Anonymisierungs-Preprocessing greift vor dem LLM-Call — es funktioniert mit jedem
+Modell identisch weil der Bias strukturell ausgeschlossen wird, nicht durch Anweisung
+unterdrückt.
+
+**Status:** Konzept — offen.
+
 ---
 
 ## Offene Fragen

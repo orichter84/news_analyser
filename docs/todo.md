@@ -36,6 +36,10 @@ Konzept: docs/orwell_index_konzept.md
       (30–50 Artikel mit validierten Labels, Symmetrie-Testpaare inklusive)
 - [ ] **Symmetrie-Tests** — Testpaare bei denen nur die Zielgruppe getauscht wird,
       manuelle Validierung der Label-Konsistenz (LLM-Trainingsbias prüfen)
+      → Erster Testfall dokumentiert: tests/symmetrie/ergebnisse.md
+- [ ] **Anonymisierungs-Preprocessing** — Zwei-Pass-Architektur: Pass 1 anonymisiert
+      (Orwell, Bernays, Techniken bias-frei), Pass 2 original (Politische Strömung).
+      NER-Kandidat: spaCy de_core_news_lg oder LLM-Vorpass
 - [ ] **Statistik & Ausgabe** — Neue Felder in db_storage, stats und CLI-Output
 
 ---
