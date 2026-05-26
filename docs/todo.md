@@ -58,6 +58,7 @@ Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Appli
 - [x] **Artikel-Detailansicht** — Vollständige Analyse mit Techniken und Zitaten
 - [x] **Statistik-Seite** — Balkendiagramme, Portal-Vergleichstabelle, DK-Verteilung
 - [x] **URL-Submission** — Formular mit Job-Status-Polling
+- [ ] **Pagination** — Artikel-Liste und Backend-Endpoint auf Cursor- oder Offset-Pagination umstellen (relevant ab ~500 Artikeln)
 - [ ] **Quellenvergleich** — Interaktives Balkendiagramm Domain × Orwell (Chart.js o.ä.)
 - [ ] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
 - [ ] **Technik-Heatmap** — Domain × Technik als Matrix

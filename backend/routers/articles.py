@@ -71,4 +71,12 @@ def get_article(article_id: str) -> dict:
     except Exception:
         full = m
     full = _parse_meta(full)
+
+    # Felder aus den Metadaten auf die oberste Ebene heben (für das Frontend)
+    full.setdefault("orwell_index",        float(m.get("orwell_index", 0.0)))
+    full.setdefault("bernays_score",       float(m.get("bernays_score", 0.0)))
+    full.setdefault("dunning_kruger_index", float(m.get("dunning_kruger_index", 0.0)) or None)
+    full.setdefault("technique_names",     m.get("technique_names", []))
+    full.setdefault("intended_sentiment",  m.get("intended_sentiment", ""))
+
     return full

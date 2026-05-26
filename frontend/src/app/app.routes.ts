@@ -18,5 +18,9 @@ export const routes: Routes = [
     path: 'submit',
     loadChildren: () => import('./features/submit/submit.routes').then(m => m.SUBMIT_ROUTES),
   },
+  {
+    path: 'knowledge',
+    loadChildren: () => import('./features/knowledge/knowledge.routes').then(m => m.KNOWLEDGE_ROUTES),
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];

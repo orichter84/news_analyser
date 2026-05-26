@@ -28,6 +28,10 @@ def run(url: str) -> None:
         print(f"[!] Could not extract text from {url}")
         return
 
+    if article.is_paywall:
+        print(f"[~] Paywall erkannt ({article.word_count} Wörter) – übersprungen: {url}")
+        return
+
     print(f"[*] Analyzing ({len(article.text)} chars) …")
     result = analyze_article(article)
     if not result:

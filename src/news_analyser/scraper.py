@@ -14,6 +14,8 @@ import requests
 from bs4 import BeautifulSoup
 
 
+PAYWALL_MIN_WORDS = 150  # Artikel mit weniger Wörtern gelten als Paywall-Teaser
+
 @dataclass
 class Article:
     url: str
@@ -24,6 +26,7 @@ class Article:
     author: str | None = None
     published_at: str | None = None  # ISO-8601 Publikationsdatum laut Artikel
     word_count: int = 0
+    is_paywall: bool = False
 
 
 def _bs4_fallback(html: str) -> str:
@@ -91,6 +94,8 @@ def fetch_article(url: str, timeout: int = 15) -> Article | None:
         return None
 
     text = text.strip()
+    words = len(text.split())
+    is_paywall = words < PAYWALL_MIN_WORDS
 
     return Article(
         url=url,
@@ -100,5 +105,6 @@ def fetch_article(url: str, timeout: int = 15) -> Article | None:
         title=title,
         author=author,
         published_at=published_at,
-        word_count=len(text.split()),
+        word_count=words,
+        is_paywall=is_paywall,
     )
