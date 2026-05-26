@@ -40,7 +40,9 @@ def run(url: str) -> None:
     word_count = result.get("word_count", 0)
     bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
     dk = ft.get("dunning_kruger_index", 0.0)
-    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:+.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
+    stroemung = result.get("politische_stroemung", ["neutral"])
+    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
+    print(f"    Stroemung: {stroemung}")
     print(f"    Techniken: {[t['technique'] for t in techniques]}")
 
 
@@ -71,7 +73,9 @@ def run_text_file(path: str, domain: str, source_url: str) -> None:
     word_count = result.get("word_count", 0)
     bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
     dk = ft.get("dunning_kruger_index", 0.0)
-    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:+.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
+    stroemung = result.get("politische_stroemung", ["neutral"])
+    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
+    print(f"    Stroemung: {stroemung}")
     print(f"    Techniken: {[t['technique'] for t in techniques]}")
 
 

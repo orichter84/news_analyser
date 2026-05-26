@@ -59,6 +59,9 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "bernays_score":        round(
             len(techniques) / analysis.get("word_count", 1) * 1000, 2
         ) if analysis.get("word_count", 0) > 0 else 0.0,
+        "politische_stroemung": json.dumps(
+            analysis.get("politische_stroemung", ["neutral"]), ensure_ascii=False
+        ),
         "analysis_json":        json.dumps(analysis, ensure_ascii=False),
     }
 

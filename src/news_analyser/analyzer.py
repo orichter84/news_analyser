@@ -1,4 +1,8 @@
-"""LLM-based manipulation and framing analyser."""
+"""LLM-based manipulation and framing analyser — two-pass architecture.
+
+Pass 1 (anonymised text): Orwell-Index (extremism), Bernays Score, Techniques
+Pass 2 (original text):   Politische Strömung (labels), DK-Index
+"""
 
 import json
 import re
@@ -9,6 +13,7 @@ from .config import LLMConfig
 from .prompts import load_prompt
 from .connectors import load_connector
 from .keywords import compute_keyword_signal
+from .anonymizer import anonymize
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -28,17 +33,24 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
 def analyze_article(article: Article) -> dict[str, Any] | None:
     cfg = LLMConfig.from_env()
     connector = load_connector(cfg.provider)
-    system_prompt = load_prompt("system")
 
     kw = compute_keyword_signal(article.text)
+    anon = anonymize(article.text)
 
-    input_data = {
+    base_meta = {
         "url": article.url,
         "domain": article.domain,
         "title": article.title or "",
         "author": article.author or "",
         "published_at": article.published_at or article.fetched_at,
         "word_count": article.word_count,
+    }
+
+    # ------------------------------------------------------------------
+    # Pass 1 — anonymisierter Text → Orwell-Index (Extremismus), Techniken
+    # ------------------------------------------------------------------
+    pass1_input = {
+        **base_meta,
         "keyword_signal": {
             "raw_signal": kw["raw_signal"],
             "left_count": kw["left_count"],
@@ -46,25 +58,63 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
             "left_hits": kw["left_hits"],
             "right_hits": kw["right_hits"],
         },
-        "text": article.text,
+        "text": anon["text"],
     }
 
     try:
-        raw = connector.generate(
-            system_prompt=system_prompt,
-            input_data=input_data,
+        raw1 = connector.generate(
+            system_prompt=load_prompt("system", "pass1"),
+            input_data=pass1_input,
             model=cfg.model,
             temperature=cfg.temperature,
             max_tokens=cfg.max_tokens,
         )
     except Exception as exc:
-        print(f"[analyzer] Connector error: {exc}")
+        print(f"[analyzer] Pass 1 Connector error: {exc}")
         return None
 
-    result = _extract_json(raw)
-    if result is not None:
-        result.setdefault("title", article.title or "")
-        result.setdefault("author", article.author or "")
-        result.setdefault("published_at", article.published_at or article.fetched_at)
-        result.setdefault("word_count", article.word_count)
+    result1 = _extract_json(raw1)
+    if result1 is None:
+        return None
+
+    # ------------------------------------------------------------------
+    # Pass 2 — Originaltext → Politische Strömung, DK-Index
+    # ------------------------------------------------------------------
+    pass2_input = {
+        **base_meta,
+        "text": article.text,
+    }
+
+    try:
+        raw2 = connector.generate(
+            system_prompt=load_prompt("system", "pass2"),
+            input_data=pass2_input,
+            model=cfg.model,
+            temperature=cfg.temperature,
+            max_tokens=cfg.max_tokens,
+        )
+    except Exception as exc:
+        print(f"[analyzer] Pass 2 Connector error: {exc}")
+        return None
+
+    result2 = _extract_json(raw2)
+    if result2 is None:
+        return None
+
+    # ------------------------------------------------------------------
+    # Ergebnisse zusammenführen
+    # ------------------------------------------------------------------
+    result = {
+        **base_meta,
+        "source_url":          result1.get("source_url", article.url),
+        "timestamp":           result1.get("timestamp", base_meta["published_at"]),
+        "detected_techniques": result1.get("detected_techniques", []),
+        "framing_target": {
+            **result1.get("framing_target", {}),
+            "dunning_kruger_index": result2.get("dunning_kruger_index", 0.0),
+            "target_direction":     result2.get("target_direction", ""),
+        },
+        "politische_stroemung": result2.get("politische_stroemung", ["neutral"]),
+    }
+
     return result
