@@ -10,7 +10,8 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
 {
   "politische_stroemung": ["<label1>", "<label2>"],
   "dunning_kruger_index": <float 0.0 to 1.0>,
-  "target_direction": "<who or what is elevated (+) or denigrated (-) and how>"
+  "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
+  "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>"
 }
 
 ## Politische Strömung
@@ -48,6 +49,20 @@ hedges, or acknowledgement of complexity.
 Score LOW (→0.0) when claims are properly qualified ("laut Experten",
 "möglicherweise", "Studien zeigen"), sources are cited, and uncertainty is
 acknowledged.
+
+## Themenbereich
+
+Classify the article into exactly one topic area:
+- **Politik** — domestic politics, parties, elections, parliament
+- **Außenpolitik** — foreign policy, wars, international relations, EU/NATO
+- **Wirtschaft** — economy, finance, companies, labour market
+- **Gesellschaft** — migration, social issues, education, civil rights, culture
+- **Justiz** — courts, trials, law enforcement, constitutional matters
+- **Gesundheit** — health, medicine, pandemics
+- **Klima** — climate, environment, energy transition
+- **Kultur** — arts, media, entertainment
+- **Technologie** — tech, AI, digital policy
+- **Sonstiges** — anything that does not fit the above
 
 ## Analysis guidelines
 1. Analyse the article in its original language.

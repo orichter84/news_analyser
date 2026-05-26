@@ -114,8 +114,9 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     # ------------------------------------------------------------------
     # Ergebnisse zusammenführen
     # ------------------------------------------------------------------
-    stroemung = result2.get("politische_stroemung", ["neutral"])
-    orwell    = result1.get("framing_target", {}).get("orwell_index", 0.0)
+    stroemung   = result2.get("politische_stroemung", ["neutral"])
+    orwell      = result1.get("framing_target", {}).get("orwell_index", 0.0)
+    themenbereich = result2.get("themenbereich", "Sonstiges")
 
     result = {
         **base_meta,
@@ -128,6 +129,7 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
             "target_direction":     result2.get("target_direction", ""),
         },
         "politische_stroemung": stroemung,
+        "themenbereich":        themenbereich,
     }
 
     # Artikel als Anker für zukünftige Analysen speichern

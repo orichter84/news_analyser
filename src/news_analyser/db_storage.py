@@ -62,6 +62,7 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "politische_stroemung": json.dumps(
             analysis.get("politische_stroemung", ["neutral"]), ensure_ascii=False
         ),
+        "themenbereich":        analysis.get("themenbereich", "Sonstiges"),
         "analysis_json":        json.dumps(analysis, ensure_ascii=False),
     }
 

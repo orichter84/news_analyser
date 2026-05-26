@@ -16,6 +16,7 @@ import feedparser
 from .config import FeedConfig
 from .db_storage import is_known_url
 from .main import run
+from .topic_filter import is_relevant
 
 
 def _load_feed_urls(feeds_file: Path) -> list[str]:
@@ -31,7 +32,11 @@ def _load_feed_urls(feeds_file: Path) -> list[str]:
     ]
 
 
-def _fetch_new_urls(feed_urls: list[str], max_articles: int) -> Generator[str, None, None]:
+def _fetch_new_urls(
+    feed_urls: list[str],
+    max_articles: int,
+    allowed_topics: frozenset[str],
+) -> Generator[str, None, None]:
     """Yield Artikel-URLs aus allen Feeds, die noch nicht in der DB sind."""
     seen = 0
     for feed_url in feed_urls:
@@ -47,6 +52,12 @@ def _fetch_new_urls(feed_urls: list[str], max_articles: int) -> Generator[str, N
                 continue
             if is_known_url(url):
                 continue
+            title   = entry.get("title", "")
+            summary = entry.get("summary", "")
+            relevant, topic = is_relevant(title, summary, allowed_topics)
+            if not relevant:
+                print(f"[feed] Thema '{topic or 'unbekannt'}' gefiltert: {title[:60]}")
+                continue
             seen += 1
             yield url
 
@@ -55,7 +66,11 @@ def run_once(cfg: FeedConfig) -> None:
     feed_urls = _load_feed_urls(cfg.feeds_file)
     print(f"[feed] {len(feed_urls)} Feed(s) geladen, max. {cfg.max_articles} neue Artikel.")
 
-    new_urls = list(_fetch_new_urls(feed_urls, cfg.max_articles))
+    if cfg.allowed_topics:
+        print(f"[feed] Themenfilter aktiv: {', '.join(sorted(cfg.allowed_topics))}")
+    else:
+        print("[feed] Themenfilter deaktiviert (FEED_TOPICS=all) — alle Artikel werden analysiert.")
+    new_urls = list(_fetch_new_urls(feed_urls, cfg.max_articles, cfg.allowed_topics))
     if not new_urls:
         print("[feed] Keine neuen Artikel gefunden.")
         return

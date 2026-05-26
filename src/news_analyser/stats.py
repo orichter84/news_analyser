@@ -29,6 +29,8 @@ def _load_dataframe() -> pd.DataFrame:
         df["politische_stroemung"] = df["politische_stroemung"].apply(
             lambda x: json.loads(x) if isinstance(x, str) else ["neutral"]
         )
+    if "themenbereich" not in df.columns:
+        df["themenbereich"] = "Sonstiges"
     return df
 
 
@@ -130,6 +132,27 @@ def domain_averages(df: pd.DataFrame) -> pd.DataFrame:
     return agg.sort_values("bernays_avg", ascending=False).round(3)
 
 
+def thema_bernays(df: pd.DataFrame) -> pd.DataFrame:
+    """Durchschnittlicher Bernays Score und Orwell-Index pro Themenbereich."""
+    if "themenbereich" not in df.columns:
+        return pd.DataFrame()
+    cols = ["bernays_score", "orwell_index"]
+    for col in cols:
+        df[col] = df[col].astype(float)
+    agg = (
+        df.groupby("themenbereich")[cols]
+        .agg(["mean", "count"])
+    )
+    agg.columns = ["_".join(c) for c in agg.columns]
+    agg = agg.rename(columns={
+        "bernays_score_mean":  "bernays_avg",
+        "bernays_score_count": "artikel",
+        "orwell_index_mean":   "orwell_avg",
+        "orwell_index_count":  "_drop",
+    }).drop(columns=["_drop"], errors="ignore")
+    return agg.sort_values("bernays_avg", ascending=False).round(3)
+
+
 def author_orwell(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
     """Durchschnittlicher Orwell-Index pro Autor (mind. 2 Artikel)."""
     if "author" not in df.columns:
@@ -212,6 +235,18 @@ def print_report(n: int = 5) -> None:
             if has_dk:
                 line += f"  {row['dk_avg']:>6.3f}"
             print(line)
+
+    thema_df = thema_bernays(df)
+    if not thema_df.empty:
+        print(f"\n[T] Bernays Score und Orwell-Index nach Themenbereich:")
+        print(f"  {'Thema':<20} {'Artikel':>7}  {'Bernays-Avg':>11}  {'Orwell-Avg':>10}")
+        print("  " + "-" * 54)
+        for thema, row in thema_df.iterrows():
+            print(
+                f"  {thema:<20} {int(row['artikel']):>7}"
+                f"  {row['bernays_avg']:>11.2f}"
+                f"  {row['orwell_avg']:>10.3f}"
+            )
 
     author_df = author_orwell(df, n)
     if not author_df.empty:
