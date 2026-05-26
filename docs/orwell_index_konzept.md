@@ -141,15 +141,18 @@ Orwell-Index. Der Orwell-Index misst rhetorischen Extremismus der per Definition
 symmetrisch ist: extreme Rhetorik ist extrem unabhängig davon gegen wen sie sich richtet.
 
 Der Bias schlägt dort durch wo das LLM entscheidet ob es ein Label wie "Scapegoating"
-oder "rassistisch" vergibt. LLMs werden auf Internetdaten trainiert die eine globale
-Mehrheitsperspektive widerspiegeln — Westeuropäer sind global eine Minderheit,
-anti-westeuropäische Rhetorik ist in den Trainingsdaten häufiger und normalisierter
-als umgekehrt.
+oder "rassistisch" vergibt. LLMs werden auf Internetdaten trainiert die zwar
+westeuropäische und englischsprachige Perspektiven *überrepräsentieren* — aber
+gleichzeitig politische Diskursnormen widerspiegeln in denen asymmetrische Schutzregeln
+für verschiedene Gruppen gelten. Westeuropäer werden in diesen Diskursen oft als
+"Mehrheit" oder "Standardgruppe" behandelt, gegen die gerichtete Rhetorik weniger
+als schützenswert gilt — unabhängig von ihrer tatsächlichen globalen Demographie.
 
 **Konkrete Auswirkung:** Der Agent vergibt Labels wie "Scapegoating" oder "rassistisch"
-zuverlässig wenn klassische Minderheiten die Zielgruppe sind — wendet dieselben Labels
-aber möglicherweise nicht an wenn strukturell identische Rhetorik gegen Westeuropäer,
-Christen oder andere Mehrheitsgruppen gerichtet ist.
+zuverlässig wenn Gruppen betroffen sind die im politischen Diskurs als Minderheiten
+gelten — wendet dieselben Labels aber möglicherweise nicht an wenn strukturell identische
+Rhetorik gegen Westeuropäer oder Christen gerichtet ist, weil diese im Trainingsdiskurs
+als "Mehrheit" kodiert sind und entsprechende Schutzmechanismen fehlen.
 
 **Das systemische Risiko:** Das Tool würde exakt den Medienbias reproduzieren den es
 aufdecken soll — nur versteckt hinter scheinbar objektiven Metriken. Ein Ergebnis das
