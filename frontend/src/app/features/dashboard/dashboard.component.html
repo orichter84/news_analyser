@@ -1,0 +1,81 @@
+<div class="dashboard">
+  @if (loading()) {
+    <p class="loading">Lade Daten…</p>
+  } @else {
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-value">{{ stats()?.total_articles ?? 0 }}</span>
+        <span class="kpi-label">Analysierte Artikel</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ (stats()?.orwell_distribution?.['mean'] ?? 0) | number:'1.2-2' }}</span>
+        <span class="kpi-label">Orwell-Index ø</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ (stats()?.bernays_distribution?.['mean'] ?? 0) | number:'1.2-2' }}</span>
+        <span class="kpi-label">Bernays Score ø</span>
+      </div>
+      @if (stats()?.dk_distribution) {
+        <div class="kpi-card">
+          <span class="kpi-value">{{ (stats()?.dk_distribution?.['mean'] ?? 0) | number:'1.2-2' }}</span>
+          <span class="kpi-label">DK-Index ø</span>
+        </div>
+      }
+    </div>
+
+    <div class="panel-row">
+      <section class="panel">
+        <h2>Top Manipulationstechniken</h2>
+        @for (entry of topTechniques(); track entry[0]) {
+          <div class="bar-row">
+            <span class="bar-label">{{ entry[0] }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="(entry[1] / topTechniques()[0][1]) * 100"></div>
+            </div>
+            <span class="bar-count">{{ entry[1] }}</span>
+          </div>
+        }
+      </section>
+
+      <section class="panel">
+        <h2>Politische Strömungen</h2>
+        @for (entry of topStroemungen(); track entry[0]) {
+          <div class="tag-row">
+            <span class="tag">{{ entry[0] }}</span>
+            <span class="tag-count">{{ entry[1] }}×</span>
+          </div>
+        }
+      </section>
+    </div>
+
+    <section class="panel recent">
+      <h2>Zuletzt analysiert</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Portal</th>
+            <th>Titel</th>
+            <th>Orwell</th>
+            <th>Bernays</th>
+            <th>Strömung</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of recentArticles(); track a.source_url) {
+            <tr [routerLink]="['/articles', a.source_url]" class="clickable">
+              <td class="domain">{{ a.domain }}</td>
+              <td class="title">{{ a.title || '(kein Titel)' }}</td>
+              <td class="score" [class.high]="a.orwell_index > 0.6">{{ a.orwell_index | number:'1.2-2' }}</td>
+              <td class="score">{{ a.bernays_score | number:'1.2-2' }}</td>
+              <td class="tags">
+                @for (s of a.politische_stroemung; track s) {
+                  <span class="tag small">{{ s }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</div>

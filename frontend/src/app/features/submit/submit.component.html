@@ -1,0 +1,46 @@
+<div class="submit-page">
+  <h1>Artikel einreichen</h1>
+
+  <form class="submit-form" (ngSubmit)="submit()">
+    <label>
+      Artikel-URL
+      <input
+        type="url"
+        [(ngModel)]="url"
+        name="url"
+        placeholder="https://www.tagesschau.de/..."
+        required
+        [disabled]="submitting()"
+      />
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" [(ngModel)]="force" name="force" />
+      Neu analysieren (auch wenn bereits in DB)
+    </label>
+    <button type="submit" [disabled]="submitting() || !url">
+      {{ submitting() ? 'Analysiere…' : 'Analyse starten' }}
+    </button>
+  </form>
+
+  @if (message()) {
+    <p class="status-msg">{{ message() }}</p>
+  }
+
+  @if (jobId()) {
+    <div class="job-status">
+      <p>Job-ID: <code>{{ jobId() }}</code></p>
+      @if (!jobStatus()) {
+        <p class="loading">Starte…</p>
+      } @else if (jobStatus()?.status === 'pending') {
+        <p class="loading">Analyse läuft…</p>
+      } @else if (jobStatus()?.status === 'done') {
+        <p class="success">Analyse abgeschlossen.</p>
+        @if (jobStatus()?.result) {
+          <pre class="result-preview">{{ jobStatus()?.result | json }}</pre>
+        }
+      } @else if (jobStatus()?.status === 'error') {
+        <p class="error">Fehler: {{ jobStatus()?.message }}</p>
+      }
+    </div>
+  }
+</div>

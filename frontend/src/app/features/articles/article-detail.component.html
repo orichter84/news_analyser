@@ -1,0 +1,66 @@
+<div class="article-detail">
+  <a routerLink="/articles" class="back">&larr; Zurück zur Liste</a>
+
+  @if (loading()) {
+    <p class="loading">Lade Artikel…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    @let a = article()!;
+    <header>
+      <h1>{{ a.title || '(kein Titel)' }}</h1>
+      <div class="meta">
+        <span>{{ a.domain }}</span>
+        @if (a.author) { <span>· {{ a.author }}</span> }
+        @if (a.published_at) { <span>· {{ a.published_at | date:'dd.MM.yyyy' }}</span> }
+        <span>· {{ a.word_count }} Wörter</span>
+      </div>
+    </header>
+
+    <div class="score-grid">
+      <div class="score-card" [class.high]="a.orwell_index > 0.6">
+        <span class="score-value">{{ a.orwell_index | number:'1.2-2' }}</span>
+        <span class="score-label">Orwell-Index</span>
+      </div>
+      <div class="score-card">
+        <span class="score-value">{{ a.bernays_score | number:'1.2-2' }}</span>
+        <span class="score-label">Bernays Score</span>
+      </div>
+      @if (a.dunning_kruger_index != null) {
+        <div class="score-card">
+          <span class="score-value">{{ a.dunning_kruger_index | number:'1.2-2' }}</span>
+          <span class="score-label">DK-Index</span>
+        </div>
+      }
+    </div>
+
+    <section class="framing">
+      <h2>Framing</h2>
+      <p><strong>Narrativ:</strong> {{ a.framing_target.main_narrative }}</p>
+      <p><strong>Intendierte Emotion:</strong> {{ a.framing_target.intended_sentiment }}</p>
+      <p>
+        <strong>Politische Strömung:</strong>
+        @for (s of a.politische_stroemung; track s) {
+          <span class="tag">{{ s }}</span>
+        }
+      </p>
+    </section>
+
+    <section class="techniques">
+      <h2>Erkannte Techniken ({{ a.detected_techniques.length }})</h2>
+      @for (t of a.detected_techniques; track t.technique) {
+        <div class="technique-card">
+          <div class="technique-header">
+            <span class="technique-name">{{ t.technique }}</span>
+          </div>
+          <blockquote class="quote">{{ t.quote }}</blockquote>
+          <p class="explanation">{{ t.explanation }}</p>
+        </div>
+      }
+    </section>
+
+    <div class="source-link">
+      <a [href]="a.source_url" target="_blank" rel="noopener">Originalartikel öffnen &rarr;</a>
+    </div>
+  }
+</div>

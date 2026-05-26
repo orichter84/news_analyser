@@ -42,26 +42,28 @@ Konzept: docs/orwell_index_konzept.md
 Ziel: Das System von einem lokalen CLI-Werkzeug zu einer zugänglichen Web-Applikation machen.
 
 #### Backend — FastAPI
-- [ ] **REST API** — Endpunkte für Artikel-Abfragen, Filter und Statistiken
-  - `GET /articles` — Liste mit Filter (domain, score-range, technik, datum)
-  - `GET /articles/{id}` — Detailansicht mit Zitaten und Erklärungen
-  - `POST /analyse` — URL einreichen und Analyse anstoßen
+- [x] **REST API** — Endpunkte für Artikel-Abfragen, Filter und Statistiken
+  - `GET /articles` — Liste mit Filter (domain, orwell-range, limit)
+  - `GET /articles/{url}` — Detailansicht mit Zitaten und Erklärungen
+  - `POST /analyse` — URL einreichen und Analyse anstoßen (BackgroundTask)
+  - `GET /analyse/job/{id}` — Job-Status-Polling
   - `GET /stats` — Aggregierte Statistiken als JSON
   - `GET /search?q=...` — Semantische Suche via ChromaDB
 - [ ] **Authentifizierung** — Optionaler API-Key-Schutz für den Analyse-Endpunkt
-- [ ] **Job-Queue** — Asynchrone Analyse-Jobs (FastAPI BackgroundTasks oder Celery)
+- [x] **Job-Queue** — Asynchrone Analyse-Jobs (FastAPI BackgroundTasks)
 
-#### Frontend
-- [ ] **Dashboard** — Übersichtsseite mit aktuellen Analysen und Kennzahlen
-- [ ] **Quellenvergleich** — Orwell-Index-Vergleich zwischen Domains (Balkendiagramm)
+#### Frontend — Angular 17+ Standalone
+- [x] **Dashboard** — KPI-Kacheln, Top-Techniken, Top-Strömungen, letzte Artikel
+- [x] **Artikel-Liste** — Filterbare Tabelle (Domain, Orwell-Range)
+- [x] **Artikel-Detailansicht** — Vollständige Analyse mit Techniken und Zitaten
+- [x] **Statistik-Seite** — Balkendiagramme, Portal-Vergleichstabelle, DK-Verteilung
+- [x] **URL-Submission** — Formular mit Job-Status-Polling
+- [ ] **Quellenvergleich** — Interaktives Balkendiagramm Domain × Orwell (Chart.js o.ä.)
 - [ ] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
 - [ ] **Technik-Heatmap** — Domain × Technik als Matrix
-- [ ] **Artikel-Detailansicht** — Vollständige Analyse mit hervorgehobenen Textzitaten
-- [ ] **URL-Submission** — Formular zum Einreichen eigener Artikel-URLs
 
 #### Stack-Entscheidung
-- [ ] **Option A: FastAPI + HTMX** — Schlank, kein JS-Framework, server-seitiges Rendering. Empfohlen für MVP.
-- [ ] **Option B: FastAPI + React** — Mehr Aufwand, aber reichhaltigere Interaktivität. Sinnvoll wenn das Dashboard komplex wird.
+- [x] **FastAPI + Angular 17+ Standalone** — Gewählt. Backend: `backend/`, Frontend: `frontend/`
 
 #### Knowledge Base
 - [ ] **Technik-Glossar** — Erklärung jeder Manipulationstechnik mit Beispielen (FUD, Framing, Loaded Language, etc.)

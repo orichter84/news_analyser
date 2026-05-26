@@ -32,6 +32,22 @@ def _bs4_fallback(html: str) -> str:
     return " ".join(p.get_text(separator=" ", strip=True) for p in paragraphs)
 
 
+def _extract_title(html: str) -> str | None:
+    soup = BeautifulSoup(html, "html.parser")
+    og = soup.find("meta", property="og:title")
+    if og:
+        content = og.get("content")
+        if content:
+            return str(content).strip()
+    h1 = soup.find("h1")
+    if h1:
+        return h1.get_text(strip=True)
+    tag = soup.find("title")
+    if tag:
+        return tag.get_text(strip=True)
+    return None
+
+
 def fetch_article(url: str, timeout: int = 15) -> Article | None:
     domain = urlparse(url).netloc.removeprefix("www.")
     fetched_at = datetime.datetime.utcnow().isoformat() + "Z"
@@ -58,10 +74,14 @@ def fetch_article(url: str, timeout: int = 15) -> Article | None:
         favor_recall=True,
     )
 
-    text = doc.text if doc else None
-    title = doc.title if doc else None
-    author = doc.author if doc else None
-    published_at = doc.date if doc else None
+    text       = getattr(doc, "text",   None) if doc else None
+    title      = getattr(doc, "title",  None) if doc else None
+    author     = getattr(doc, "author", None) if doc else None
+    published_at = getattr(doc, "date", None) if doc else None
+
+    # Titel-Fallback: og:title → h1 → <title>
+    if not title:
+        title = _extract_title(html)
 
     # BeautifulSoup als letzter Ausweg für den Text
     if not text or len(text) < 200:
