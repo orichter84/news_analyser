@@ -129,6 +129,7 @@ def main() -> None:
                 interval=args.interval,
                 max_articles=cfg.max_articles,
                 feeds_file=cfg.feeds_file,
+                allowed_topics=cfg.allowed_topics,
             )
         elif args.auto:
             cfg = FeedConfig(
@@ -136,6 +137,7 @@ def main() -> None:
                 interval=cfg.interval,
                 max_articles=cfg.max_articles,
                 feeds_file=cfg.feeds_file,
+                allowed_topics=cfg.allowed_topics,
             )
         start(cfg)
 
