@@ -8,6 +8,16 @@ https://rss.zeit.de/news/index
 https://www.welt.de/feeds/latest.rss
 https://www.faz.net/rss/aktuell/
 
+# Links / Sozialistisch
+https://www.taz.de/!p4608;rss/
+https://www.jungewelt.de/rss.php
+
+# Konservativ-Liberal
+https://www.cicero.de/feed
+
+# International
+https://rss.dw.com/rdf/rss-de-all
+
 # Österreich
 https://www.derstandard.at/rss
 
