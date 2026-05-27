@@ -37,7 +37,7 @@ class FeedConfig:
     @classmethod
     def from_env(cls) -> "FeedConfig":
         from .topic_filter import DEFAULT_ALLOWED_TOPICS
-        root = Path(__file__).parent.parent.parent
+        data_dir = Path(__file__).parent / "data"
         raw = os.environ.get("FEED_TOPICS", "")
         if raw.strip().lower() == "all":
             topics: frozenset[str] = frozenset()
@@ -49,6 +49,6 @@ class FeedConfig:
             mode=os.environ.get("FEED_MODE", "manual"),
             interval=int(os.environ.get("FEED_INTERVAL", "3600")),
             max_articles=int(os.environ.get("FEED_MAX_ARTICLES", "20")),
-            feeds_file=Path(os.environ.get("FEED_FILE", str(root / "feeds.txt"))),
+            feeds_file=Path(os.environ.get("FEED_FILE", str(data_dir / "feeds.txt"))),
             allowed_topics=topics,
         )

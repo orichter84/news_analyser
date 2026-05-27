@@ -6,48 +6,36 @@ and returns a signal for overall extremism intensity — direction-neutral.
 
 The signal is passed to Pass 1 (anonymised) as a weak prior (~20-30% weight).
 The LLM remains the final arbiter.
+
+Keyword lists are loaded from src/news_analyser/data/keywords_*.txt.
+Lines starting with # are comments and are ignored.
 """
 
+from pathlib import Path
 from typing import TypedDict
+
+_DATA_DIR = Path(__file__).parent / "data"
+
+
+def _load_keywords(filename: str) -> list[str]:
+    """Load keywords from a text file, ignoring blank lines and # comments."""
+    path = _DATA_DIR / filename
+    keywords: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            keywords.append(line)
+    return keywords
 
 
 # Extreme Rhetorik — linkes Spektrum
-EXTREME_LEFT: list[str] = [
-    # Kampf & Mobilisierung
-    "klassenkampf", "revolution", "widerstand", "aufstand", "mobilisierung",
-    "blockade", "sabotage", "systemsturz", "enteignung",
-    # Feindbilder
-    "kapitalisten", "konzernherrschaft", "ausbeutung", "faschisten",
-    "unterdrücker", "herrschende klasse", "bourgeoisie",
-    # Apokalyptische Sprache
-    "kapitalismus zerstört", "system überwinden", "alles steht auf dem spiel",
-    "kein kompromiss", "kampf ums überleben",
-    # Totalitärer Anspruch
-    "vergesellschaftung", "diktatur des proletariats", "klassenjustiz",
-]
+EXTREME_LEFT: list[str] = _load_keywords("keywords_extreme_left.txt")
 
 # Extreme Rhetorik — rechtes Spektrum
-EXTREME_RIGHT: list[str] = [
-    # Kampf & Mobilisierung
-    "volksverrat", "remigration", "bevölkerungsaustausch", "endkampf",
-    "widerstand", "reconquista", "abendland verteidigen",
-    # Feindbilder
-    "lügenpresse", "systemmedien", "globalisten", "überfremdung",
-    "islamisierung", "bevölkerungsaustausch", "politkaste", "altparteien",
-    # Apokalyptische Sprache
-    "deutschland wird abgeschafft", "großer austausch", "volkstod",
-    "existenzielle bedrohung", "letzte chance",
-    # Totalitärer Anspruch
-    "völkisch", "rassenrein", "blut und boden", "lebensraum",
-    "führerprinzip",
-]
+EXTREME_RIGHT: list[str] = _load_keywords("keywords_extreme_right.txt")
 
 # Allgemeine Extremismus-Indikatoren (richtungsunabhängig)
-EXTREME_GENERAL: list[str] = [
-    "menschenverachtend", "vernichten", "ausrotten", "säuberung",
-    "todfeind", "parasiten", "untermenschen", "verräter",
-    "kollaborateur", "feinde des volkes",
-]
+EXTREME_GENERAL: list[str] = _load_keywords("keywords_general.txt")
 
 
 class KeywordSignal(TypedDict):

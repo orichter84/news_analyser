@@ -10,8 +10,8 @@ build/
 # Umgebung & Secrets
 .env
 
-# Datenbank & generierte Daten
-data/
+# Datenbank & generierte Daten (nur Root-Verzeichnis, nicht src/*/data/)
+/data/
 
 # Logs
 logs/
