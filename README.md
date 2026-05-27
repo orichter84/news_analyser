@@ -110,10 +110,62 @@ python run.py --url https://www.spiegel.de/...
 |---|---|---|
 | `openai` | `OPENAI_API_KEY` | OpenAI API (Standard) |
 | `anthropic` | `ANTHROPIC_API_KEY` | Anthropic API |
-| `cli` | — | Claude Code CLI (lokal, kein API-Key) |
+| `cli` | — | Claude Code CLI (kein API-Key erforderlich) |
 | `lm_studio` | — | LM Studio lokaler Server |
 | `copilot` | `GITHUB_TOKEN` | GitHub Copilot |
 | `m365_copilot` | `M365_COPILOT_ACCESS_TOKEN` | Microsoft 365 Copilot |
+
+### Claude Code CLI (`cli`)
+
+Der `cli`-Provider nutzt die lokal installierte [Claude Code CLI](https://claude.ai/code) als Subprocess — kein separater API-Key nötig, die Authentifizierung läuft über den CLI-Login.
+
+**Installation (Node.js 18+ erforderlich):**
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+**Anmelden:**
+
+```bash
+claude login
+```
+
+Ein Browser-Fenster öffnet sich zur Authentifizierung mit dem Anthropic-Account. Nach dem Login kann die CLI direkt verwendet werden.
+
+**`.env` konfigurieren:**
+
+```env
+LLM_PROVIDER=cli
+```
+
+### LM Studio (`lm_studio`)
+
+[LM Studio](https://lmstudio.ai) ermöglicht den Betrieb lokaler Sprachmodelle ohne Cloud-Anbindung — kein API-Key erforderlich.
+
+**Installation:**
+
+1. LM Studio von [lmstudio.ai](https://lmstudio.ai) herunterladen und installieren
+2. Im Tab **Discover** ein Modell herunterladen (empfohlen: Mistral 7B Q8 oder Llama 3 8B Q8)
+3. Im Tab **Local Server** das Modell laden und den Server starten — läuft standardmäßig auf Port 1234
+
+**`.env` konfigurieren:**
+
+```env
+LLM_PROVIDER=lm_studio
+OPENAI_MODEL=llama-3-8b-instruct   # Modell-ID aus LM Studio (Anzeige im Server-Tab)
+```
+
+Die `OPENAI_BASE_URL` muss nicht gesetzt werden — der Connector verwendet automatisch `http://localhost:1234/v1`.
+
+> **Alternative: Ollama** — funktioniert ebenfalls lokal über den `openai`-Provider, da Ollama eine OpenAI-kompatible API anbietet:
+> ```env
+> LLM_PROVIDER=openai
+> OPENAI_API_KEY=ollama
+> OPENAI_BASE_URL=http://localhost:11434/v1
+> OPENAI_MODEL=llama3.2
+> ```
+> Modell vorher herunterladen: `ollama pull llama3.2`
 
 ---
 
