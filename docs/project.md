@@ -1,6 +1,6 @@
 # News Analyser
 
-Automatisiertes System zur Erkennung von Manipulations- und Framing-Techniken in deutschsprachigen Nachrichtenartikeln. Artikel werden per URL oder RSS-Feed eingelesen, von einem LLM-Agenten in zwei Passes analysiert und strukturiert in einer lokalen ChromaDB gespeichert. Eine FastAPI + Angular Web-UI ermöglicht Auswertung und Recherche.
+Automatisiertes System zur Erkennung von Manipulations- und Framing-Techniken in deutschsprachigen Nachrichtenartikeln. Artikel werden per URL oder RSS-Feed eingelesen, von einem LLM-Agenten in zwei Analysedurchläufen ausgewertet und strukturiert in einer lokalen ChromaDB gespeichert. Eine FastAPI + Angular Web-UI ermöglicht Auswertung und Recherche.
 
 ---
 
@@ -255,7 +255,7 @@ Paywalled Artikel werden nicht analysiert und nicht gespeichert.
 
 ## Techniken-Datenbank
 
-19 dokumentierte Manipulationstechniken sind in ChromaDB gespeichert (`techniques`-Collection). Bei der Analyse werden LLM-Freitext-Ausgaben semantisch auf kanonische Namen gemappt (Cosine-Similarity, Threshold 0.35). Neue Techniken können durch Erweiterung von `technique_store.py` hinzugefügt werden.
+19 dokumentierte Manipulationstechniken sind in `technique_store.py` definiert und werden beim ersten Start automatisch in ChromaDB eingespielt (`techniques`-Collection). Die Collection liegt in `data/` und wird nicht ins Repository gepusht — die Quelldaten in `technique_store.py` sind jedoch versioniert und ermöglichen eine automatische Wiederherstellung. Bei der Analyse werden LLM-Freitext-Ausgaben semantisch auf kanonische Namen gemappt (Cosine-Similarity, Schwellenwert 0.35). Neue Techniken können durch Erweiterung von `technique_store.py` hinzugefügt werden.
 
 Kategorien: **Emotional** (Appeal to Fear, Bandwagon, Appeal to Emotion), **Logisch** (Ad Hominem, Straw Man, False Dichotomy, Slippery Slope, Cherry Picking), **Rhetorisch** (Loaded Language, Whataboutism, Euphemismus, Dysphemismus, Appeal to Authority, Presuppositional Framing), **Strukturell** (Framing, Agenda Setting, False Balance, Scapegoating, Repetition).
 
@@ -267,7 +267,4 @@ Kategorien: **Emotional** (Appeal to Fear, Bandwagon, Appeal to Emotion), **Logi
 LLM_PROVIDER=lm_studio
 # Modell muss unter http://localhost:1234 laufen
 # Empfohlen: Mistral 7B Q8 oder Llama 3 8B Q8
-# Mindest-Hardware: 32GB Unified Memory (Apple Silicon M5 Pro empfohlen)
 ```
-
-Der Watcher läuft als Dauerdienst — aktives Cooling ist bei Dauerlast wichtig (MacBook Pro, kein Air).
