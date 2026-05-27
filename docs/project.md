@@ -49,33 +49,44 @@ news_analyser/
 ├── run.py                          Einstiegspunkt CLI
 ├── requirements.txt                Python-Abhängigkeiten (Analyse-Engine)
 ├── requirements-api.txt            Python-Abhängigkeiten (FastAPI Backend)
-├── feeds.txt                       RSS-Feed-URLs (eine pro Zeile, # = Kommentar)
 ├── .env.example                    Vorlage für Umgebungsvariablen
 │
-├── src/news_analyser/
-│   ├── main.py                     CLI-Logik (--url, --feed, --stats, --auto)
-│   ├── scraper.py                  Artikel-Extraktion + Paywall-Erkennung
-│   ├── analyzer.py                 Zwei-Pass LLM-Analyse
-│   ├── anonymizer.py               spaCy NER-basierte Anonymisierung
-│   ├── keywords.py                 Keyword-Signal (links/rechts/extremism)
-│   ├── topic_filter.py             Keyword-Themenvorfilter für RSS
-│   ├── anchor_store.py             RAG-Ankerpunkte (ChromaDB: orwell_anchors)
-│   ├── technique_store.py          Techniken-DB + semantische Normalisierung
-│   ├── db_storage.py               ChromaDB-Persistenz (articles)
-│   ├── feed.py                     RSS-Collector
-│   ├── stats.py                    Statistik-Auswertung (pandas)
-│   ├── config.py                   LLMConfig, FeedConfig
+├── src/
+│   ├── llm_connectors/             LLM-Backend-Abstraktion (eigenständiges Paket)
+│   │   ├── base.py                 LLMConnector ABC
+│   │   ├── anthropic_connector.py  Anthropic Messages API
+│   │   ├── openai_connector.py     OpenAI / LM Studio / GitHub Copilot
+│   │   ├── cli_connector.py        Claude Code CLI (Subprocess)
+│   │   └── m365_copilot_connector.py  Microsoft 365 Copilot
 │   │
-│   ├── prompts/system/
-│   │   ├── pass1.md                Systemprompt Pass 1 (anonymisiert)
-│   │   └── pass2.md                Systemprompt Pass 2 (Original)
-│   │
-│   └── connectors/                 LLM-Backend-Abstraktion
-│       ├── base.py                 LLMConnector ABC
-│       ├── anthropic_connector.py  Anthropic Messages API
-│       ├── openai_connector.py     OpenAI / Ollama / LM Studio
-│       ├── cli_connector.py        Claude Code CLI (Subprocess)
-│       └── M365CopilotConnector.py Microsoft 365 Copilot
+│   └── news_analyser/
+│       ├── main.py                 CLI-Logik (--url, --feed, --stats, --auto)
+│       ├── scraper.py              Artikel-Extraktion + Paywall-Erkennung
+│       ├── anonymizer.py           spaCy NER-basierte Anonymisierung
+│       ├── keywords.py             Keyword-Signal (links/rechts/allgemein)
+│       ├── topic_filter.py         Keyword-Themenvorfilter für RSS
+│       ├── feed.py                 RSS-Collector
+│       ├── stats.py                Statistik-Auswertung (pandas)
+│       ├── config.py               LLMConfig, FeedConfig
+│       │
+│       ├── agents/
+│       │   └── analyzer.py         Zwei-Pass LLM-Analyse
+│       │
+│       ├── repositories/           ChromaDB-Zugriff
+│       │   ├── db_storage.py       Artikel speichern + suchen (articles)
+│       │   ├── anchor_store.py     RAG-Ankerpunkte (orwell_anchors)
+│       │   └── technique_store.py  Techniken-KB + semantische Normalisierung
+│       │
+│       ├── prompts/system/
+│       │   ├── pass1.md            Systemprompt Pass 1 (anonymisiert)
+│       │   └── pass2.md            Systemprompt Pass 2 (Original)
+│       │
+│       └── data/                   Initialisierungsdaten (versioniert)
+│           ├── feeds.txt           RSS-Feed-URLs
+│           ├── techniques.json     19 Manipulationstechniken
+│           ├── keywords_extreme_left.txt
+│           ├── keywords_extreme_right.txt
+│           └── keywords_general.txt
 │
 ├── backend/                        FastAPI REST-API
 │   ├── main.py                     App-Instanz, CORS, Router
@@ -100,7 +111,7 @@ news_analyser/
 │           └── services/           ApiService (HttpClient)
 │
 └── data/
-    └── chroma_db/                  Lokale Vektordatenbank (auto-generiert)
+    └── chroma_db/                  Lokale Vektordatenbank (auto-generiert, nicht im Repo)
         ├── articles                Analysierte Artikel
         ├── orwell_anchors          RAG-Kalibrierungsanker
         └── techniques              Dokumentierte Manipulationstechniken
@@ -255,7 +266,7 @@ Paywalled Artikel werden nicht analysiert und nicht gespeichert.
 
 ## Techniken-Datenbank
 
-19 dokumentierte Manipulationstechniken sind in `technique_store.py` definiert und werden beim ersten Start automatisch in ChromaDB eingespielt (`techniques`-Collection). Die Collection liegt in `data/` und wird nicht ins Repository gepusht — die Quelldaten in `technique_store.py` sind jedoch versioniert und ermöglichen eine automatische Wiederherstellung. Bei der Analyse werden LLM-Freitext-Ausgaben semantisch auf kanonische Namen gemappt (Cosine-Similarity, Schwellenwert 0.35). Neue Techniken können durch Erweiterung von `technique_store.py` hinzugefügt werden.
+19 dokumentierte Manipulationstechniken sind in `src/news_analyser/data/techniques.json` definiert und werden beim ersten Start automatisch in ChromaDB eingespielt (`techniques`-Collection). Die Collection liegt in `data/` und wird nicht ins Repository gepusht — die Quelldaten in `techniques.json` sind versioniert und ermöglichen eine automatische Wiederherstellung. Bei der Analyse werden LLM-Freitext-Ausgaben semantisch auf kanonische Namen gemappt (Cosine-Similarity, Schwellenwert 0.35). Neue Techniken können durch Erweiterung von `techniques.json` hinzugefügt werden.
 
 Kategorien: **Emotional** (Appeal to Fear, Bandwagon, Appeal to Emotion), **Logisch** (Ad Hominem, Straw Man, False Dichotomy, Slippery Slope, Cherry Picking), **Rhetorisch** (Loaded Language, Whataboutism, Euphemismus, Dysphemismus, Appeal to Authority, Presuppositional Framing), **Strukturell** (Framing, Agenda Setting, False Balance, Scapegoating, Repetition).
 
