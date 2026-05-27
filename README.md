@@ -182,9 +182,12 @@ news_analyser/
 │   └── routers/             Endpunkte: articles, analyse, stats, search, techniques
 ├── frontend/                Angular 17+ SPA
 ├── data/                    ChromaDB (lokal, persistent, nicht im Repo)
+├── config/                  Nutzer-Konfiguration (committed, kein Secret)
+│   ├── feeds.txt            RSS-Feed-URLs (eine pro Zeile, # für Kommentare)
+│   └── rerun_urls.txt       URLs für manuelle Wiederholung (--file)
 ├── requirements.txt         Analyse-Pipeline-Dependencies
 ├── requirements-api.txt     Backend-Dependencies (FastAPI etc.)
-└── .env.example             Konfigurationsvorlage
+└── .env.example             Konfigurationsvorlage (Secrets + Provider-Auswahl)
 ```
 
 ---
