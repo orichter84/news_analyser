@@ -48,7 +48,7 @@ python -m spacy download de_core_news_md
 
 > Beide Optionen erzeugen eine `.venv/`-Umgebung — eine davon reicht, nicht beide.
 
-### 4. Umgebungsvariablen konfigurieren
+### 3. Umgebungsvariablen konfigurieren
 
 ```bash
 cp .env.example .env
@@ -57,7 +57,7 @@ cp .env.example .env
 
 Mindestens `LLM_PROVIDER` setzen. Je nach Provider wird zusätzlich ein API-Key benötigt — `cli` und `lm_studio` funktionieren ohne. Alle Optionen sind in `.env.example` dokumentiert.
 
-### 5. Frontend (optional)
+### 4. Frontend (optional)
 
 ```bash
 cd frontend
@@ -68,14 +68,16 @@ npm install
 
 ## Starten
 
-### Backend (Port 8000)
+Backend und Frontend laufen parallel — am besten zwei separate Terminals im Projektverzeichnis öffnen.
+
+### Terminal 1 — Backend (Port 8000)
 
 ```bash
 cd backend
 uvicorn main:app --reload
 ```
 
-### Frontend (Port 4200)
+### Terminal 2 — Frontend (Port 4200)
 
 ```bash
 cd frontend
