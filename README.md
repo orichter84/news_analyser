@@ -153,10 +153,9 @@ LLM_PROVIDER=cli
 
 ```env
 LLM_PROVIDER=lm_studio
-OPENAI_MODEL=llama-3-8b-instruct   # Modell-ID aus LM Studio (Anzeige im Server-Tab)
 ```
 
-Die `OPENAI_BASE_URL` muss nicht gesetzt werden — der Connector verwendet automatisch `http://localhost:1234/v1`.
+Das aktive Modell wird in LM Studio selbst festgelegt — `OPENAI_MODEL` hat keinen Effekt. Die `OPENAI_BASE_URL` muss ebenfalls nicht gesetzt werden, der Connector verwendet automatisch `http://localhost:1234/v1`.
 
 > **Alternative: Ollama** — funktioniert ebenfalls lokal über den `openai`-Provider, da Ollama eine OpenAI-kompatible API anbietet:
 > ```env
