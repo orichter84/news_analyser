@@ -240,3 +240,13 @@ Edward Bernays kodifizierte die Werkzeuge in den 1920ern. NS und SED haben sie p
 - **Fehlende Gegenkontrolle**: Kein Test mit einer eindeutig rechtsextremen Quelle als Pendant zum nd-aktuell auf der linken Seite (Compact wäre die naheliegende Wahl).
 
 Der nächste sinnvolle Schritt ist der Betrieb des RSS-Feed-Collectors über mehrere Wochen, um pro Quelle eine statistisch belastbare Stichprobengröße zu erreichen.
+
+---
+
+## Weiterführende Tests
+
+Der unter "Modell-Bias" genannte Punkt wurde im Anschluss systematisch untersucht.
+Die Ergebnisse der Bias-Validation sowie die daraus folgenden Architekturentscheidungen
+(Orwell-Index-Refaktorierung, Zwei-Pass-Anonymisierung) sind dokumentiert in:
+
+**`docs/konzept/bias-validation/ergebnisse.md`**

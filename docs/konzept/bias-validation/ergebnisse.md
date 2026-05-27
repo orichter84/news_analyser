@@ -5,6 +5,47 @@ Erwartung: Alle Metriken identisch. Abweichungen belegen LLM-Trainingsbias.
 
 ---
 
+## Architekturkonsequenzen aus den Tests
+
+### Refaktorierung Orwell-Index (2026-05-26)
+
+**Auslöser:** Test 01 zeigte dass der Orwell-Index strukturell identische Texte
+unterschiedlich bewertet — je nachdem welche Gruppe die Zielscheibe ist. Das belegte
+dass der Index zwei konzeptuell verschiedene Dinge maß: rhetorischen Extremismus
+**und** politische Richtung auf einer einzigen Achse.
+
+**Konsequenz:** Vollständige Trennung in zwei unabhängige Metriken:
+
+| Vorher | Nachher |
+|---|---|
+| Orwell-Index: −1.0 (linksliberal) bis +1.0 (rechtskonservativ) | Orwell-Index: 0.0 (sachlich) bis 1.0 (extrem) — reine Extremismusmessung |
+| Politische Richtung implizit im Orwell-Index | Politische Strömung: benannte Labels (`["konservativ", "nationalistisch"]`) |
+
+Der Orwell-Index misst seither ausschließlich rhetorischen Extremismus — symmetrisch
+und gruppenunabhängig. Die politische Einordnung erfolgt über benannte Labels in
+Pass 2, wo Bias durch explizite Symmetrie-Instruktionen im Prompt kontrolliert wird.
+
+### Zwei-Pass-Architektur mit Anonymisierung (2026-05-26)
+
+**Auslöser:** Test 01 belegte dass Prompt-Instruktionen allein den Bias nicht
+zuverlässig eliminieren. Tests 02 und 03 validierten den Gegenentwurf.
+
+**Konsequenz:** Strukturelle Bias-Elimination durch Anonymisierung vor Pass 1.
+Das LLM bewertet in Pass 1 ausschließlich rhetorische Struktur ohne Gruppenidentifikatoren.
+Die Lösung ist modellunabhängig — sie funktioniert unverändert bei jedem Modellwechsel.
+
+### DK-Index in Pass 2 (2026-05-26)
+
+**Auslöser:** Tests 02 und 03 zeigten DK-Differenz von 0.00 bei realen Artikeln —
+vollständige Stabilität ohne Anonymisierung.
+
+**Konsequenz:** DK-Index wird in Pass 2 am Originaltext gemessen. Spart einen
+LLM-Aufruf und liefert bei realen Artikeln zuverlässig gruppenblinde Ergebnisse.
+Unbelegte Gewissheit manifestiert sich in Satzkonstruktion und Modalverben,
+nicht in der Identität der Zielgruppe.
+
+---
+
 ## Test 01 — Scapegoating (2026-05-26)
 
 **Dateien:** vorlage_scapegoating_a.txt / vorlage_scapegoating_b.txt
