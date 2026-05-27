@@ -9,6 +9,7 @@ Analysiert Nachrichtenartikel auf Manipulationstechniken, rhetorischen Extremism
 ## Voraussetzungen
 
 - Python 3.11+
+- [uv](https://github.com/astral-sh/uv) (empfohlener Package Manager — `pip install uv`)
 - Node.js 18+ (nur für das Frontend)
 - Zugang zu einem LLM-Backend (OpenAI, Anthropic, LM Studio, Claude CLI o.ä.)
 
@@ -23,26 +24,29 @@ git clone <repo-url>
 cd news_analyser
 ```
 
-### 2. Virtuelle Umgebung erstellen
+### 2. Virtuelle Umgebung + Abhängigkeiten installieren
+
+**Option A — mit uv (empfohlen):**
+
+```bash
+uv venv
+source .venv/bin/activate      # Linux/macOS
+.venv\Scripts\activate         # Windows
+uv pip install -r requirements.txt -r requirements-api.txt
+python -m spacy download de_core_news_md
+```
+
+**Option B — ohne uv (klassisch):**
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate      # Linux/macOS
 .venv\Scripts\activate         # Windows
-```
-
-### 3. Abhängigkeiten installieren
-
-```bash
-# Analyse-Pipeline
-pip install -r requirements.txt
-
-# Backend (FastAPI)
-pip install -r requirements-api.txt
-
-# Deutsches spaCy-Sprachmodell (Anonymisierung)
+pip install -r requirements.txt -r requirements-api.txt
 python -m spacy download de_core_news_md
 ```
+
+> Beide Optionen erzeugen eine `.venv/`-Umgebung — eine davon reicht, nicht beide.
 
 ### 4. Umgebungsvariablen konfigurieren
 
@@ -51,7 +55,7 @@ cp .env.example .env
 # .env mit einem Editor öffnen und API-Key eintragen
 ```
 
-Mindestens `LLM_PROVIDER` und den passenden API-Key setzen — siehe `.env.example` für alle Optionen.
+Mindestens `LLM_PROVIDER` setzen. Je nach Provider wird zusätzlich ein API-Key benötigt — `cli` und `lm_studio` funktionieren ohne. Alle Optionen sind in `.env.example` dokumentiert.
 
 ### 5. Frontend (optional)
 
