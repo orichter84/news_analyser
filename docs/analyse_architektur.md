@@ -180,7 +180,7 @@ ebenfalls ab — jedoch deutlich schwächer als die anderen Metriken. Entscheide
 die Folgetests an realen Artikeln (Tests 02 und 03): dort ist die DK-Differenz in
 beiden Fällen **0.00** — vollständige Stabilität unabhängig von Gruppenidentifikatoren.
 
-Das ist konzeptuell begründet: epistemische Überzeugheit manifestiert sich in
+Das ist konzeptuell begründet: unbelegte Gewissheit manifestiert sich in
 Satzkonstruktion und Modalverben, nicht in der Identität der Zielgruppe. Die
 Abweichung in Test 01 erklärt sich durch den synthetischen, konstruiert extremen
 Charakter des Ausgangstexts — bei realen Artikeln greift dieser Effekt nicht.
