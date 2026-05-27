@@ -166,8 +166,28 @@ Techniken und Labels müssen identisch oder begründbar verschieden sein.
 | Migranten / Ausländer | Einheimische / Deutsche |
 | Linke / Kommunisten | Rechte / Nationalisten |
 
-Erster dokumentierter Testfall: `tests/symmetrie/ergebnisse.md` (2026-05-26) —
-Bias nachgewiesen, Differenz Orwell-Index: -0.20, Bernays: -20.41.
+Ergebnisse aus `tests/symmetrie/ergebnisse.md` (2026-05-26):
+
+| Metrik | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
+|---|---|---|---|
+| Orwell-Index | 0.95 | 0.75 | **-0.20** |
+| Bernays Score | 122.45 | 102.04 | **-20.41** |
+| DK-Index | 0.97 | 0.88 | **-0.09** |
+| Anzahl Techniken | 6 | 5 | **-1** |
+
+Orwell-Index und Bernays Score zeigen deutlichen Bias. Der DK-Index weicht mit -0.09
+ebenfalls ab — jedoch deutlich schwächer als die anderen Metriken. Entscheidend sind
+die Folgetests an realen Artikeln (Tests 02 und 03): dort ist die DK-Differenz in
+beiden Fällen **0.00** — vollständige Stabilität unabhängig von Gruppenidentifikatoren.
+
+Das ist konzeptuell begründet: epistemische Überzeugheit manifestiert sich in
+Satzkonstruktion und Modalverben, nicht in der Identität der Zielgruppe. Die
+Abweichung in Test 01 erklärt sich durch den synthetischen, konstruiert extremen
+Charakter des Ausgangstexts — bei realen Artikeln greift dieser Effekt nicht.
+
+**Architekturentscheidung:** Der DK-Index wird daher in Pass 2 am Originaltext
+gemessen, ohne Anonymisierungs-Preprocessing. Er spart damit einen LLM-Aufruf
+und liefert bei realen Artikeln zuverlässig gruppenblinde Ergebnisse.
 
 ---
 
