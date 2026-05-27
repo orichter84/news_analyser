@@ -1,9 +1,21 @@
 """
-Connector plugin registry.
+llm_connectors — LLM backend abstraction layer.
+
+Provides a uniform interface (LLMConnector) over multiple LLM backends.
+New connectors only need to implement LLMConnector.generate() and LLMConnector.name.
 
 Usage:
-    from .connectors import load_connector
+    from llm_connectors import load_connector
     connector = load_connector("openai")
+    response = connector.generate(system_prompt, input_data, model, temperature, max_tokens)
+
+Supported backends:
+    openai      — OpenAI Chat Completions API (OPENAI_API_KEY)
+    anthropic   — Anthropic Messages API (ANTHROPIC_API_KEY)
+    cli         — Claude Code CLI via subprocess
+    copilot     — GitHub Copilot via OpenAI-compatible API (GITHUB_TOKEN)
+    lm_studio   — LM Studio local server (LM_STUDIO_API_KEY, optional)
+    m365_copilot — Microsoft 365 Copilot via Graph API (M365_COPILOT_ACCESS_TOKEN)
 """
 
 from functools import partial
@@ -12,7 +24,7 @@ from .base import LLMConnector
 from .anthropic_connector import AnthropicConnector
 from .cli_connector import CLIConnector
 from .openai_connector import OpenAIConnector
-from .M365CopilotConnector import M365CopilotConnector
+from .m365_copilot_connector import M365CopilotConnector
 
 _REGISTRY = {
     "anthropic": AnthropicConnector,
@@ -40,7 +52,7 @@ def load_connector(name: str) -> LLMConnector:
     """Instantiate a connector by name.
 
     Raises:
-        ValueError: If connector name is unknown
+        ValueError: If connector name is unknown.
     """
     cls = _REGISTRY.get(name)
     if cls is None:

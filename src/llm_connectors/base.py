@@ -2,8 +2,8 @@
 LLMConnector — abstract base class for all connector plugins.
 
 Each connector wraps a specific LLM backend (Anthropic API, Claude CLI, Ollama, …)
-behind a uniform interface. The pipeline and AgentManager only depend on this
-interface, never on a concrete connector.
+behind a uniform interface. The pipeline only depends on this interface,
+never on a concrete connector.
 """
 
 from abc import ABC, abstractmethod

@@ -1,6 +1,8 @@
 """
 OpenAIConnector — calls the OpenAI Chat Completions API.
 Requires OPENAI_API_KEY environment variable.
+
+Also serves as base for OpenAI-compatible endpoints (LM Studio, GitHub Copilot).
 """
 
 import os

@@ -11,7 +11,7 @@ from typing import Any
 from ..scraper import Article
 from ..config import LLMConfig
 from ..prompts import load_prompt
-from ..connectors import load_connector
+from llm_connectors import load_connector
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from ..anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
