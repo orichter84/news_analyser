@@ -1,29 +1,20 @@
-"""Central configuration – reads from environment variables."""
+"""Central configuration – reads from environment variables.
+
+Note: .env is loaded by the news_analyser package __init__.py — no load_dotenv here.
+"""
 
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
-
 
 @dataclass(frozen=True)
 class LLMConfig:
     provider: str
-    model: str
-    temperature: float
-    max_tokens: int
 
     @classmethod
     def from_env(cls) -> "LLMConfig":
-        return cls(
-            provider=os.environ.get("LLM_PROVIDER", "openai"),
-            model=os.environ.get("OPENAI_MODEL", "gpt-4o"),
-            temperature=float(os.environ.get("LLM_TEMPERATURE", "0.2")),
-            max_tokens=int(os.environ.get("LLM_MAX_TOKENS", "2048")),
-        )
+        return cls(provider=os.environ.get("LLM_PROVIDER", "openai"))
 
 
 @dataclass(frozen=True)

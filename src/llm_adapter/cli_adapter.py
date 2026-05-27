@@ -1,8 +1,16 @@
 """
 CLIAdapter — ruft den Claude Code CLI als Subprocess auf.
 
-Voraussetzung: `claude` muss im PATH verfügbar sein und authentifiziert sein.
+Voraussetzung: `claude` muss im PATH verfügbar und authentifiziert sein.
 Hinweis: temperature und max_tokens werden vom CLI nicht unterstützt und ignoriert.
+
+Config keys (passed to initialize):
+    model — Modellname, wird per --model an die CLI übergeben
+            (default: "claude-opus-4-5")
+
+ENV fallbacks (wenn nicht im config dict):
+    LLM_MODEL    — provider-agnostischer Modellname (bevorzugt)
+    OPENAI_MODEL — Legacy-Alias (backward compat)
 """
 
 import json
@@ -15,17 +23,28 @@ from .base import LLMAdapter
 class CLIAdapter(LLMAdapter):
     """Adapter der den lokalen `claude`-CLI per Subprocess aufruft."""
 
+    _DEFAULTS: dict = {
+        "model": "claude-opus-4-5",
+    }
+
     @property
     def name(self) -> str:
         return "cli"
+
+    def initialize(self, config: dict) -> None:
+        # ---- Schritt 1: Nicht-sicherheitskritische Konfiguration ----
+        import os
+        model = config.get("model")
+        if not model:
+            model = os.environ.get("LLM_MODEL") or os.environ.get("OPENAI_MODEL")
+        self._model: str = model or self._DEFAULTS["model"]
+
+        # Kein Schritt 2: Der CLI authentifiziert sich eigenständig.
 
     def generate(
         self,
         system_prompt: str,
         input_data: Dict[str, Any],
-        model: str,
-        temperature: float,
-        max_tokens: int,
     ) -> str:
         user_content = json.dumps(input_data, ensure_ascii=False, indent=2)
 
@@ -33,7 +52,7 @@ class CLIAdapter(LLMAdapter):
             "claude", "-p",
             "--no-session-persistence",  # keine History-Einträge
             "--system-prompt", system_prompt,
-            "--model", model,
+            "--model", self._model,
             "--tools", "",               # alle Tools deaktivieren – nur Text-Output
         ]
 

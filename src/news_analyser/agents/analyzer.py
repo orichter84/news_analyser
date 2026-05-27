@@ -5,13 +5,13 @@ Pass 2 (original text):   Politische Strömung (labels), DK-Index
 """
 
 import json
+import os
 import re
 from typing import Any
 
 from ..scraper import Article
-from ..config import LLMConfig
 from ..prompts import load_prompt
-from llm_adapter import load_adapter
+import llm_adapter
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
@@ -33,8 +33,8 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
 
 
 def analyze_article(article: Article) -> dict[str, Any] | None:
-    cfg = LLMConfig.from_env()
-    connector = load_adapter(cfg.provider)
+    provider = os.environ.get("LLM_PROVIDER", "openai")
+    adapter  = llm_adapter.get_instance(provider)
 
     kw      = compute_keyword_signal(article.text)
     anon    = anonymize(article.text)
@@ -73,15 +73,12 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         pass1_prompt = pass1_prompt + "\n\n" + anchor_section
 
     try:
-        raw1 = connector.generate(
+        raw1 = adapter.generate(
             system_prompt=pass1_prompt,
             input_data=pass1_input,
-            model=cfg.model,
-            temperature=cfg.temperature,
-            max_tokens=cfg.max_tokens,
         )
     except Exception as exc:
-        print(f"[analyzer] Pass 1 Connector error: {exc}")
+        print(f"[analyzer] Pass 1 error: {exc}")
         return None
 
     result1 = _extract_json(raw1)
@@ -102,15 +99,12 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     }
 
     try:
-        raw2 = connector.generate(
+        raw2 = adapter.generate(
             system_prompt=load_prompt("system", "pass2"),
             input_data=pass2_input,
-            model=cfg.model,
-            temperature=cfg.temperature,
-            max_tokens=cfg.max_tokens,
         )
     except Exception as exc:
-        print(f"[analyzer] Pass 2 Connector error: {exc}")
+        print(f"[analyzer] Pass 2 error: {exc}")
         return None
 
     result2 = _extract_json(raw2)
