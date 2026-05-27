@@ -1,5 +1,5 @@
 """
-M365CopilotConnector — calls Microsoft 365 Copilot via Microsoft Graph Copilot Chat API (beta).
+M365CopilotAdapter — calls Microsoft 365 Copilot via Microsoft Graph Copilot Chat API (beta).
 
 - Uses delegated OAuth access token (Bearer) from env var: M365_COPILOT_ACCESS_TOKEN
 - Creates a copilotConversation once and reuses it for subsequent calls (multi-turn).
@@ -12,10 +12,10 @@ from typing import Any, Dict, Optional
 
 import requests
 
-from .base import LLMConnector
+from .base import LLMAdapter
 
 
-class M365CopilotConnector(LLMConnector):
+class M365CopilotAdapter(LLMAdapter):
     @property
     def name(self) -> str:
         return "m365_copilot"

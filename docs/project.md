@@ -52,12 +52,12 @@ news_analyser/
 ├── .env.example                    Vorlage für Umgebungsvariablen
 │
 ├── src/
-│   ├── llm_connectors/             LLM-Backend-Abstraktion (eigenständiges Paket)
-│   │   ├── base.py                 LLMConnector ABC
-│   │   ├── anthropic_connector.py  Anthropic Messages API
-│   │   ├── openai_connector.py     OpenAI / LM Studio / GitHub Copilot
-│   │   ├── cli_connector.py        Claude Code CLI (Subprocess)
-│   │   └── m365_copilot_connector.py  Microsoft 365 Copilot
+│   ├── llm_adapter/                LLM-Backend-Abstraktion (eigenständiges Paket)
+│   │   ├── base.py                 LLMAdapter ABC
+│   │   ├── anthropic_adapter.py    Anthropic Messages API
+│   │   ├── openai_adapter.py       OpenAI / LM Studio / GitHub Copilot
+│   │   ├── cli_adapter.py          Claude Code CLI (Subprocess)
+│   │   └── m365_copilot_adapter.py Microsoft 365 Copilot
 │   │
 │   └── news_analyser/
 │       ├── main.py                 CLI-Logik (--url, --feed, --stats, --auto)

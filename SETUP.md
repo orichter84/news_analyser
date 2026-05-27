@@ -114,7 +114,7 @@ python run.py --text-file artikel.txt --domain beispiel.de
 ### `ModuleNotFoundError`
 → Abhängigkeiten nicht installiert. Schritt 2 wiederholen.
 
-### `claude: command not found` (bei CLIConnector)
+### `claude: command not found` (bei CLIAdapter)
 → Claude Code CLI nicht installiert. Installation: https://claude.ai/code
 
 ### ChromaDB-Warnungen beim Start (`HF Hub unauthenticated`)

@@ -1,7 +1,7 @@
 # Testergebnisse — Erster Proof of Concept
 
 **Datum:** 22. Mai 2026  
-**System:** news_analyser v0.1 — CLIConnector (claude-sonnet-4-6)  
+**System:** news_analyser v0.1 — CLIAdapter (claude-sonnet-4-6)  
 **Metrik:** Orwell-Index (−1.0 bis +1.0)
 
 ---

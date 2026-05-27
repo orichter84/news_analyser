@@ -1,5 +1,5 @@
 """
-OpenAIConnector — calls the OpenAI Chat Completions API.
+OpenAIAdapter — calls the OpenAI Chat Completions API.
 Requires OPENAI_API_KEY environment variable.
 
 Also serves as base for OpenAI-compatible endpoints (LM Studio, GitHub Copilot).
@@ -14,18 +14,18 @@ try:
 except ImportError:
     _openai = None
 
-from .base import LLMConnector
+from .base import LLMAdapter
 
 
-class OpenAIConnector(LLMConnector):
-    """Connector for the OpenAI Chat Completions API."""
+class OpenAIAdapter(LLMAdapter):
+    """Adapter for the OpenAI Chat Completions API."""
 
     def __init__(
         self,
         api_key_env: str = "OPENAI_API_KEY",
         api_key_default: str | None = None,
         base_url: str | None = None,
-        connector_name: str = "openai",
+        adapter_name: str = "openai",
         use_system_role: bool = True,
     ) -> None:
         if _openai is None:
@@ -35,13 +35,13 @@ class OpenAIConnector(LLMConnector):
             raise EnvironmentError(
                 f"{api_key_env} not set. Export it before starting the server."
             )
-        self._connector_name = connector_name
+        self._adapter_name = adapter_name
         self._use_system_role = use_system_role
         self._client = _openai.OpenAI(api_key=api_key, base_url=base_url)
 
     @property
     def name(self) -> str:
-        return self._connector_name
+        return self._adapter_name
 
     def generate(
         self,

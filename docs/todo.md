@@ -9,7 +9,7 @@
 - [x] Zwei-Pass-LLM-Architektur (Anonymisierung + Originaltext)
 - [x] Anonymisierungs-Preprocessing via spaCy de_core_news_md
 - [x] Keyword-Signal als Extremismus-Vorfilter (keywords.py)
-- [x] Connector-Abstraktion (OpenAI, Anthropic, CLI, LM Studio, M365 Copilot)
+- [x] Adapter-Abstraktion (OpenAI, Anthropic, CLI, LM Studio, M365 Copilot)
 - [x] Systemprompts als editierbare Markdown-Dateien (pass1.md, pass2.md)
 
 ### Indikatoren
@@ -78,7 +78,7 @@
 - [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Schwarze/Weiße, Migranten/Einheimische, Linke/Rechte)
 - [ ] **Keyword-Listen** — Gegner-Framing-Filter (Keywords in Anführungszeichen als "zitiert" markieren)
 - [ ] **Manuell kuratierter Anker-Korpus** — Initiale Kuration mit verifizierten Referenzartikeln für bessere Cold-Start-Kalibrierung
-- [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Connector-Interface
+- [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Adapter-Interface
 - [ ] **Analyse-Validierung** — Prüfen ob zurückgegebene quote-Felder tatsächlich im Artikeltext enthalten sind
 
 ### Export & Integration

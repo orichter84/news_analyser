@@ -11,7 +11,7 @@ from typing import Any
 from ..scraper import Article
 from ..config import LLMConfig
 from ..prompts import load_prompt
-from llm_connectors import load_connector
+from llm_adapter import load_adapter
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
@@ -34,7 +34,7 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
 
 def analyze_article(article: Article) -> dict[str, Any] | None:
     cfg = LLMConfig.from_env()
-    connector = load_connector(cfg.provider)
+    connector = load_adapter(cfg.provider)
 
     kw      = compute_keyword_signal(article.text)
     anon    = anonymize(article.text)

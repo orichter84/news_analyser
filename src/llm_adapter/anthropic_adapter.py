@@ -1,5 +1,5 @@
 """
-AnthropicConnector — calls the Anthropic Messages API directly.
+AnthropicAdapter — calls the Anthropic Messages API directly.
 Requires ANTHROPIC_API_KEY environment variable.
 """
 
@@ -12,11 +12,11 @@ try:
 except ImportError:
     _anthropic = None
 
-from .base import LLMConnector
+from .base import LLMAdapter
 
 
-class AnthropicConnector(LLMConnector):
-    """Connector for the Anthropic Messages API."""
+class AnthropicAdapter(LLMAdapter):
+    """Adapter for the Anthropic Messages API."""
 
     def __init__(self) -> None:
         if _anthropic is None:

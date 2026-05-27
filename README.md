@@ -177,7 +177,7 @@ news_analyser/
 │   ├── repositories/        ChromaDB-Zugriff (Artikel, Anker, Techniken)
 │   ├── prompts/             Editierbare System-Prompts (Markdown)
 │   └── data/                Keyword-Listen, Techniken-JSON, Feeds
-├── src/llm_connectors/      LLM-Backend-Abstraktionsschicht
+├── src/llm_adapter/         LLM-Backend-Abstraktionsschicht
 ├── backend/                 FastAPI REST-API
 │   └── routers/             Endpunkte: articles, analyse, stats, search, techniques
 ├── frontend/                Angular 17+ SPA

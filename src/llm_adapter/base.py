@@ -1,17 +1,17 @@
 """
-LLMConnector — abstract base class for all connector plugins.
+LLMAdapter — abstract base class for all adapter plugins.
 
-Each connector wraps a specific LLM backend (Anthropic API, Claude CLI, Ollama, …)
+Each adapter wraps a specific LLM backend (Anthropic API, Claude CLI, LM Studio, …)
 behind a uniform interface. The pipeline only depends on this interface,
-never on a concrete connector.
+never on a concrete adapter.
 """
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
 
-class LLMConnector(ABC):
-    """Abstract connector interface for LLM backends."""
+class LLMAdapter(ABC):
+    """Abstract adapter interface for LLM backends."""
 
     @abstractmethod
     def generate(
@@ -26,7 +26,7 @@ class LLMConnector(ABC):
 
         Args:
             system_prompt: Agent system prompt
-            input_data:    Structured input (will be YAML-serialised as user message)
+            input_data:    Structured input (will be JSON-serialised as user message)
             model:         Model identifier
             temperature:   Sampling temperature
             max_tokens:    Maximum tokens in the response
@@ -38,4 +38,4 @@ class LLMConnector(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Connector identifier (e.g. 'anthropic', 'cli', 'ollama')."""
+        """Adapter identifier (e.g. 'anthropic', 'cli', 'lm_studio')."""

@@ -1,5 +1,5 @@
 """
-CLIConnector — ruft den Claude Code CLI als Subprocess auf.
+CLIAdapter — ruft den Claude Code CLI als Subprocess auf.
 
 Voraussetzung: `claude` muss im PATH verfügbar sein und authentifiziert sein.
 Hinweis: temperature und max_tokens werden vom CLI nicht unterstützt und ignoriert.
@@ -9,11 +9,11 @@ import json
 import subprocess
 from typing import Any, Dict
 
-from .base import LLMConnector
+from .base import LLMAdapter
 
 
-class CLIConnector(LLMConnector):
-    """Connector der den lokalen `claude`-CLI per Subprocess aufruft."""
+class CLIAdapter(LLMAdapter):
+    """Adapter der den lokalen `claude`-CLI per Subprocess aufruft."""
 
     @property
     def name(self) -> str:
