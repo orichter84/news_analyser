@@ -16,7 +16,7 @@ import datetime
 from pathlib import Path
 
 from .scraper import Article, fetch_article
-from .analyzer import analyze_article
+from .agents import analyze_article
 from .db_storage import store_result
 from .stats import print_report
 

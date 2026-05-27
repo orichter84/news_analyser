@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from news_analyser.scraper import fetch_article
-from news_analyser.analyzer import analyze_article
+from news_analyser.agents import analyze_article
 from news_analyser.db_storage import store_result, is_known_url
 
 router = APIRouter(prefix="/analyse", tags=["analyse"])
