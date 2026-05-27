@@ -6,7 +6,7 @@
     "category": "Emotional",
     "description": "Bedrohungsszenarien werden eingesetzt, um emotionale Abwehrreaktionen zu erzeugen. Der Leser soll durch Angst statt durch rationale Argumente zu einer Schlussfolgerung gefuehrt werden.",
     "example": "Wenn wir jetzt nicht handeln, werden unsere Kinder in einem Land ohne Zukunft aufwachsen.",
-    "reference_url": "https://de.wikipedia.org/wiki/Angstappell",
+    "reference_url": "https://de.wikipedia.org/wiki/Furchtappell",
     "doc": "Appeal to Fear Angst-Appell Bedrohungsappell FUD Fear Uncertainty Doubt Angstmache Panik Bedrohung"
   },
   {
@@ -26,7 +26,7 @@
     "category": "Logisch",
     "description": "Nur Fakten und Studien, die die eigene Position stuetzen, werden praesentiert. Widerlegende oder einschraenkende Belege werden weggelassen oder ignoriert.",
     "example": "Einen Temperaturrekord hervorheben, waehrend der langfristige Trend verschwiegen wird.",
-    "reference_url": "https://de.wikipedia.org/wiki/Rosinenpicken_(Rhetorik)",
+    "reference_url": "https://de.wikipedia.org/wiki/Rosinenpicken_(Argumentationstheorie)",
     "doc": "Cherry Picking Rosinenpicken selektive Evidenz selektive Wahrnehmung Datenauswahl Omission Auslassung"
   },
   {
@@ -46,7 +46,7 @@
     "category": "Rhetorisch",
     "description": "Emotional aufgeladene Begriffe werden bewusst statt neutraler Beschreibungen eingesetzt, um beim Leser eine vorgewuenschte emotionale Reaktion auszuloesen.",
     "example": "Invasoren statt Migranten -- Gesinnungsschnueffelei statt Datenschutzpruefung.",
-    "reference_url": "https://de.wikipedia.org/wiki/Emotiv",
+    "reference_url": "https://de.wikipedia.org/wiki/Reizwort",
     "doc": "Loaded Language wertbeladene Sprache emotiv emotionale Sprache Stigmatisierung Weasel Words Konnotation"
   },
   {
@@ -56,7 +56,7 @@
     "category": "Emotional",
     "description": "Soziale Akzeptanz wird als Argument eingesetzt: Da es alle tun oder denken, muss es richtig sein. Nutzt den menschlichen Wunsch, zur Mehrheit zu gehoeren.",
     "example": "Immer mehr Experten sind sich einig, dass ...",
-    "reference_url": "https://de.wikipedia.org/wiki/Bandwagon_effect",
+    "reference_url": "https://de.wikipedia.org/wiki/Mitl%C3%A4ufereffekt",
     "doc": "Bandwagon Mitlaeufereffekt Herdenmentalitaet Mehrheitsmeinung Konsens Appeal to Popularity"
   },
   {
@@ -86,7 +86,7 @@
     "category": "Logisch",
     "description": "Eine Handlung wird als zwangslaefige Ursache einer Kette von immer extremeren Folgen dargestellt, ohne dass diese Kausalitaet belegt wird.",
     "example": "Wenn wir Tempolimit 130 einfuehren, werden wir bald gar kein Auto mehr fahren duerfen.",
-    "reference_url": "https://de.wikipedia.org/wiki/Slippery_slope",
+    "reference_url": "https://de.wikipedia.org/wiki/Dammbruchargument",
     "doc": "Slippery Slope Dammbruch-Argument schiefe Ebene Kettenreaktion Domino-Effekt"
   },
   {
@@ -146,7 +146,7 @@
     "category": "Strukturell",
     "description": "Zwei Positionen werden als gleichwertig dargestellt, obwohl sie empirisch oder argumentativ stark unterschiedlich fundiert sind. Erzeugt kuenstliche Kontroverse.",
     "example": "Klimawandel-Skeptiker werden gleichwertig neben dem wissenschaftlichen Konsens praesentiert.",
-    "reference_url": "https://de.wikipedia.org/wiki/False_balance",
+    "reference_url": "https://de.wikipedia.org/wiki/False_Balance",
     "doc": "False Balance falsche Ausgewogenheit Bothsidesism falsche Gleichwertigkeit kuenstliche Kontroverse"
   },
   {
@@ -166,7 +166,7 @@
     "category": "Strukturell",
     "description": "Durch wiederholte Aussagen -- auch unabhaengig von ihrem Wahrheitsgehalt -- entsteht der Eindruck von Wahrheit. Der Illusorische-Wahrheit-Effekt wirkt auch bei kritischem Publikum.",
     "example": "Eine Schlagzeile, die taeglich variiert wiederholt wird, bis sie als Fakt gilt.",
-    "reference_url": "https://de.wikipedia.org/wiki/Illusorische-Wahrheit-Effekt",
+    "reference_url": "https://de.wikipedia.org/wiki/Wahrheitseffekt",
     "doc": "Repetition Wiederholung illusorische Wahrheit Hammering message repetition"
   },
   {
@@ -186,7 +186,7 @@
     "category": "Emotional",
     "description": "Emotionen werden angesprochen um eine Schlussfolgerung zu stuetzen, ohne rationale Argumente oder Belege zu liefern. Kann positiv (Hoffnung, Stolz) oder negativ (Empoerung, Ekel) sein.",
     "example": "Denk an die Kinder. Kannst du das wirklich verantworten?",
-    "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_passiones",
+    "reference_url": "https://de.wikipedia.org/wiki/Pathos",
     "doc": "Appeal to Emotion emotionaler Appell Gefuehlsappell Mitleid Empoerung Ekel Hoffnung Pathos"
   }
 ]
