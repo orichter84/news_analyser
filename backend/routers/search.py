@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Query
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
-from news_analyser.db_storage import query_similar
+from news_analyser.repositories.db_storage import query_similar
 
 router = APIRouter(prefix="/search", tags=["search"])
 

@@ -14,7 +14,7 @@ from typing import Generator
 import feedparser
 
 from .config import FeedConfig
-from .db_storage import is_known_url
+from .repositories.db_storage import is_known_url
 from .main import run
 from .topic_filter import is_relevant
 

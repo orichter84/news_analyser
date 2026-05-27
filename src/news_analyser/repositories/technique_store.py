@@ -15,8 +15,8 @@ from typing import Any
 import chromadb
 from chromadb.utils import embedding_functions
 
-_DB_PATH = Path(__file__).parent.parent.parent / "data" / "chroma_db"
-_DATA_DIR = Path(__file__).parent / "data"
+_DB_PATH  = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
+_DATA_DIR = Path(__file__).parent.parent / "data"
 _COLLECTION = "techniques"
 _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"

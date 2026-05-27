@@ -14,8 +14,8 @@ from ..prompts import load_prompt
 from llm_connectors import load_connector
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
-from ..anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
-from ..technique_store import normalize_technique
+from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
+from ..repositories.technique_store import normalize_technique
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:

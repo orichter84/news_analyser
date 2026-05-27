@@ -17,7 +17,7 @@ from pathlib import Path
 
 from .scraper import Article, fetch_article
 from .agents import analyze_article
-from .db_storage import store_result
+from .repositories.db_storage import store_result
 from .stats import print_report
 
 

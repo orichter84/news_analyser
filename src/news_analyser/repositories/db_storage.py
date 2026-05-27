@@ -15,7 +15,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 
-_DB_PATH = Path(__file__).parent.parent.parent / "data" / "chroma_db"
+_DB_PATH = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
 _COLLECTION = "articles"
 
 # Uses sentence-transformers/all-MiniLM-L6-v2 locally (no API key needed).

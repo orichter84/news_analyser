@@ -6,7 +6,7 @@ from typing import Any
 from fastapi import APIRouter, Query, HTTPException
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
-from news_analyser.db_storage import _get_collection
+from news_analyser.repositories.db_storage import _get_collection
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 

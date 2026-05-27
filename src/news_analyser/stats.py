@@ -12,7 +12,7 @@ from typing import Any
 
 import pandas as pd
 
-from .db_storage import _get_collection
+from .repositories.db_storage import _get_collection
 
 
 def _parse_targets(raw: Any) -> list[dict]:

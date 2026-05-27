@@ -11,13 +11,14 @@ Lazy-Loading-Prinzip:
 """
 
 from __future__ import annotations
+import json
 from pathlib import Path
 from typing import Any
 
 import chromadb
 from chromadb.utils import embedding_functions
 
-_DB_PATH   = Path(__file__).parent.parent.parent / "data" / "chroma_db"
+_DB_PATH   = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
 _COLLECTION = "orwell_anchors"
 _EMBED_FN   = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
@@ -55,11 +56,11 @@ def get_similar_anchors(text: str, k: int = K_RESULTS) -> list[dict[str, Any]]:
     anchors = []
     for i, meta in enumerate(results["metadatas"][0]):
         anchors.append({
-            "orwell_index":       meta.get("orwell_index", 0.0),
+            "orwell_index":         meta.get("orwell_index", 0.0),
             "politische_stroemung": meta.get("politische_stroemung", "neutral"),
-            "domain":             meta.get("domain", ""),
-            "excerpt":            results["documents"][0][i][:300],
-            "similarity":         round(1 - results["distances"][0][i], 3),
+            "domain":               meta.get("domain", ""),
+            "excerpt":              results["documents"][0][i][:300],
+            "similarity":           round(1 - results["distances"][0][i], 3),
         })
     return anchors
 
@@ -73,15 +74,14 @@ def add_anchor(
 ) -> None:
     """Speichert einen analysierten Artikel als Anker-Referenz."""
     col = _get_collection()
-    import json
     col.upsert(
         ids=[source_url],
         documents=[text],
         metadatas=[{
-            "orwell_index":        orwell_index,
+            "orwell_index":         orwell_index,
             "politische_stroemung": json.dumps(politische_stroemung, ensure_ascii=False),
-            "domain":              domain,
-            "source_url":          source_url,
+            "domain":               domain,
+            "source_url":           source_url,
         }],
     )
 

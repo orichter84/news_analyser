@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
-from news_analyser.technique_store import get_all_techniques, get_technique
+from news_analyser.repositories.technique_store import get_all_techniques, get_technique
 
 router = APIRouter(prefix="/techniques", tags=["techniques"])
 
