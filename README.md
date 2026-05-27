@@ -1,6 +1,6 @@
 # News Analyser
 
-Analysiert Nachrichtenartikel auf Manipulationstechniken, rhetorischen Extremismus und politisches Framing — lokal, ohne Cloud-Abhängigkeit.
+Analysiert Nachrichtenartikel auf Manipulationstechniken, rhetorischen Extremismus und politisches Framing. Die Analyse-Pipeline und Datenbank laufen lokal — für das LLM-Backend kann wahlweise ein lokales Modell (LM Studio) oder ein Cloud-Dienst (OpenAI, Anthropic, GitHub Copilot) verwendet werden.
 
 **Indikatoren:** Orwell-Index (Extremismus), Bernays-Score (Manipulationsintensität), Dunning-Kruger-Index (unbelegte Gewissheit), politische Strömung, Manipulation Targets, 19 dokumentierte Techniken.
 
