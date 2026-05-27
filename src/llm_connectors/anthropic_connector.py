@@ -3,10 +3,9 @@ AnthropicConnector — calls the Anthropic Messages API directly.
 Requires ANTHROPIC_API_KEY environment variable.
 """
 
+import json
 import os
 from typing import Any, Dict
-
-import yaml
 
 try:
     import anthropic as _anthropic
@@ -41,7 +40,7 @@ class AnthropicConnector(LLMConnector):
         temperature: float,
         max_tokens: int,
     ) -> str:
-        user_content = yaml.safe_dump(input_data, sort_keys=False, allow_unicode=True)
+        user_content = json.dumps(input_data, ensure_ascii=False, indent=2)
         response = self._client.messages.create(
             model=model,
             max_tokens=max_tokens,
@@ -49,4 +48,7 @@ class AnthropicConnector(LLMConnector):
             system=system_prompt,
             messages=[{"role": "user", "content": user_content}],
         )
-        return response.content[0].text
+        text_block = next((b for b in response.content if b.type == "text"), None)
+        if text_block is None:
+            raise RuntimeError("Anthropic response enthielt keinen Text-Block.")
+        return text_block.text

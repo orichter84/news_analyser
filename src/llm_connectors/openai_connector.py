@@ -5,10 +5,9 @@ Requires OPENAI_API_KEY environment variable.
 Also serves as base for OpenAI-compatible endpoints (LM Studio, GitHub Copilot).
 """
 
+import json
 import os
 from typing import Any, Dict, List
-
-import yaml
 
 try:
     import openai as _openai
@@ -52,7 +51,7 @@ class OpenAIConnector(LLMConnector):
         temperature: float,
         max_tokens: int,
     ) -> str:
-        user_content = yaml.safe_dump(input_data, sort_keys=False, allow_unicode=True)
+        user_content = json.dumps(input_data, ensure_ascii=False, indent=2)
         messages: List[Any] = (
             [
                 {"role": "system", "content": system_prompt},

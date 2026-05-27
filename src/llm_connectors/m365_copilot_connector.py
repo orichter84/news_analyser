@@ -6,11 +6,10 @@ M365CopilotConnector — calls Microsoft 365 Copilot via Microsoft Graph Copilot
 - Ignores model/temperature/max_tokens as requested.
 """
 
-import os
 import json
+import os
 from typing import Any, Dict, Optional
 
-import yaml
 import requests
 
 from .base import LLMConnector
@@ -55,8 +54,8 @@ class M365CopilotConnector(LLMConnector):
         temperature: float,
         max_tokens: int,
     ) -> str:
-        user_yaml = yaml.safe_dump(input_data, sort_keys=False, allow_unicode=True)
-        prompt = f"{system_prompt}\n\nInput:\n{user_yaml}"
+        user_json = json.dumps(input_data, ensure_ascii=False, indent=2)
+        prompt = f"{system_prompt}\n\nInput:\n{user_json}"
 
         convo_id = self._ensure_conversation()
 

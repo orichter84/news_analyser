@@ -5,10 +5,9 @@ Voraussetzung: `claude` muss im PATH verfügbar sein und authentifiziert sein.
 Hinweis: temperature und max_tokens werden vom CLI nicht unterstützt und ignoriert.
 """
 
+import json
 import subprocess
 from typing import Any, Dict
-
-import yaml
 
 from .base import LLMConnector
 
@@ -28,7 +27,7 @@ class CLIConnector(LLMConnector):
         temperature: float,
         max_tokens: int,
     ) -> str:
-        user_content = yaml.safe_dump(input_data, sort_keys=False, allow_unicode=True)
+        user_content = json.dumps(input_data, ensure_ascii=False, indent=2)
 
         cmd = [
             "claude", "-p",

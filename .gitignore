@@ -13,6 +13,9 @@ build/
 # Datenbank & generierte Daten (nur Root-Verzeichnis, nicht src/*/data/)
 /data/
 
+# Lokale Notizen
+*_local.md
+
 # Logs
 logs/
 
