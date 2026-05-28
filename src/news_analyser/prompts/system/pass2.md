@@ -16,7 +16,9 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
     {
       "entity": "<name of person, organisation or group>",
       "direction": "<positiv | negativ | neutral>",
-      "rolle": "<one of: Sündenbock | Opfer | Held | Feind | Bedrohung | Autorität | Nutznießer | Sonstiges>"
+      "direction_quote": "<verbatim quote from the article that supports the direction assessment, or null>",
+      "rolle": "<one of: Sündenbock | Opfer | Held | Feind | Bedrohung | Autorität | Nutznießer | Versager | Täter | Sonstiges>",
+      "rolle_quote": "<verbatim quote from the article that supports the rolle assessment, or null>"
     }
   ]
 }
@@ -77,14 +79,35 @@ List every person, organisation or group that is a **clear target** of the detec
 manipulation techniques — either as beneficiary or victim.
 
 - **entity**: Use the name as it appears in the article (real names, not placeholders)
-- **direction**: The author's rhetorical stance toward the entity — independent of the entity's narrative role.
-  - `positiv` — the text elevates, defends, or speaks favourably of the entity
-  - `negativ` — the text attacks, blames, demeans, or speaks unfavourably of the entity
+- **direction_quote**: A short verbatim quote (1–2 sentences max) from the article that best
+  supports the `direction` assessment. Use `null` if no single passage clearly supports it.
+- **rolle_quote**: A short verbatim quote (1–2 sentences max) from the article that best
+  supports the `rolle` assessment. Use `null` if no single passage clearly supports it.
+  Quotes must be copied verbatim — do not paraphrase or translate.
+- **direction**: The **reader's intended attitude** toward the entity — how does the author want
+  the reader to feel about this entity after reading?
+  - `positiv` — the text shapes sympathy, approval, or solidarity toward the entity
+  - `negativ` — the text shapes rejection, blame, fear, or contempt toward the entity
   - `neutral` — the entity is mentioned factually without clear emotional colouring
-  - **Important**: `direction` and `rolle` are ORTHOGONAL. An `Opfer` (victim) can be `positiv`
-    (portrayed as noble/deserving) or `negativ` (portrayed as weak/partly responsible).
-    A `Feind` (enemy) is usually `negativ`, but can be `neutral` in a balanced report.
-    Do NOT derive direction from role — assess the actual language used.
+  - **CRITICAL — two separate assessments, never inferred from each other:**
+    1. `rolle` answers: *What narrative function does the entity serve in the story?*
+    2. `direction` answers: *What attitude toward this entity does the author engineer in the reader?*
+    These must be assessed independently. Never derive one from the other.
+    - ❌ Entity is in danger → direction = `negativ` (wrong — that describes the situation, not the reader's attitude)
+    - ❌ Entity has role `Opfer` → direction = `positiv` (wrong — a defamed victim gets `negativ`)
+    - ❌ Entity has role `Feind` → direction = `negativ` (wrong — a balanced report can assign `neutral`)
+    - ✓ Ask only: *Does the text want the reader to feel sympathy (→ `positiv`),
+      hostility/contempt (→ `negativ`), or indifference (→ `neutral`) toward this entity?*
+  - **Calibration examples** (role × direction combinations are all valid):
+    - Nazi propaganda, Jewish population: `rolle: Sündenbock`, `direction: negativ`
+      (defamed as threat — reader meant to feel fear and hostility)
+    - Nazi propaganda, German people: `rolle: Opfer`, `direction: positiv`
+      (portrayed as noble victims — reader meant to feel solidarity)
+    - Nazi propaganda, a minority group framed as "victims of their own nature":
+      `rolle: Opfer`, `direction: negativ`
+      (called victims but defamed — reader meant to feel contempt, not sympathy)
+    - Balanced investigative report on a corrupt official: `rolle: Täter`, `direction: neutral`
+      (documented without emotional colouring)
 - **rolle**: The entity's narrative function — independent of how favourably it is presented:
 {{ROLES}}
 
