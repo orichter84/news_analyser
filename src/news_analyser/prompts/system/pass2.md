@@ -77,16 +77,19 @@ List every person, organisation or group that is a **clear target** of the detec
 manipulation techniques — either as beneficiary or victim.
 
 - **entity**: Use the name as it appears in the article (real names, not placeholders)
-- **direction**: `positiv` = elevated/defended, `negativ` = denigrated/attacked, `neutral` = mentioned without clear framing
-- **rolle**: Choose the most fitting role:
-  - `Sündenbock` — blamed for problems without sufficient evidence
-  - `Opfer` — portrayed as victim deserving sympathy
-  - `Held` — portrayed as saviour or moral authority
-  - `Feind` — framed as active threat or adversary
-  - `Bedrohung` — framed as abstract danger (not necessarily intentional)
-  - `Autorität` — used to lend credibility (Appeal to Authority)
-  - `Nutznießer` — portrayed as benefiting from a situation
-  - `Sonstiges` — none of the above
+- **direction**: The author's rhetorical stance toward the entity — independent of the entity's narrative role.
+  - `positiv` — the text elevates, defends, or speaks favourably of the entity
+  - `negativ` — the text attacks, blames, demeans, or speaks unfavourably of the entity
+  - `neutral` — the entity is mentioned factually without clear emotional colouring
+  - **Important**: `direction` and `rolle` are ORTHOGONAL. An `Opfer` (victim) can be `positiv`
+    (portrayed as noble/deserving) or `negativ` (portrayed as weak/partly responsible).
+    A `Feind` (enemy) is usually `negativ`, but can be `neutral` in a balanced report.
+    Do NOT derive direction from role — assess the actual language used.
+- **rolle**: The entity's narrative function — independent of how favourably it is presented:
+{{ROLES}}
+
+  Disambiguation: `Sündenbock` = unjust blame; `Versager` = incompetence (no intent);
+  `Täter` = deliberate action; `Feind` = ongoing threat rather than past act.
 
 Only list entities where manipulation techniques are clearly directed at them.
 If no techniques are detected, return an empty array.

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "suendenbock",
+    "name": "Sündenbock",
+    "description": "Einer Entität wird die Schuld für ein Problem zugeschrieben, ohne dass hierfür ausreichende Belege vorliegen. Die Zuschreibung ist ungerecht oder übertrieben.",
+    "prompt_en": "blamed for a problem without sufficient evidence; the attribution is unjust or disproportionate",
+    "dk_signal": false,
+    "doc": "Sündenbock Schuldzuweisung Schuldiger Sündenböcke Schuldige ungerechte Schuld Anschuldigung falsche Schuld Scapegoat"
+  },
+  {
+    "id": "opfer",
+    "name": "Opfer",
+    "description": "Die Entität wird in der Rolle des Opfers dargestellt: Sie erleidet Schaden, den andere verursacht haben, und ist nicht selbst Urheber des Problems.",
+    "prompt_en": "cast as victim: suffering harm caused by others, not the originator of the harm",
+    "dk_signal": false,
+    "doc": "Opfer Opferrolle Leidtragender Betroffener Geschädigter Victim Leidende erleidet"
+  },
+  {
+    "id": "held",
+    "name": "Held",
+    "description": "Die Entität wird als Retter, Verteidiger oder moralische Autorität dargestellt, die aktiv für das Gute handelt.",
+    "prompt_en": "cast as saviour, defender, or moral authority acting for the common good",
+    "dk_signal": false,
+    "doc": "Held Heldin Retter Verteidiger Heilsbringer Kämpfer Hero Retter Schutzengel"
+  },
+  {
+    "id": "feind",
+    "name": "Feind",
+    "description": "Die Entität wird als aktiver, anhaltender Gegner oder Bedrohung gerahmt. Der Fokus liegt auf der gegenwärtigen oder zukünftigen Bedrohung, nicht auf einer vergangenen Tat.",
+    "prompt_en": "cast as active, ongoing adversary or threat (present/future oriented — not a past act)",
+    "dk_signal": false,
+    "doc": "Feind Feindbild Gegner Widersacher Antagonist Enemy Adversary Gegenspieler"
+  },
+  {
+    "id": "bedrohung",
+    "name": "Bedrohung",
+    "description": "Die Entität wird als abstrakte Gefahr gerahmt, nicht unbedingt durch bewusstes Handeln. Oft struktureller oder systemischer Natur.",
+    "prompt_en": "cast as abstract danger or structural risk, not necessarily through intentional action",
+    "dk_signal": false,
+    "doc": "Bedrohung Gefahr Risiko Gefährdung Threat Risk Danger abstrakte Bedrohung"
+  },
+  {
+    "id": "autoritaet",
+    "name": "Autorität",
+    "description": "Die Entität wird zitiert oder erwähnt, um der Argumentation Glaubwürdigkeit zu verleihen (Appeal to Authority). Die inhaltliche Argumentation bleibt sekundär.",
+    "prompt_en": "cited to lend credibility to the argument (Appeal to Authority)",
+    "dk_signal": false,
+    "doc": "Autorität Experte Fachmann Sachverständiger Authority Expert Quelle Referenz Glaubwürdigkeit"
+  },
+  {
+    "id": "nutzniesser",
+    "name": "Nutznießer",
+    "description": "Die Entität profitiert von einer Situation auf Kosten anderer, wird aber nicht unbedingt als aktiv schuldiger Akteur dargestellt.",
+    "prompt_en": "cast as benefiting from a situation at others' expense, without necessarily being an active wrongdoer",
+    "dk_signal": false,
+    "doc": "Nutznießer Profiteur Gewinner Begünstigter Profiteering Beneficiary profitiert"
+  },
+  {
+    "id": "versager",
+    "name": "Versager",
+    "description": "Die Entität hat eine negative Situation durch Inkompetenz, Unfähigkeit oder mangelnde Sorgfalt verursacht — ohne bösen Willen, aber mit zuschreibbarer Verantwortung. Häufig in Verbindung mit hohem Dunning-Kruger-Index.",
+    "prompt_en": "portrayed as having caused harm through incompetence or failure to act competently; no malicious intent but clear responsibility",
+    "dk_signal": true,
+    "doc": "Versager Versagen Inkompetenz unfähig Unfähigkeit Versager gescheitert scheitern Dilettant inkompetent"
+  },
+  {
+    "id": "taeter",
+    "name": "Täter",
+    "description": "Die Entität hat eine negative Situation durch bewusstes Handeln oder das willentliche Unterlassen von Hilfeleistung verursacht. Impliziert Vorsatz und Verantwortungsübernahme.",
+    "prompt_en": "portrayed as having deliberately caused harm through intentional action or wilful omission; implies conscious agency",
+    "dk_signal": false,
+    "doc": "Täter Täterin Verursacher Verantwortlicher verantwortlich schuldig Urheber Perpetrator Aggressor vorsätzlich"
+  },
+  {
+    "id": "sonstiges",
+    "name": "Sonstiges",
+    "description": "Keine der definierten Rollen trifft zu.",
+    "prompt_en": "none of the above roles apply",
+    "dk_signal": false,
+    "doc": "Sonstiges andere sonstige keine Rolle Other"
+  }
+]

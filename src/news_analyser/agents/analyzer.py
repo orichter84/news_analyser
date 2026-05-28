@@ -16,6 +16,7 @@ from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 from ..repositories.technique_store import normalize_technique
+from ..repositories.role_store import normalize_role, format_roles_for_prompt
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -90,6 +91,11 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         if isinstance(t.get("technique"), str):
             t["technique"] = normalize_technique(t["technique"])
 
+    # Rollen auf kanonische Namen normalisieren (Pass 1 hat keine Rollen)
+    for t in result1.get("manipulation_targets", []):
+        if isinstance(t.get("rolle"), str):
+            t["rolle"] = normalize_role(t["rolle"])
+
     # ------------------------------------------------------------------
     # Pass 2 — Originaltext → Politische Strömung, DK-Index
     # ------------------------------------------------------------------
@@ -98,9 +104,11 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         "text": article.text,
     }
 
+    pass2_prompt = load_prompt("system", "pass2", context={"ROLES": format_roles_for_prompt()})
+
     try:
         raw2 = adapter.generate(
-            system_prompt=load_prompt("system", "pass2"),
+            system_prompt=pass2_prompt,
             input_data=pass2_input,
         )
     except Exception as exc:
@@ -110,6 +118,11 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     result2 = _extract_json(raw2)
     if result2 is None:
         return None
+
+    # Rollen aus Pass 2 normalisieren
+    for t in result2.get("manipulation_targets", []):
+        if isinstance(t.get("rolle"), str):
+            t["rolle"] = normalize_role(t["rolle"])
 
     # ------------------------------------------------------------------
     # Ergebnisse zusammenführen

@@ -28,7 +28,7 @@ class FeedConfig:
     @classmethod
     def from_env(cls) -> "FeedConfig":
         from .topic_filter import DEFAULT_ALLOWED_TOPICS
-        config_dir = Path(__file__).parent.parent.parent.parent / "config"
+        config_dir = Path(__file__).parent.parent.parent / "config"
         raw = os.environ.get("FEED_TOPICS", "")
         if raw.strip().lower() == "all":
             topics: frozenset[str] = frozenset()

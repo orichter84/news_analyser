@@ -125,6 +125,13 @@ _global_manager.register_adapter("lm_studio", OpenAIAdapter, {
     "use_system_role": False,              # LM Studio merges system+user
 })
 
+_global_manager.register_adapter("grok", OpenAIAdapter, {
+    "api_key_env":  "XAI_API_KEY",
+    "base_url":     "https://api.x.ai/v1",
+    "adapter_name": "grok",
+    "model":        "grok-3",               # überschreibbar via LLM_MODEL
+})
+
 _global_manager.register_adapter("m365_copilot", M365CopilotAdapter, {
     "api_key_env": "M365_COPILOT_ACCESS_TOKEN",
 })
