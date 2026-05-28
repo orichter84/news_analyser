@@ -52,29 +52,30 @@
     @if (a.manipulation_targets && a.manipulation_targets.length > 0) {
       <section class="targets">
         <h2>Manipulations-Targets</h2>
-        <table class="targets-table">
-          <thead>
-            <tr>
-              <th>Entität</th>
-              <th>Richtung</th>
-              <th>Rolle</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (t of a.manipulation_targets; track t.entity) {
-              <tr>
-                <td class="target-entity">{{ t.entity }}</td>
-                <td>
-                  <span class="target-direction" [class]="'dir-' + t.direction">
-                    {{ t.direction === 'positiv' ? '▲' : t.direction === 'negativ' ? '▼' : '●' }}
-                    {{ t.direction }}
-                  </span>
-                </td>
-                <td class="target-rolle">{{ t.rolle }}</td>
-              </tr>
+        @for (t of a.manipulation_targets; track t.entity) {
+          <div class="target-card">
+            <div class="target-header">
+              <span class="target-entity">{{ t.entity }}</span>
+              <span class="target-direction" [class]="'dir-' + t.direction">
+                {{ t.direction === 'positiv' ? '▲' : t.direction === 'negativ' ? '▼' : '●' }}
+                {{ t.direction }}
+              </span>
+              <span class="target-rolle">{{ t.rolle }}</span>
+            </div>
+            @if (t.direction_quote) {
+              <div class="target-evidence">
+                <span class="evidence-label">Richtung</span>
+                <blockquote class="quote">{{ t.direction_quote }}</blockquote>
+              </div>
             }
-          </tbody>
-        </table>
+            @if (t.rolle_quote) {
+              <div class="target-evidence">
+                <span class="evidence-label">Rolle</span>
+                <blockquote class="quote">{{ t.rolle_quote }}</blockquote>
+              </div>
+            }
+          </div>
+        }
       </section>
     }
 

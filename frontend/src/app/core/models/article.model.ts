@@ -28,7 +28,9 @@ export interface ArticleListItem {
 export interface ManipulationTarget {
   entity: string;
   direction: 'positiv' | 'negativ' | 'neutral';
+  direction_quote?: string | null;
   rolle: string;
+  rolle_quote?: string | null;
 }
 
 export interface ArticleDetail extends ArticleListItem {
