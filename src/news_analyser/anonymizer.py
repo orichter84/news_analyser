@@ -95,8 +95,10 @@ def anonymize(text: str) -> AnonymizationResult:
     # Deduplizierungs-Dicts: surface form → Platzhalter
     seen_per: dict[str, str] = {}
     seen_org: dict[str, str] = {}
+    seen_geo: dict[str, str] = {}
     person_counter = 0
     org_counter = 0
+    geo_counter = 0
 
     # --- Schicht 1: spaCy NER ---
     nlp = _load_nlp()
@@ -130,10 +132,19 @@ def anonymize(text: str) -> AnonymizationResult:
             placeholder = seen_org[key]
             replacements.append((ent.start_char, ent.end_char, placeholder))
 
+        elif ent.label_ in ("LOC", "GPE"):
+            key = surface_lower.rstrip(".,;:!?")
+            if key not in seen_geo:
+                geo_counter += 1
+                seen_geo[key] = f"Geo-{_num_to_letter(geo_counter)}"
+            placeholder = seen_geo[key]
+            replacements.append((ent.start_char, ent.end_char, placeholder))
+
     # Mapping aufbauen (Platzhalter → repräsentatives Original)
     mapping: dict[str, str] = {}
     for surface, ph in {**{v: k for k, v in seen_per.items()},
-                        **{v: k for k, v in seen_org.items()}}.items():
+                        **{v: k for k, v in seen_org.items()},
+                        **{v: k for k, v in seen_geo.items()}}.items():
         mapping[surface] = ph
 
     # Replacements von hinten nach vorne anwenden (Indizes bleiben stabil)

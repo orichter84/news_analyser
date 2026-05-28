@@ -78,6 +78,7 @@
 ### Qualität & Tests
 - [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Schwarze/Weiße, Migranten/Einheimische, Linke/Rechte)
 - [ ] **Keyword-Listen** — Gegner-Framing-Filter (Keywords in Anführungszeichen als "zitiert" markieren)
+- [ ] **Keyword Lazy-Update** — SQLite-DB speichert Keyword-Treffer mit Kontext-Satz; periodischer Job klassifiziert affirmativ vs. zitierend und schreibt Korrekturen zurück in die Keyword-Listen
 - [ ] **Manuell kuratierter Anker-Korpus** — Initiale Kuration mit verifizierten Referenzartikeln für bessere Cold-Start-Kalibrierung
 - [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Adapter-Interface
 - [ ] **Analyse-Validierung** — Prüfen ob zurückgegebene quote-Felder tatsächlich im Artikeltext enthalten sind

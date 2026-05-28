@@ -37,20 +37,19 @@ def _fetch_new_urls(
     max_articles: int,
     allowed_topics: frozenset[str],
 ) -> Generator[str, None, None]:
-    """Yield Artikel-URLs aus allen Feeds, die noch nicht in der DB sind."""
-    seen = 0
+    """Yield Artikel-URLs im Round-Robin über alle Feeds, bis max_articles erreicht."""
+    # Kandidaten pro Feed sammeln
+    candidates: list[list[str]] = []
     for feed_url in feed_urls:
         parsed = feedparser.parse(feed_url)
         if parsed.bozo:
             print(f"[feed] Warnung: Feed nicht lesbar: {feed_url}")
+            candidates.append([])
             continue
+        feed_candidates: list[str] = []
         for entry in parsed.entries:
-            if seen >= max_articles:
-                return
             url = entry.get("link", "")
-            if not url:
-                continue
-            if is_known_url(url):
+            if not url or is_known_url(url):
                 continue
             title   = entry.get("title", "")
             summary = entry.get("summary", "")
@@ -58,8 +57,24 @@ def _fetch_new_urls(
             if not relevant:
                 print(f"[feed] Thema '{topic or 'unbekannt'}' gefiltert: {title[:60]}")
                 continue
-            seen += 1
-            yield url
+            feed_candidates.append(url)
+        candidates.append(feed_candidates)
+
+    # Round-Robin: je ein Artikel pro Feed abwechselnd
+    seen = 0
+    round_idx = 0
+    while seen < max_articles:
+        any_left = False
+        for feed_candidates in candidates:
+            if round_idx < len(feed_candidates):
+                any_left = True
+                yield feed_candidates[round_idx]
+                seen += 1
+                if seen >= max_articles:
+                    return
+        if not any_left:
+            return
+        round_idx += 1
 
 
 def run_once(cfg: FeedConfig) -> None:
