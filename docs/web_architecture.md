@@ -57,7 +57,7 @@ news_analyser/
     │
     ├── core/
     │   ├── models/
-    │   │   ├── article.model.ts    ArticleListItem, ArticleDetail, ManipulationTarget
+    │   │   ├── article.model.ts    ArticleListItem, ArticleDetail, ManipulationTarget (inkl. Quotes)
     │   │   ├── stats.model.ts      StatsResponse, DomainAverage
     │   │   ├── analyse.model.ts    AnalyseRequest, JobStatus
     │   │   └── technique.model.ts  Technique
@@ -147,7 +147,7 @@ GET  /techniques/{id}
 ### Artikel-Detail `/articles/{encoded_url}`
 - Score-Karten: Orwell-Index, Bernays-Score, DK-Index
 - Framing: Narrativ, Sentiment, Politische Strömung, Themenbereich
-- Manipulation Targets: Entität, Richtung (▲ positiv / ▼ negativ / ● neutral), Rolle
+- Manipulation Targets: Entität, Richtung (▲ positiv / ▼ negativ / ● neutral), Rolle — mit optionalen Zitat-Belegen für Richtung und Rolle
 - Erkannte Techniken mit Zitat und Erklärung — Technik-Namen verlinken auf `/techniques/:id`
 
 ### Statistiken `/stats`

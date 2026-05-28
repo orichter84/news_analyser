@@ -75,7 +75,8 @@ news_analyser/
 │       ├── repositories/           ChromaDB-Zugriff
 │       │   ├── db_storage.py       Artikel speichern + suchen (articles)
 │       │   ├── anchor_store.py     RAG-Ankerpunkte (orwell_anchors)
-│       │   └── technique_store.py  Techniken-KB + semantische Normalisierung
+│       │   ├── technique_store.py  Techniken-KB + semantische Normalisierung
+│       │   └── role_store.py       Rollen-KB (roles.json) + Fuzzy-Normalisierung
 │       │
 │       ├── prompts/system/
 │       │   ├── pass1.md            Systemprompt Pass 1 (anonymisiert)
@@ -84,6 +85,7 @@ news_analyser/
 │       └── data/                   Initialisierungsdaten (versioniert)
 │           ├── feeds.txt           RSS-Feed-URLs
 │           ├── techniques.json     19 Manipulationstechniken
+│           ├── roles.json          10 Manipulations-Rollen (Lazy Loading)
 │           ├── keywords_extreme_left.txt
 │           ├── keywords_extreme_right.txt
 │           └── keywords_general.txt
@@ -183,10 +185,11 @@ python run.py --stats --top 10
 
 | Variable | Standard | Beschreibung |
 |---|---|---|
-| `LLM_PROVIDER` | `openai` | `openai`, `anthropic`, `cli`, `lm_studio`, `copilot` |
+| `LLM_PROVIDER` | `openai` | `openai`, `anthropic`, `cli`, `lm_studio`, `grok`, `copilot` |
+| `LLM_MODEL` | *(adapter-abhängig)* | Modellname — überschreibt den Adapter-Standard |
 | `OPENAI_API_KEY` | – | API-Key für OpenAI oder kompatible Endpunkte |
 | `ANTHROPIC_API_KEY` | – | API-Key für Anthropic |
-| `OPENAI_MODEL` | `gpt-4o` | Modellname |
+| `XAI_API_KEY` | – | API-Key für Grok (xAI) |
 | `LLM_TEMPERATURE` | `0.2` | Sampling-Temperatur |
 | `LLM_MAX_TOKENS` | `2048` | Max. Tokens pro Antwort |
 
@@ -235,7 +238,9 @@ python run.py --stats --top 10
     {
       "entity": "Bundesregierung",
       "direction": "negativ",
-      "rolle": "Aggressor"
+      "direction_quote": "exaktes Zitat das die Leserhaltung belegt, oder null",
+      "rolle": "Täter",
+      "rolle_quote": "exaktes Zitat das die narrative Funktion belegt, oder null"
     }
   ]
 }
@@ -250,7 +255,7 @@ python run.py --stats --top 10
 | `dunning_kruger_index` | 0.0 – 1.0 | Wie überzeugt ein Text formuliert ist ohne durch Quellen, Konjunktiv oder Einschränkungen gedeckt zu sein |
 | `politische_stroemung` | Labels | Ideologische Verortung (mehrere möglich): `liberal`, `konservativ`, `sozialdemokratisch`, `sozialistisch`, `nationalistisch`, `grün`, u.a. |
 | `themenbereich` | Kategorie | Thematische Einordnung: Politik, Wirtschaft, Technologie, … |
-| `manipulation_targets` | Liste | Entitäten mit Richtung (positiv/negativ/neutral) und Rolle (Opfer, Aggressor, Held, Feind, Sündenbock, …) |
+| `manipulation_targets` | Liste | Entitäten mit Richtung (positiv/negativ/neutral), Rolle (Sündenbock, Opfer, Held, Feind, Bedrohung, Autorität, Nutznießer, Versager, Täter, Sonstiges) und optionalen Zitat-Belegen |
 
 ---
 

@@ -18,7 +18,8 @@
 - [x] Dunning-Kruger-Index — unbelegte Gewissheit (0.0–1.0)
 - [x] Politische Strömung — benannte Labels (`list[str]`)
 - [x] Themenbereich — Klassifikation (Politik, Wirtschaft, Technologie, …)
-- [x] Manipulation Targets — Entität, Richtung, Rolle (strukturiertes JSON)
+- [x] Manipulation Targets — Entität, Richtung, Rolle (strukturiertes JSON) mit optionalen Zitat-Belegen (`direction_quote`, `rolle_quote`)
+- [x] Rollen-KB — 10 Rollen in `roles.json`, Lazy Loading via `role_store.py` + `{{ROLES}}`-Placeholder im Prompt, Fuzzy-Normalisierung
 - [x] Techniken-DB — 19 dokumentierte Techniken mit semantischer Normalisierung
 
 ### Datenbank & RAG

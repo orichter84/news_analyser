@@ -242,7 +242,7 @@ Natur aus gruppenblind und wird in Pass 2 am Originaltext gemessen.
 | Politische Strömung als Labels | ✅ implementiert |
 | DK-Index | ✅ implementiert |
 | Themenbereich-Klassifikation | ✅ implementiert |
-| Manipulation Targets (Entität, Richtung, Rolle) | ✅ implementiert |
+| Manipulation Targets (Entität, Richtung, Rolle, Zitat-Belege) | ✅ implementiert |
 | Techniken-DB mit semantischer Normalisierung | ✅ implementiert |
 | RAG via ChromaDB (dynamische Anker) | ✅ implementiert |
 | Manuell kuratierter Anker-Korpus | ⏳ offen |
