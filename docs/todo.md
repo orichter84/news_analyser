@@ -45,7 +45,9 @@
 - [x] Dashboard — KPI-Kacheln, Top-Techniken, Top-Strömungen, letzte Artikel
 - [x] Artikel-Liste — filterbar nach Domain, Orwell-Range, Limit
 - [x] Artikel-Detail — Scores, Framing, Manipulation Targets, Techniken (verlinkt)
-- [x] Statistik-Seite — Domain-Tabelle, Top-Techniken, Strömungen
+- [x] Statistik-Seite — Sub-Navigation (Übersicht / Verlauf), Domain-Tabelle, Top-Techniken, Strömungen
+- [x] Statistik-Verlauf — Tagesbasierte Liniendiagramme (Orwell, Bernays, DK) mit Domain-Filter und Median/Maximum-Toggle (Chart.js)
+- [x] Paywall-Warnung beim manuellen Einreichen — eigener Job-Status `paywall` mit Hinweis im UI
 - [x] URL-Submission — Formular mit Job-Status-Polling
 - [x] Techniken-Übersicht `/techniques` — gruppiert nach Kategorie
 - [x] Techniken-Detail `/techniques/:id` — eigene URL pro Technik (verlinkbar)
@@ -64,7 +66,7 @@
 ### Auswertung & Visualisierung
 - [ ] **entity_targeting und thema_bernays in /stats API** — Endpunkt exponieren und im Frontend visualisieren
 - [ ] **Quellenvergleich** — Interaktives Balkendiagramm Domain × Orwell-Index (Chart.js)
-- [ ] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
+- [x] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
 - [ ] **Technik-Heatmap** — Domain × Technik als Matrix in der Stats-Ansicht
 - [ ] **Richtung/Rolle-Korrelation** — Empirische Auswertung: Hypothese "Passivität = Positiv" (positive Manipulation targets fast immer Opfer, kein handelnder positiver Akteur)
 
