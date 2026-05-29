@@ -1,99 +1,10 @@
 <div class="stats-page">
   <h1>Statistiken</h1>
-
-  @if (loading()) {
-    <p class="loading">Lade Statistiken…</p>
-  } @else if (!stats()?.total_articles) {
-    <p class="empty">Keine Daten vorhanden.</p>
-  } @else {
-    @let s = stats()!;
-
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <span class="kpi-value">{{ s.total_articles }}</span>
-        <span class="kpi-label">Gesamt Artikel</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-value">{{ s.orwell_distribution['mean'] | number:'1.3-3' }}</span>
-        <span class="kpi-label">Orwell ø</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-value">{{ s.bernays_distribution['mean'] | number:'1.2-2' }}</span>
-        <span class="kpi-label">Bernays ø</span>
-      </div>
-      @if (s.dk_distribution) {
-        <div class="kpi-card">
-          <span class="kpi-value">{{ s.dk_distribution['mean'] | number:'1.3-3' }}</span>
-          <span class="kpi-label">DK-Index ø</span>
-        </div>
-      }
-    </div>
-
-    <div class="panel-row">
-      <section class="panel">
-        <h2>Manipulationstechniken</h2>
-        @for (entry of entries(s.top_techniques); track entry[0]) {
-          <div class="bar-row">
-            <span class="bar-label">{{ entry[0] }}</span>
-            <div class="bar-track">
-              <div class="bar-fill" [style.width.%]="(entry[1] / entries(s.top_techniques)[0][1]) * 100"></div>
-            </div>
-            <span class="bar-count">{{ entry[1] }}</span>
-          </div>
-        }
-      </section>
-
-      <section class="panel">
-        <h2>Politische Strömungen</h2>
-        @for (entry of entries(s.top_stroemungen); track entry[0]) {
-          <div class="bar-row">
-            <span class="bar-label">{{ entry[0] }}</span>
-            <div class="bar-track">
-              <div class="bar-fill stroemung" [style.width.%]="(entry[1] / entries(s.top_stroemungen)[0][1]) * 100"></div>
-            </div>
-            <span class="bar-count">{{ entry[1] }}</span>
-          </div>
-        }
-      </section>
-    </div>
-
-    <section class="panel full">
-      <h2>Kennwert-Durchschnitt pro Portal</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Portal</th>
-            <th>Artikel</th>
-            <th>Orwell ø</th>
-            <th>Bernays ø</th>
-            @if (s.domain_averages[0]?.dk_avg != null) { <th>DK ø</th> }
-          </tr>
-        </thead>
-        <tbody>
-          @for (d of s.domain_averages; track d.domain) {
-            <tr>
-              <td>{{ d.domain }}</td>
-              <td class="num">{{ d.artikel }}</td>
-              <td class="num" [class.high]="d.orwell_avg > 0.6">{{ d.orwell_avg | number:'1.3-3' }}</td>
-              <td class="num">{{ d.bernays_avg | number:'1.2-2' }}</td>
-              @if (d.dk_avg != null) { <td class="num">{{ d.dk_avg | number:'1.3-3' }}</td> }
-            </tr>
-          }
-        </tbody>
-      </table>
-    </section>
-
-    <section class="panel">
-      <h2>Intendierte Emotionen</h2>
-      @for (entry of entries(s.sentiment_distribution); track entry[0]) {
-        <div class="bar-row">
-          <span class="bar-label">{{ entry[0] }}</span>
-          <div class="bar-track">
-            <div class="bar-fill sentiment" [style.width.%]="(entry[1] / entries(s.sentiment_distribution)[0][1]) * 100"></div>
-          </div>
-          <span class="bar-count">{{ entry[1] }}</span>
-        </div>
-      }
-    </section>
-  }
+  <nav class="stats-subnav">
+    <ul>
+      <li><a routerLink="uebersicht" routerLinkActive="active">Übersicht</a></li>
+      <li><a routerLink="verlauf" routerLinkActive="active">Verlauf</a></li>
+    </ul>
+  </nav>
+  <router-outlet />
 </div>

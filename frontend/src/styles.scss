@@ -178,6 +178,34 @@ td.date { white-space: nowrap; color: var(--muted); }
 .job-status { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
 .result-preview { background: var(--bg); border-radius: 4px; padding: 1rem; font-size: 0.75rem; color: var(--muted); overflow: auto; max-height: 400px; white-space: pre-wrap; }
 
+/* ---- Stats sub-navigation ---- */
+.stats-subnav {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+
+  ul {
+    display: flex;
+    list-style: none;
+    gap: 0.25rem;
+  }
+
+  a {
+    display: block;
+    padding: 0.35rem 0.8rem;
+    border-radius: calc(var(--radius) - 2px);
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.15s, background 0.15s;
+
+    &:hover { color: var(--text); background: var(--border); }
+    &.active { color: var(--accent-hi); background: rgba(124,106,247,0.12); }
+  }
+}
+
 /* ---- Article detail ---- */
 .article-detail {
   max-width: 860px;

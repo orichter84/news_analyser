@@ -1,28 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ApiService } from '../../core/services/api.service';
-import { StatsResponse } from '../../core/models/stats.model';
+import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-stats',
   standalone: true,
-  imports: [CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './stats.component.html',
 })
-export class StatsComponent implements OnInit {
-  private api = inject(ApiService);
-  stats = signal<StatsResponse | null>(null);
-  loading = signal(true);
-
-  ngOnInit() {
-    this.api.getStats().subscribe(s => {
-      this.stats.set(s);
-      this.loading.set(false);
-    });
-  }
-
-  entries(obj: Record<string, number> | undefined): [string, number][] {
-    if (!obj) return [];
-    return Object.entries(obj).sort((a, b) => b[1] - a[1]);
-  }
-}
+export class StatsComponent {}
