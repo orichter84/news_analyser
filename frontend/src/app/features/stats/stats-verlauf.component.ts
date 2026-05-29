@@ -21,11 +21,12 @@ export class StatsVerlaufComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private api = inject(ApiService);
 
-  domains    = signal<string[]>([]);
+  domains        = signal<string[]>([]);
   selectedDomain = signal<string>('');
-  data       = signal<VerlaufEntry[]>([]);
-  loading    = signal(true);
-  hasDk      = signal(false);
+  selectedMetric = signal<'median' | 'max'>('median');
+  data           = signal<VerlaufEntry[]>([]);
+  loading        = signal(true);
+  hasDk          = signal(false);
 
   private charts: Chart[] = [];
 
@@ -48,6 +49,11 @@ export class StatsVerlaufComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData();
   }
 
+  onMetricChange(metric: 'median' | 'max') {
+    this.selectedMetric.set(metric);
+    setTimeout(() => this.buildCharts(), 0);
+  }
+
   private loadData() {
     this.loading.set(true);
     const domain = this.selectedDomain() || undefined;
@@ -67,26 +73,28 @@ export class StatsVerlaufComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!entries.length) return;
 
     const labels = entries.map(e => e.date);
+    const m = this.selectedMetric();
+    const label = m === 'median' ? 'Median' : 'Maximum';
 
     if (this.orwellCanvas) {
       this.charts.push(this.makeChart(
         this.orwellCanvas.nativeElement, labels,
-        entries.map(e => e.orwell_median),
-        'Orwell-Index (Median)', '#a89aff', 0, 1,
+        entries.map(e => m === 'median' ? e.orwell_median : e.orwell_max),
+        `Orwell-Index (${label})`, '#a89aff', 0, 1,
       ));
     }
     if (this.bernaysCanvas) {
       this.charts.push(this.makeChart(
         this.bernaysCanvas.nativeElement, labels,
-        entries.map(e => e.bernays_median),
-        'Bernays Score (Median)', '#52e0a8', 0, undefined,
+        entries.map(e => m === 'median' ? e.bernays_median : e.bernays_max),
+        `Bernays Score (${label})`, '#52e0a8', 0, undefined,
       ));
     }
     if (this.dkCanvas && this.hasDk()) {
       this.charts.push(this.makeChart(
         this.dkCanvas.nativeElement, labels,
-        entries.map(e => e.dk_median ?? null),
-        'DK-Index (Median)', '#e07a52', 0, 1,
+        entries.map(e => (m === 'median' ? e.dk_median : e.dk_max) ?? null),
+        `DK-Index (${label})`, '#e07a52', 0, 1,
       ));
     }
   }

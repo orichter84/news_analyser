@@ -228,10 +228,13 @@ def daily_verlauf(df: pd.DataFrame, domain: str | None = None) -> list[dict]:
     agg: dict = {
         "count":          ("orwell_index", "count"),
         "orwell_median":  ("orwell_index", "median"),
+        "orwell_max":     ("orwell_index", "max"),
         "bernays_median": ("bernays_score", "median"),
+        "bernays_max":    ("bernays_score", "max"),
     }
     if has_dk:
         agg["dk_median"] = ("dunning_kruger_index", "median")
+        agg["dk_max"]    = ("dunning_kruger_index", "max")
 
     grouped = (
         df.groupby("date")
@@ -246,10 +249,13 @@ def daily_verlauf(df: pd.DataFrame, domain: str | None = None) -> list[dict]:
             "date":           str(row["date"]),
             "count":          int(row["count"]),
             "orwell_median":  round(float(row["orwell_median"]), 3),
+            "orwell_max":     round(float(row["orwell_max"]), 3),
             "bernays_median": round(float(row["bernays_median"]), 2),
+            "bernays_max":    round(float(row["bernays_max"]), 2),
         }
         if has_dk and pd.notna(row.get("dk_median")):
             entry["dk_median"] = round(float(row["dk_median"]), 3)
+            entry["dk_max"]    = round(float(row["dk_max"]), 3)
         result.append(entry)
 
     return result

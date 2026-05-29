@@ -9,6 +9,11 @@
         }
       </select>
     </label>
+
+    <div class="metric-toggle">
+      <button [class.active]="selectedMetric() === 'median'" (click)="onMetricChange('median')">Median</button>
+      <button [class.active]="selectedMetric() === 'max'" (click)="onMetricChange('max')">Maximum</button>
+    </div>
   </div>
 
   @if (loading()) {
