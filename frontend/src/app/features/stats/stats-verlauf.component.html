@@ -1,0 +1,44 @@
+<div class="verlauf-page">
+  <div class="verlauf-filter">
+    <label>
+      Portal
+      <select [(ngModel)]="selectedDomain" (ngModelChange)="onDomainChange()">
+        <option value="">Alle Portale</option>
+        @for (d of domains(); track d) {
+          <option [value]="d">{{ d }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (loading()) {
+    <p class="loading">Lade Verlaufsdaten…</p>
+  } @else if (!data().length) {
+    <p class="empty">Keine Daten für diesen Zeitraum.</p>
+  } @else {
+    <div class="verlauf-charts">
+      <div class="verlauf-chart-card">
+        <h2>Orwell-Index</h2>
+        <div class="chart-wrap">
+          <canvas #orwellCanvas></canvas>
+        </div>
+      </div>
+
+      <div class="verlauf-chart-card">
+        <h2>Bernays Score</h2>
+        <div class="chart-wrap">
+          <canvas #bernaysCanvas></canvas>
+        </div>
+      </div>
+
+      @if (hasDk()) {
+        <div class="verlauf-chart-card">
+          <h2>DK-Index</h2>
+          <div class="chart-wrap">
+            <canvas #dkCanvas></canvas>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

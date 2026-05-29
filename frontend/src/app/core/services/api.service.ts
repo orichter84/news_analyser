@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { ArticleListItem, ArticleDetail, ArticleFilter } from '../models/article.model';
-import { StatsResponse } from '../models/stats.model';
+import { StatsResponse, VerlaufEntry } from '../models/stats.model';
 import { AnalyseRequest, AnalyseResponse, JobStatus } from '../models/analyse.model';
 import { Technique } from '../models/technique.model';
 
@@ -27,6 +27,12 @@ export class ApiService {
 
   getStats(): Observable<StatsResponse> {
     return this.http.get<StatsResponse>(`${this.base}/stats`);
+  }
+
+  getVerlauf(domain?: string): Observable<VerlaufEntry[]> {
+    let params = new HttpParams();
+    if (domain) params = params.set('domain', domain);
+    return this.http.get<VerlaufEntry[]>(`${this.base}/stats/verlauf`, { params });
   }
 
   submitAnalyse(req: AnalyseRequest): Observable<AnalyseResponse> {

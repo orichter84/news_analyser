@@ -1,3 +1,11 @@
+export interface VerlaufEntry {
+  date: string;
+  count: number;
+  orwell_median: number;
+  bernays_median: number;
+  dk_median?: number;
+}
+
 export interface DomainAverage {
   domain: string;
   artikel: number;

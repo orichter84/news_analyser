@@ -206,6 +206,38 @@ td.date { white-space: nowrap; color: var(--muted); }
   }
 }
 
+/* ---- Verlauf ---- */
+.verlauf-filter {
+  margin-bottom: 1.5rem;
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    width: 220px;
+  }
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.35rem 0.6rem;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+}
+.verlauf-charts { display: flex; flex-direction: column; gap: 1rem; }
+.verlauf-chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.chart-wrap { position: relative; height: 220px; }
+
 /* ---- Article detail ---- */
 .article-detail {
   max-width: 860px;
