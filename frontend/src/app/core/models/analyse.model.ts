@@ -10,7 +10,7 @@ export interface AnalyseResponse {
 }
 
 export interface JobStatus {
-  status: 'pending' | 'done' | 'error';
+  status: 'pending' | 'done' | 'error' | 'paywall';
   message?: string;
   result?: Record<string, unknown>;
 }

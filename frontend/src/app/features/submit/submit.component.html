@@ -38,6 +38,8 @@
         @if (jobStatus()?.result) {
           <pre class="result-preview">{{ jobStatus()?.result | json }}</pre>
         }
+      } @else if (jobStatus()?.status === 'paywall') {
+        <p class="error">⚠ Artikel befindet sich hinter einer Paywall — keine Analyse möglich.</p>
       } @else if (jobStatus()?.status === 'error') {
         <p class="error">Fehler: {{ jobStatus()?.message }}</p>
       }

@@ -26,6 +26,9 @@ def _run_analysis(job_id: str, url: str) -> None:
         if article is None:
             _jobs[job_id] = {"status": "error", "message": "Scraping fehlgeschlagen"}
             return
+        if article.is_paywall:
+            _jobs[job_id] = {"status": "paywall", "message": "Artikel befindet sich hinter einer Paywall."}
+            return
         result = analyze_article(article)
         if result is None:
             _jobs[job_id] = {"status": "error", "message": "Analyse fehlgeschlagen"}

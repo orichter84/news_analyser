@@ -83,6 +83,10 @@
 - [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Adapter-Interface
 - [ ] **Analyse-Validierung** — Prüfen ob zurückgegebene quote-Felder tatsächlich im Artikeltext enthalten sind
 
+### LLM-Betrieb
+- [ ] **Hybrid-Provider** — Nach Pass 1: wenn `orwell_index > threshold` oder Domain in Prioritätsliste → tiefer Cloud-Provider (`LLM_PROVIDER_DEEP`), sonst lokales Modell (`LLM_PROVIDER`). Konfigurierbar via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Warten auf Apple Silicon Hardware für lokalen LLM-Betrieb.
+- [ ] **MCP-Server** — Lokaler MCP-Server als Brücke zwischen Claude Desktop (Cloud-Scheduling) und lokalem Backend. Tools: `trigger_feed()`, `get_stats()`. Ermöglicht Remote-Trigger ohne öffentlich erreichbares Backend.
+
 ### Export & Integration
 - [ ] **CSV/JSON-Export** — Alle gespeicherten Analysen exportieren
 - [ ] **Authentifizierung** — Optionaler API-Key-Schutz für den Analyse-Endpunkt
