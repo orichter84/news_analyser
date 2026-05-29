@@ -205,6 +205,56 @@ def thema_bernays(df: pd.DataFrame) -> pd.DataFrame:
     return agg.sort_values("bernays_avg", ascending=False).round(3)
 
 
+def daily_verlauf(df: pd.DataFrame, domain: str | None = None) -> list[dict]:
+    """Tagesbasierter Median der numerischen Indikatoren, optional nach Domain gefiltert."""
+    if domain:
+        df = df[df["domain"] == domain]
+    if df.empty:
+        return []
+
+    df = df.copy()
+    df["date"] = pd.to_datetime(
+        df["published_at"].where(df["published_at"].notna(), df.get("timestamp")),
+        errors="coerce",
+    ).dt.date
+    df = df.dropna(subset=["date"])
+
+    for col in ["orwell_index", "bernays_score"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    has_dk = "dunning_kruger_index" in df.columns
+    if has_dk:
+        df["dunning_kruger_index"] = pd.to_numeric(df["dunning_kruger_index"], errors="coerce")
+
+    agg: dict = {
+        "count":          ("orwell_index", "count"),
+        "orwell_median":  ("orwell_index", "median"),
+        "bernays_median": ("bernays_score", "median"),
+    }
+    if has_dk:
+        agg["dk_median"] = ("dunning_kruger_index", "median")
+
+    grouped = (
+        df.groupby("date")
+        .agg(**agg)
+        .reset_index()
+        .sort_values("date")
+    )
+
+    result = []
+    for _, row in grouped.iterrows():
+        entry: dict = {
+            "date":           str(row["date"]),
+            "count":          int(row["count"]),
+            "orwell_median":  round(float(row["orwell_median"]), 3),
+            "bernays_median": round(float(row["bernays_median"]), 2),
+        }
+        if has_dk and pd.notna(row.get("dk_median")):
+            entry["dk_median"] = round(float(row["dk_median"]), 3)
+        result.append(entry)
+
+    return result
+
+
 def author_orwell(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
     """Durchschnittlicher Orwell-Index pro Autor (mind. 2 Artikel)."""
     if "author" not in df.columns:

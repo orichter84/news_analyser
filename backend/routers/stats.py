@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from news_analyser.stats import (
@@ -14,9 +14,18 @@ from news_analyser.stats import (
     dunning_kruger_distribution,
     domain_averages,
     sentiment_distribution,
+    daily_verlauf,
 )
 
 router = APIRouter(prefix="/stats", tags=["stats"])
+
+
+@router.get("/verlauf")
+def get_verlauf(domain: str | None = Query(None)) -> list[dict]:
+    df = _load_dataframe()
+    if df.empty:
+        return []
+    return daily_verlauf(df, domain=domain)
 
 
 @router.get("")
