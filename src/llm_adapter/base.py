@@ -68,3 +68,8 @@ class LLMAdapter(ABC):
     @abstractmethod
     def name(self) -> str:
         """Adapter identifier (e.g. 'anthropic', 'cli', 'lm_studio')."""
+
+    @property
+    def model(self) -> str:
+        """Active model identifier. Overridden by adapters that support model selection."""
+        return self.name

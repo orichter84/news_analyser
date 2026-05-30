@@ -41,6 +41,10 @@ class AnthropicAdapter(LLMAdapter):
     def name(self) -> str:
         return "anthropic"
 
+    @property
+    def model(self) -> str:
+        return self._model
+
     def initialize(self, config: dict) -> None:
         if _anthropic is None:
             raise ImportError(

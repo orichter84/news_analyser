@@ -35,6 +35,10 @@ class M365CopilotAdapter(LLMAdapter):
     def name(self) -> str:
         return "m365_copilot"
 
+    @property
+    def model(self) -> str:
+        return "m365-copilot"
+
     def initialize(self, config: dict) -> None:
         # ---- Schritt 1: Nicht-sicherheitskritische Konfiguration ----
         api_key_env: str = config.get("api_key_env", self._DEFAULTS["api_key_env"])

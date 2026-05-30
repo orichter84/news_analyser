@@ -31,6 +31,10 @@ class CLIAdapter(LLMAdapter):
     def name(self) -> str:
         return "cli"
 
+    @property
+    def model(self) -> str:
+        return self._model
+
     def initialize(self, config: dict) -> None:
         # ---- Schritt 1: Nicht-sicherheitskritische Konfiguration ----
         import os

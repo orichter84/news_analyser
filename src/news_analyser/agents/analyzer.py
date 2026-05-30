@@ -4,6 +4,8 @@ Pass 1 (anonymised text): Orwell-Index (extremism), Bernays Score, Techniques
 Pass 2 (original text):   Politische Strömung (labels), DK-Index
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -145,6 +147,8 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
         "politische_stroemung":  stroemung,
         "themenbereich":         themenbereich,
         "manipulation_targets":  manipulation_targets,
+        "llm_provider":          adapter.name,
+        "llm_model":             adapter.model,
     }
 
     # Artikel als Anker für zukünftige Analysen speichern

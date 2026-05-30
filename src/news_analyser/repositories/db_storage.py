@@ -7,6 +7,8 @@ Stores:
   - metadata:  flattened analysis JSON (for filtering + stats queries)
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Any
@@ -67,6 +69,8 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
             analysis.get("manipulation_targets", []), ensure_ascii=False
         ),
         "analysis_json":        json.dumps(analysis, ensure_ascii=False),
+        "llm_provider":         analysis.get("llm_provider", ""),
+        "llm_model":            analysis.get("llm_model", ""),
     }
 
 

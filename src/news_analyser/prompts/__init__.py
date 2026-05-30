@@ -4,6 +4,8 @@ Supports {{PLACEHOLDER}} substitution via the optional context dict:
     load_prompt("system", "pass2", context={"ROLES": "..."})
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 _PROMPTS_DIR = Path(__file__).parent

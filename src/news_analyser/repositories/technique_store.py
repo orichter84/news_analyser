@@ -8,6 +8,8 @@ Serves two purposes:
 Technique definitions are loaded from src/news_analyser/data/techniques.json.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Any

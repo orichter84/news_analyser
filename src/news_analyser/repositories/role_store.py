@@ -13,6 +13,8 @@ Normalisierung (kein ChromaDB — die Liste ist kurz und besteht aus Einzelwört
   4. Fallback: Original-Name unverändert
 """
 
+from __future__ import annotations
+
 import difflib
 import json
 from pathlib import Path

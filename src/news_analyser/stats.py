@@ -6,6 +6,8 @@ Verwendung:
     python run.py --stats --top 10
 """
 
+from __future__ import annotations
+
 import json
 from collections import Counter
 from typing import Any

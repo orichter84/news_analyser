@@ -5,6 +5,8 @@ Primary engine: trafilatura (best recall on news sites).
 Fallback:       BeautifulSoup paragraph extraction.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 import datetime

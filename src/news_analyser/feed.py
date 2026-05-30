@@ -6,6 +6,8 @@ in die Analyse-Pipeline. Unterstützt manuellen Einzel-Lauf und
 automatischen Intervall-Betrieb.
 """
 
+from __future__ import annotations
+
 import time
 import datetime
 from pathlib import Path

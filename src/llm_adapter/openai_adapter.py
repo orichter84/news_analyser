@@ -21,6 +21,8 @@ ENV fallbacks for non-security values (if not in config dict):
     LLM_MAX_TOKENS   — max output tokens
 """
 
+from __future__ import annotations
+
 import json
 import os
 from typing import Any, Dict, List
@@ -96,10 +98,34 @@ class OpenAIAdapter(LLMAdapter):
                 "und kein Standardwert (api_key_default) konfiguriert."
             )
 
+        self._base_url = base_url
         client_kwargs: dict = {"api_key": api_key}
         if base_url:
             client_kwargs["base_url"] = base_url
+            self._model = self._resolve_active_model(base_url) or self._model
         self._client = _openai.OpenAI(**client_kwargs)
+
+    @staticmethod
+    def _resolve_active_model(base_url: str) -> str | None:
+        """Queries /api/v0/models to find the loaded LLM (LM Studio and compatible servers)."""
+        try:
+            import requests
+            api_base = base_url.rstrip("/").removesuffix("/v1")
+            resp = requests.get(f"{api_base}/api/v0/models", timeout=2)
+            if resp.ok:
+                loaded = [
+                    m for m in resp.json().get("data", [])
+                    if m.get("state") == "loaded" and m.get("type") == "llm"
+                ]
+                if loaded:
+                    return loaded[0]["id"]
+        except Exception:
+            pass
+        return None
+
+    @property
+    def model(self) -> str:
+        return self._model
 
     def generate(
         self,

@@ -35,6 +35,8 @@ Two-phase initialization (inside initialize):
     Step 2 — security-critical:   ENV[config["api_key_env"]] → API key value
 """
 
+from __future__ import annotations
+
 from .base import LLMAdapter
 from .anthropic_adapter import AnthropicAdapter
 from .cli_adapter import CLIAdapter
