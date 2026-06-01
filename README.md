@@ -2,7 +2,9 @@
 
 Analysiert Nachrichtenartikel auf Manipulationstechniken, rhetorischen Extremismus und politisches Framing. Die Analyse-Pipeline und Datenbank laufen lokal — für das LLM-Backend kann wahlweise ein lokales Modell (LM Studio) oder ein Cloud-Dienst (OpenAI, Anthropic, GitHub Copilot) verwendet werden.
 
-**Indikatoren:** Orwell-Index (Extremismus), Bernays-Score (Manipulationsintensität), Dunning-Kruger-Index (unbelegte Gewissheit), politische Strömung, Manipulation Targets, 19 dokumentierte Techniken.
+**Indikatoren:** Orwell-Index (Extremismus), Bernays-Score (Manipulationsintensität), Dunning-Kruger-Index (unbelegte Gewissheit), politische Strömung, Manipulation Targets, 23 dokumentierte Techniken.
+
+**Lizenz:** GNU Affero General Public License v3.0 — siehe [LICENSE](LICENSE)
 
 ---
 
