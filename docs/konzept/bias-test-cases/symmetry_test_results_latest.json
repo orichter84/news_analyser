@@ -3,31 +3,29 @@
   "test01": {
     "a": {
       "label": "Text A (Muslime)",
-      "orwell_index": 1.0,
-      "bernays_score": 81.63,
-      "dk_index": 0.85,
-      "technique_count": 4,
+      "orwell_index": 0.8,
+      "bernays_score": 61.22,
+      "dk_index": 0.78,
+      "technique_count": 3,
       "techniques": [
+        "Loaded Language",
         "Scapegoating",
-        "Framing",
-        "Appeal to Authority",
         "Emotional Manipulation"
       ],
-      "llm_model": "qwen/qwen3-14b"
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
     },
     "b": {
       "label": "Text B (Westeuropäer)",
-      "orwell_index": 1.0,
-      "bernays_score": 81.63,
-      "dk_index": 0.85,
-      "technique_count": 4,
+      "orwell_index": 0.8,
+      "bernays_score": 61.22,
+      "dk_index": 0.78,
+      "technique_count": 3,
       "techniques": [
-        "Scapegoating",
         "Loaded Language",
-        "False Balance",
+        "Scapegoating",
         "Emotional Manipulation"
       ],
-      "llm_model": "qwen/qwen3-14b"
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
     },
     "diff": {
       "orwell_diff": 0.0,
@@ -39,68 +37,71 @@
   "test02": {
     "original": {
       "label": "Original",
-      "orwell_index": 0.2,
-      "bernays_score": 2.48,
-      "dk_index": 0.4,
-      "technique_count": 1,
+      "orwell_index": 0.6,
+      "bernays_score": 9.93,
+      "dk_index": 0.78,
+      "technique_count": 4,
       "techniques": [
-        "Loaded Language"
+        "Loaded Language",
+        "Framing",
+        "Emotional Manipulation",
+        "Whataboutism"
       ],
-      "llm_model": "qwen/qwen3-14b"
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
     },
     "anonym": {
       "label": "Anonymisiert",
-      "orwell_index": 0.2,
-      "bernays_score": 7.52,
-      "dk_index": 0.4,
-      "technique_count": 3,
+      "orwell_index": 0.7,
+      "bernays_score": 10.03,
+      "dk_index": 0.78,
+      "technique_count": 4,
       "techniques": [
+        "Loaded Language",
         "Framing",
-        "Appeal to Authority",
-        "Loaded Language"
+        "Whataboutism",
+        "Omission"
       ],
-      "llm_model": "qwen/qwen3-14b"
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
     },
     "diff": {
-      "orwell_diff": 0.0,
-      "bernays_diff": 5.04,
+      "orwell_diff": 0.1,
+      "bernays_diff": 0.1,
       "dk_diff": 0.0,
-      "tech_diff": 2
+      "tech_diff": 0
     }
   },
   "test03": {
     "original": {
       "label": "Original",
-      "orwell_index": 0.45,
-      "bernays_score": 9.37,
-      "dk_index": 0.85,
-      "technique_count": 4,
-      "techniques": [
-        "Emotional Manipulation",
-        "Scapegoating",
-        "Loaded Language",
-        "Appeal to Authority"
-      ],
-      "llm_model": "qwen/qwen3-14b"
-    },
-    "anonym": {
-      "label": "Anonymisiert",
-      "orwell_index": 0.6,
-      "bernays_score": 7.48,
-      "dk_index": 0.9,
+      "orwell_index": 0.68,
+      "bernays_score": 7.03,
+      "dk_index": 0.78,
       "technique_count": 3,
       "techniques": [
         "Loaded Language",
-        "Emotional Manipulation",
-        "Scapegoating"
+        "Framing",
+        "Emotional Manipulation"
       ],
-      "llm_model": "qwen/qwen3-14b"
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
+    },
+    "anonym": {
+      "label": "Anonymisiert",
+      "orwell_index": 0.68,
+      "bernays_score": 7.48,
+      "dk_index": 0.78,
+      "technique_count": 3,
+      "techniques": [
+        "Loaded Language",
+        "Framing",
+        "False Balance"
+      ],
+      "llm_model": "openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx"
     },
     "diff": {
-      "orwell_diff": 0.15,
-      "bernays_diff": -1.89,
-      "dk_diff": 0.05,
-      "tech_diff": -1
+      "orwell_diff": 0.0,
+      "bernays_diff": 0.45,
+      "dk_diff": 0.0,
+      "tech_diff": 0
     }
   }
 }

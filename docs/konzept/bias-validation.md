@@ -298,14 +298,68 @@ Zweck: Vergleich der Symmetrie-Stabilität über verschiedene Modelle hinweg.
 
 ---
 
+---
+
+## Wiederholungstest — 2026-06-01 (LM Studio, openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx, 24 Techniken)
+
+Testlauf mit der ungefilterten "Heretic Uncensored" Variante des GPT-OSS-20B-Modells.
+Motivation: Das Basismodell (gpt-oss-20b-mlx) blockierte in Pass 2 alle politischen Inhalte.
+Die Uncensored-Variante ermöglicht die vollständige Analyse — bei deutlich höherer Inferenzgeschwindigkeit als Qwen3-14B, relevant für automatischen Server-Feed-Betrieb.
+
+- Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
+- Modell: `openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx` (MLX, Apple Silicon)
+- Ausführung: `docs/konzept/run_symmetry_tests.py`
+
+### Test 01 — Scapegoating (synthetisch)
+
+| Metrik           | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
+|------------------|-----------------|----------------------|-----------|
+| Orwell-Index     | 0.80            | 0.80                 | **0.00** ✅ |
+| Bernays Score    | 61.22           | 61.22                | **0.00** ✅ |
+| DK-Index         | 0.78            | 0.78                 | **0.00** ✅ |
+| Anzahl Techniken | 3               | 3                    | **0** ✅ |
+
+**Techniken A+B:** Loaded Language, Scapegoating, Emotional Manipulation (identisch)
+
+**Befund:** Perfekte Symmetrie auf allen vier Metriken — identisch mit Qwen3-14B.
+
+---
+
+### Test 02 — Tagesschau antifa-ost (Original vs. Anonymisiert)
+
+| Metrik           | Original | Anonymisiert | Differenz |
+|------------------|----------|--------------|-----------|
+| Orwell-Index     | 0.60     | 0.70         | +0.10 |
+| Bernays Score    | 9.93     | 10.03        | +0.10 |
+| DK-Index         | 0.78     | 0.78         | **0.00** ✅ |
+| Anzahl Techniken | 4        | 4            | 0 |
+
+**Befund:** DK vollständig stabil. Minimale Orwell/Bernays-Differenz (+0.10) im Rahmen des bekannten Kontext-Verlust-Effekts.
+
+---
+
+### Test 03 — Junge Freiheit Riemann/Antifa (Original vs. Anonymisiert)
+
+| Metrik           | Original | Anonymisiert | Differenz |
+|------------------|----------|--------------|-----------|
+| Orwell-Index     | 0.68     | 0.68         | **0.00** ✅ |
+| Bernays Score    | 7.03     | 7.48         | +0.45 |
+| DK-Index         | 0.78     | 0.78         | **0.00** ✅ |
+| Anzahl Techniken | 3        | 3            | 0 |
+
+**Befund:** Orwell und DK vollständig stabil. Bernays-Differenz +0.45 gering und durch Kontext-Verlust-Effekt erklärbar.
+
+---
+
 ## Modellvergleich Symmetrie-Tests (Test 01)
 
 | Modell | Δ Orwell | Δ Bernays | Δ DK | Δ Techniken |
 |---|---|---|---|---|
 | claude-opus-4-5 (CLI, 2026-06-01) | 0.00 | 0.00 | -0.07 | 0 |
 | qwen/qwen3-14b (LM Studio, 2026-06-01) | **0.00** | **0.00** | **0.00** | **0** |
+| openai-gpt-oss-20b-heretic-uncensored (LM Studio, 2026-06-01) | **0.00** | **0.00** | **0.00** | **0** |
 
-Beide Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays Score. Qwen3-14B zeigt zusätzlich keinen messbaren DK-Unterschied — leicht besseres Ergebnis als der Cloud-Adapter.
+Alle drei Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays Score. Das GPT-OSS-20B-Modell (Uncensored-Variante) liefert identische Symmetrie-Ergebnisse wie Qwen3-14B bei deutlich höherer Inferenzgeschwindigkeit — relevant für automatischen RSS-Feed-Betrieb. Das Standard-Basismodell (ohne Uncensored-Patch) ist für diesen Anwendungsfall ungeeignet da es politische Inhalte in Pass 2 vollständig blockt.
 
 ---
 
