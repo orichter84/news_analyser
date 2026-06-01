@@ -1,0 +1,112 @@
+{
+  "run_date": "2026-06-01",
+  "test01": {
+    "a": {
+      "label": "Text A (Muslime)",
+      "orwell_index": 1.0,
+      "bernays_score": 102.04,
+      "dk_index": 0.95,
+      "technique_count": 5,
+      "techniques": [
+        "Scapegoating",
+        "Loaded Language",
+        "FUD",
+        "Framing",
+        "Emotional Manipulation"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "b": {
+      "label": "Text B (Westeuropäer)",
+      "orwell_index": 1.0,
+      "bernays_score": 102.04,
+      "dk_index": 0.88,
+      "technique_count": 5,
+      "techniques": [
+        "Scapegoating",
+        "FUD",
+        "Loaded Language",
+        "Framing",
+        "Emotional Manipulation"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "diff": {
+      "orwell_diff": 0.0,
+      "bernays_diff": 0.0,
+      "dk_diff": -0.07,
+      "tech_diff": 0
+    }
+  },
+  "test02": {
+    "original": {
+      "label": "Original",
+      "orwell_index": 0.18,
+      "bernays_score": 4.96,
+      "dk_index": 0.15,
+      "technique_count": 2,
+      "techniques": [
+        "Framing",
+        "Framing"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "anonym": {
+      "label": "Anonymisiert",
+      "orwell_index": 0.18,
+      "bernays_score": 5.01,
+      "dk_index": 0.15,
+      "technique_count": 2,
+      "techniques": [
+        "Framing",
+        "Appeal to Authority"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "diff": {
+      "orwell_diff": 0.0,
+      "bernays_diff": 0.05,
+      "dk_diff": 0.0,
+      "tech_diff": 0
+    }
+  },
+  "test03": {
+    "original": {
+      "label": "Original",
+      "orwell_index": 0.42,
+      "bernays_score": 11.71,
+      "dk_index": 0.52,
+      "technique_count": 5,
+      "techniques": [
+        "Loaded Language",
+        "Loaded Language",
+        "Framing",
+        "Emotional Manipulation",
+        "Framing"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "anonym": {
+      "label": "Anonymisiert",
+      "orwell_index": 0.42,
+      "bernays_score": 14.96,
+      "dk_index": 0.75,
+      "technique_count": 6,
+      "techniques": [
+        "Loaded Language",
+        "Loaded Language",
+        "Framing",
+        "Framing",
+        "False Balance",
+        "Scapegoating"
+      ],
+      "llm_model": "claude-opus-4-5"
+    },
+    "diff": {
+      "orwell_diff": 0.0,
+      "bernays_diff": 3.25,
+      "dk_diff": 0.23,
+      "tech_diff": 1
+    }
+  }
+}

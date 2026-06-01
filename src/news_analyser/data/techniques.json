@@ -188,5 +188,45 @@
     "example": "Denk an die Kinder. Kannst du das wirklich verantworten?",
     "reference_url": "https://de.wikipedia.org/wiki/Pathos",
     "doc": "Appeal to Emotion emotionaler Appell Gefuehlsappell Mitleid Empoerung Ekel Hoffnung Pathos"
+  },
+  {
+    "id": "false-cause",
+    "name": "False Cause",
+    "name_de": "Falscher Kausalzusammenhang",
+    "category": "Logisch",
+    "description": "Ein Zusammenhang zwischen zwei Ereignissen wird als Ursache-Wirkungs-Beziehung dargestellt, obwohl nur Korrelation oder Koinzidenz vorliegt. Haeufig in Form von Post-hoc-Schlussfolgerungen.",
+    "example": "Seit die Regierung das neue Gesetz verabschiedet hat, steigt die Kriminalitaet -- also ist das Gesetz schuld.",
+    "reference_url": "https://de.wikipedia.org/wiki/Post_hoc_ergo_propter_hoc",
+    "doc": "False Cause falscher Kausalzusammenhang Post hoc Korrelation Kausalitaet Scheinzusammenhang Ursache Wirkung"
+  },
+  {
+    "id": "halo-effect",
+    "name": "Halo Effect",
+    "name_de": "Halo-Effekt",
+    "category": "Emotional",
+    "description": "Positive oder negative Eigenschaften einer Person oder Institution werden auf andere, fachfremde Bereiche uebertragen. Unterschied zu Appeal to Authority: es geht um Strahlkraft, nicht um Fachkompetenz.",
+    "example": "Der erfolgreiche Unternehmer fordert eine Rentenreform -- als waere wirtschaftlicher Erfolg ein Beleg fuer sozialpolitisches Urteilsvermoegen.",
+    "reference_url": "https://de.wikipedia.org/wiki/Halo-Effekt",
+    "doc": "Halo Effect Halo-Effekt Heiligenschein Strahlkraft Sympathieübertragung Prominenz Glaubwürdigkeit Übertragung"
+  },
+  {
+    "id": "overgeneralization",
+    "name": "Overgeneralization",
+    "name_de": "Überverallgemeinerung",
+    "category": "Logisch",
+    "description": "Einzelne Faelle oder Ereignisse werden als repraesentativ fuer eine gesamte Gruppe oder ein System dargestellt, ohne dass eine belastbare Datenbasis vorliegt.",
+    "example": "Ein Asylbewerber begeht eine Straftat -- also sind Asylbewerber kriminell.",
+    "reference_url": "https://de.wikipedia.org/wiki/Verallgemeinerung",
+    "doc": "Overgeneralization Überverallgemeinerung Verallgemeinerung Pauschalurteil Stereotypisierung Einzelfall Repraesentativitaet"
+  },
+  {
+    "id": "exaggeration",
+    "name": "Exaggeration",
+    "name_de": "Übertreibung",
+    "category": "Rhetorisch",
+    "description": "Fakten, Risiken oder Auswirkungen werden weit ueber das durch Belege gerechtfertigte Mass hinaus vergroessert dargestellt, um emotionale Wirkung oder Dringlichkeit zu erzeugen.",
+    "example": "Diese Entscheidung wird unser Land fuer immer zerstoeren.",
+    "reference_url": "https://de.wikipedia.org/wiki/Hyperbel_(Rhetorik)",
+    "doc": "Exaggeration Übertreibung Dramatisierung Hyperbel Sensationalismus alarmistisch Katastrophisierung"
   }
 ]
