@@ -63,6 +63,10 @@
 
 ## Offen
 
+### 🔴 Priorität
+
+- [ ] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB-Verbindung per ENV konfigurierbar machen (`CHROMA_MODE=local|server`, `CHROMA_HOST`, `CHROMA_PORT`). Neuer `/config`-Endpoint mit Feature-Flags (`SUBMIT_ENABLED=true|false`). Frontend blendet "Einreichen" basierend auf Flag aus. Ziel: MacBook = Entwickler-Modus (lokal, Submit aktiv), Mac Mini = Viewer-Modus (Netzwerk-ChromaDB, kein Submit). Mac Mini läuft als ChromaDB-Server + Read-Only-Frontend im Heimnetz.
+
 ### Auswertung & Visualisierung
 - [ ] **entity_targeting und thema_bernays in /stats API** — Endpunkt exponieren und im Frontend visualisieren
 - [ ] **Quellenvergleich** — Interaktives Balkendiagramm Domain × Orwell-Index (Chart.js)
