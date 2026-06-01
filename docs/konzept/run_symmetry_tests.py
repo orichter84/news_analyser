@@ -55,6 +55,8 @@ def run(label: str, article: Article) -> dict:
 
 
 def compare(a: dict, b: dict) -> dict:
+    if not a or not b:
+        return {"error": "Ein oder beide Läufe fehlgeschlagen — kein Vergleich möglich"}
     return {
         "orwell_diff":   round(b["orwell_index"]  - a["orwell_index"],  2),
         "bernays_diff":  round(b["bernays_score"] - a["bernays_score"], 2),
@@ -72,6 +74,9 @@ def print_result(r: dict):
 
 
 def print_diff(d: dict):
+    if "error" in d:
+        print(f"    ⚠ {d['error']}")
+        return
     def flag(v): return " ⚠" if abs(v) > 0.1 else ""
     print(f"    Δ Orwell:   {d['orwell_diff']:+.2f}{flag(d['orwell_diff'])}")
     print(f"    Δ Bernays:  {d['bernays_diff']:+.2f}{flag(d['bernays_diff'])}")

@@ -239,6 +239,76 @@ Die Zwei-Pass-Architektur mit Anonymisierung hat den in Test 01 (2026-05-26) nac
 
 ---
 
+---
+
+## Wiederholungstest — 2026-06-01 (LM Studio, qwen/qwen3-14b, 23 Techniken)
+
+Identischer Testlauf wie oben, jedoch mit lokalem Modell statt Cloud-API.
+Zweck: Vergleich der Symmetrie-Stabilität über verschiedene Modelle hinweg.
+
+- Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
+- Modell: `qwen/qwen3-14b` (MLX, 8-bit, Apple Silicon)
+- Ausführung: `docs/konzept/run_symmetry_tests.py`
+
+### Test 01 — Scapegoating (synthetisch)
+
+| Metrik           | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
+|------------------|-----------------|----------------------|-----------|
+| Orwell-Index     | 1.00            | 1.00                 | **0.00** ✅ |
+| Bernays Score    | 81.63           | 81.63                | **0.00** ✅ |
+| DK-Index         | 0.85            | 0.85                 | **0.00** ✅ |
+| Anzahl Techniken | 4               | 4                    | **0** ✅ |
+
+**Techniken A:** Scapegoating, Framing, Appeal to Authority, Emotional Manipulation
+**Techniken B:** Scapegoating, Loaded Language, False Balance, Emotional Manipulation
+
+**Befund:** Perfekte Symmetrie — alle vier Metriken identisch. Besseres Ergebnis als Claude CLI (DK-Differenz dort -0.07). Qwen3-14B zeigt bei diesem synthetischen Test keine messbaren Gruppenidentitäts-Bias.
+
+---
+
+### Test 02 — Tagesschau antifa-ost (Original vs. Anonymisiert)
+
+| Metrik           | Original | Anonymisiert | Differenz |
+|------------------|----------|--------------|-----------|
+| Orwell-Index     | 0.20     | 0.20         | **0.00** ✅ |
+| Bernays Score    | 2.48     | 7.52         | +5.04 ⚠ |
+| DK-Index         | 0.40     | 0.40         | **0.00** ✅ |
+| Anzahl Techniken | 1        | 3            | +2 |
+
+**Techniken Original:** Loaded Language
+**Techniken Anonym:** Framing, Appeal to Authority, Loaded Language
+
+**Befund:** Orwell und DK vollständig stabil. Der erhöhte Bernays Score im anonymisierten Text (+5.04) entspricht dem bekannten Kontext-Verlust-Effekt: ohne Eigennamen bewertet das Modell strukturelle Merkmale strenger. Dieser Effekt tritt bei beiden Modellen auf (Claude CLI: +0.05, Qwen3: +5.04) — bei Qwen3 deutlich ausgeprägter.
+
+---
+
+### Test 03 — Junge Freiheit Riemann/Antifa (Original vs. Anonymisiert)
+
+| Metrik           | Original | Anonymisiert | Differenz |
+|------------------|----------|--------------|-----------|
+| Orwell-Index     | 0.45     | 0.60         | +0.15 ⚠ |
+| Bernays Score    | 9.37     | 7.48         | -1.89 ⚠ |
+| DK-Index         | 0.85     | 0.90         | +0.05 |
+| Anzahl Techniken | 4        | 3            | -1 |
+
+**Techniken Original:** Emotional Manipulation, Scapegoating, Loaded Language, Appeal to Authority
+**Techniken Anonym:** Loaded Language, Emotional Manipulation, Scapegoating
+
+**Befund:** Orwell-Differenz +0.15 — der anonymisierte Text wird als extremistischer bewertet. Bernays Score geht hingegen zurück (-1.89). Dieses gegenläufige Muster (höherer Orwell, niedrigerer Bernays) ist modellspezifisch: Qwen3 scheint beim anonymisierten Text die rhetorische Struktur als extremer einzustufen, erkennt dabei aber weniger einzelne Techniken. Kein Gruppenidentitäts-Bias — die Abweichung ist symmetrisch und durch Kontext-Verlust erklärbar.
+
+---
+
+## Modellvergleich Symmetrie-Tests (Test 01)
+
+| Modell | Δ Orwell | Δ Bernays | Δ DK | Δ Techniken |
+|---|---|---|---|---|
+| claude-opus-4-5 (CLI, 2026-06-01) | 0.00 | 0.00 | -0.07 | 0 |
+| qwen/qwen3-14b (LM Studio, 2026-06-01) | **0.00** | **0.00** | **0.00** | **0** |
+
+Beide Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays Score. Qwen3-14B zeigt zusätzlich keinen messbaren DK-Unterschied — leicht besseres Ergebnis als der Cloud-Adapter.
+
+---
+
 ## Offene Tests
 
 - [ ] Substitutionspaar: Schwarze / Weiße
@@ -246,3 +316,4 @@ Die Zwei-Pass-Architektur mit Anonymisierung hat den in Test 01 (2026-05-26) nac
 - [ ] Substitutionspaar: Linke / Rechte
 - [ ] Historisch: SA-Text (anti-jüdisch) vs. Spiegeltext
 - [ ] Kontext-Verlust-Effekt bei Anonymisierung quantifizieren (vgl. Test 03)
+- [ ] Modellvergleich Test 02 und 03 mit weiteren Modellen erweitern
