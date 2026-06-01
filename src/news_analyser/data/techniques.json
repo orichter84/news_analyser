@@ -228,5 +228,15 @@
     "example": "Diese Entscheidung wird unser Land fuer immer zerstoeren.",
     "reference_url": "https://de.wikipedia.org/wiki/Hyperbel_(Rhetorik)",
     "doc": "Exaggeration Übertreibung Dramatisierung Hyperbel Sensationalismus alarmistisch Katastrophisierung"
+  },
+  {
+    "id": "anchoring",
+    "name": "Anchoring",
+    "name_de": "Anker-Effekt",
+    "category": "Strukturell",
+    "description": "Eine erste Zahl, Aussage oder Bewertung wird prominent platziert und dient als Referenzpunkt fuer alle nachfolgenden Informationen. Spaetere Fakten werden unbewusst relativ zu diesem Anker bewertet.",
+    "example": "\"Ueber 80 Prozent der Bevoelkerung unterstuetzen die Reform\" — danach wirken 60 Prozent Zustimmung bei einer anderen Massnahme bereits wie ein Misserfolg.",
+    "reference_url": "https://de.wikipedia.org/wiki/Ankereffekt",
+    "doc": "Anchoring Ankereffekt Ankerpunkt Referenzpunkt erste Zahl Ausgangswert Benchmark Framing Zahl"
   }
 ]
