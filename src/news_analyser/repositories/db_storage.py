@@ -16,8 +16,8 @@ from typing import Any
 import chromadb
 from chromadb.utils import embedding_functions
 
+from .chroma_client import get_client
 
-_DB_PATH = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
 _COLLECTION = "articles"
 
 # Uses sentence-transformers/all-MiniLM-L6-v2 locally (no API key needed).
@@ -28,8 +28,7 @@ _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
 
 
 def _get_collection() -> chromadb.Collection:
-    client = chromadb.PersistentClient(path=str(_DB_PATH))
-    return client.get_or_create_collection(
+    return get_client().get_or_create_collection(
         name=_COLLECTION,
         embedding_function=_EMBED_FN,
         metadata={"hnsw:space": "cosine"},
