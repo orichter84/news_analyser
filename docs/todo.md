@@ -93,6 +93,14 @@
 - [ ] **Hybrid-Provider** — Nach Pass 1: wenn `orwell_index > threshold` oder Domain in Prioritätsliste → tiefer Cloud-Provider (`LLM_PROVIDER_DEEP`), sonst lokales Modell (`LLM_PROVIDER`). Konfigurierbar via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Warten auf Apple Silicon Hardware für lokalen LLM-Betrieb.
 - [ ] **MCP-Server** — Lokaler MCP-Server als Brücke zwischen Claude Desktop (Cloud-Scheduling) und lokalem Backend. Tools: `trigger_feed()`, `get_stats()`. Ermöglicht Remote-Trigger ohne öffentlich erreichbares Backend.
 
+### Open Source / Internationalisierung
+- [ ] **README.md (Englisch)** — Projektbeschreibung, Architektur, Installation, Konfiguration auf Englisch
+- [ ] **Dokumentation übersetzen** — `docs/` Inhalte auf Englisch (oder zweisprachig)
+- [ ] **Frontend UI-Texte** — Alle deutschen Labels, Fehlermeldungen und Beschriftungen ins Englische übersetzen
+- [ ] **Code-Kommentare** — Deutsche Kommentare und Docstrings ins Englische übersetzen; deutsche Ausgabefelder (`politische_stroemung`, `themenbereich` etc.) umbenennen oder englische Aliases ergänzen
+- [ ] **spaCy Spracherkennung** — `langdetect` zur automatischen Spracherkennung; `de_core_news_md` vs. `en_core_web_md` dynamisch laden
+- [ ] **Keyword-Listen Englisch** — Englische Äquivalente für `keywords_extreme_left.txt`, `keywords_extreme_right.txt`, `keywords_general.txt` kuratieren
+
 ### Export & Integration
 - [ ] **CSV/JSON-Export** — Alle gespeicherten Analysen exportieren
 - [ ] **Authentifizierung** — Optionaler API-Key-Schutz für den Analyse-Endpunkt
