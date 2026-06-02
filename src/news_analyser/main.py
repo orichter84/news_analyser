@@ -38,7 +38,7 @@ def run(url: str) -> None:
         print("[!] Analysis failed – no JSON returned.")
         return
 
-    store_result(article.text, result)
+    store_result(article.text, result, url=article.url)
     ft = result["framing_target"]
     techniques = result["detected_techniques"]
     word_count = result.get("word_count", 0)
@@ -71,7 +71,7 @@ def run_text_file(path: str, domain: str, source_url: str) -> None:
         print("[!] Analysis failed – no JSON returned.")
         return
 
-    store_result(article.text, result)
+    store_result(article.text, result, url=article.url)
     ft = result["framing_target"]
     techniques = result["detected_techniques"]
     word_count = result.get("word_count", 0)

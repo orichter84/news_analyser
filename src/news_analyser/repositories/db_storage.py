@@ -85,10 +85,15 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def store_result(article_text: str, analysis: dict[str, Any]) -> str:
-    """Embed article_text, attach analysis as metadata. Returns the doc ID."""
+def store_result(article_text: str, analysis: dict[str, Any], url: str | None = None) -> str:
+    """Embed article_text, attach analysis as metadata. Returns the doc ID.
+
+    url overrides analysis['source_url'] as the ChromaDB ID to prevent LLM
+    hallucinations from creating duplicate entries.
+    """
     collection = _get_collection()
-    doc_id = analysis.get("source_url", "unknown")
+    doc_id = url or analysis.get("source_url", "unknown")
+    analysis["source_url"] = doc_id  # keep metadata consistent
 
     # Upsert so re-running the same URL overwrites rather than duplicates.
     collection.upsert(

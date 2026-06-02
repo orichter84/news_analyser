@@ -33,7 +33,7 @@ def _run_analysis(job_id: str, url: str) -> None:
         if result is None:
             _jobs[job_id] = {"status": "error", "message": "Analyse fehlgeschlagen"}
             return
-        store_result(article.text, result)
+        store_result(article.text, result, url=article.url)
         _jobs[job_id] = {"status": "done", "result": result}
     except Exception as exc:
         _jobs[job_id] = {"status": "error", "message": str(exc)}
