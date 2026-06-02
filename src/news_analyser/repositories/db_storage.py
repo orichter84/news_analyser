@@ -35,6 +35,17 @@ def _get_collection() -> chromadb.Collection:
     )
 
 
+def _extract_stroemung_labels(stroemung: list) -> list[str]:
+    """Extracts flat label list from both old (list[str]) and new (list[dict]) format."""
+    labels = []
+    for item in stroemung:
+        if isinstance(item, dict):
+            labels.append(item.get("label", ""))
+        elif isinstance(item, str):
+            labels.append(item)
+    return [l for l in labels if l]
+
+
 def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     """ChromaDB metadata values must be str | int | float | bool."""
     ft = analysis.get("framing_target", {})
@@ -61,7 +72,8 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
             len(techniques) / analysis.get("word_count", 1) * 1000, 2
         ) if analysis.get("word_count", 0) > 0 else 0.0,
         "politische_stroemung": json.dumps(
-            analysis.get("politische_stroemung", ["neutral"]), ensure_ascii=False
+            _extract_stroemung_labels(analysis.get("politische_stroemung", ["neutral"])),
+            ensure_ascii=False
         ),
         "themenbereich":        analysis.get("themenbereich", "Sonstiges"),
         "manipulation_targets": json.dumps(

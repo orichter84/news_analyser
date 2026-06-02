@@ -8,7 +8,10 @@ the political ideology/tradition it represents, and its epistemic overconfidence
 Return ONLY a single, valid JSON object – no markdown fences, no prose before or after.
 
 {
-  "politische_stroemung": ["<label1>", "<label2>"],
+  "politische_stroemung": [
+    {"label": "<label1>", "quote": "<verbatim sentence from the article that best supports this label, or null>"},
+    {"label": "<label2>", "quote": "<verbatim sentence from the article that best supports this label, or null>"}
+  ],
   "dunning_kruger_index": <float 0.0 to 1.0>,
   "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
   "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>",
@@ -44,7 +47,11 @@ Historical examples for calibration:
 - Grüne texts: ["grün", "sozialdemokratisch"]
 - SPD texts: ["sozialdemokratisch"]
 
-If the article is factual reporting without ideological promotion: ["neutral"]
+If the article is factual reporting without ideological promotion: [{"label": "neutral", "quote": null}]
+
+For each label, provide the most characteristic verbatim sentence (1–2 sentences max) that best
+supports the classification. If no single sentence supports it, use the most representative passage.
+Quotes must be copied verbatim — do not paraphrase or translate.
 
 ## Dunning-Kruger-Index
 

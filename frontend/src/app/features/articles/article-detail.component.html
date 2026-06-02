@@ -38,12 +38,21 @@
       <h2>Framing</h2>
       <p><strong>Narrativ:</strong> {{ a.framing_target.main_narrative }}</p>
       <p><strong>Intendierte Emotion:</strong> {{ a.framing_target.intended_sentiment }}</p>
-      <p>
+      <div class="stroemung-list">
         <strong>Politische Strömung:</strong>
         @for (s of a.politische_stroemung; track s) {
-          <span class="tag">{{ s }}</span>
+          @if (isStroemungObject(s)) {
+            <div class="stroemung-item">
+              <span class="tag">{{ s.label }}</span>
+              @if (s.quote) {
+                <blockquote class="quote stroemung-quote">{{ s.quote }}</blockquote>
+              }
+            </div>
+          } @else {
+            <span class="tag">{{ s }}</span>
+          }
         }
-      </p>
+      </div>
       @if (a.themenbereich) {
         <p><strong>Themenbereich:</strong> <span class="tag">{{ a.themenbereich }}</span></p>
       }

@@ -80,6 +80,14 @@
 ### Datenerfassung
 - [ ] **Feed-Health-Check** — Beim Start prüfen ob alle Feed-URLs erreichbar sind, tote Feeds melden
 - [ ] **MSN-Feed** — MSN Deutschland als zentraler Aggregator testen
+- [ ] **Englische Feeds** — BBC, Reuters, AP, The Guardian als Gegenquellen zu deutschen Portalen. Spracherkennung im Scraper ergänzen (langdetect o.ä.), Keyword-Listen für Englisch.
+- [ ] **Russische Gegenquellen** — TASS English, RIA Novosti English als methodischen Spiegel. Nicht als Wahrheitsquelle, sondern zur Diskrepanzerkennung: gleicher Vorfall, andere Darstellung.
+
+### Cross-Source-Verifikation
+- [ ] **Ereignis-Clustering** — Semantisch ähnliche Artikel zum selben Vorfall in ChromaDB gruppieren (Query auf anonymisierten Text, Zeitfenster ±24h). Grundlage für Quellen-Vergleich.
+- [ ] **Diskrepanz-Detektor** — Für geclusterte Artikel: Orwell-Index, Techniken und Manipulation Targets vergleichen. Große Abweichungen zwischen Quellen als Warnsignal melden.
+- [ ] **Strategische Omission** — Erkennen wenn ein Ereignis in deutschen Quellen berichtet wird, aber wichtige Kontextinformationen fehlen die in englischen/nicht-westlichen Quellen vorhanden sind.
+- [ ] **Agentur-Bias-Erkennung** — Wenn alle deutschen Portale denselben Wortlaut verwenden (hohe semantische Ähnlichkeit), als "Agenturmeldung ohne Eigenrecherche" markieren. Konsens ≠ Wahrheit.
 
 ### Qualität & Tests
 - [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Schwarze/Weiße, Migranten/Einheimische, Linke/Rechte)
