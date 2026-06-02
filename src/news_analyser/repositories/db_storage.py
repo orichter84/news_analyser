@@ -16,8 +16,8 @@ from typing import Any
 import chromadb
 from chromadb.utils import embedding_functions
 
+from .chroma_client import get_client
 
-_DB_PATH = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
 _COLLECTION = "articles"
 
 # Uses sentence-transformers/all-MiniLM-L6-v2 locally (no API key needed).
@@ -28,12 +28,22 @@ _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
 
 
 def _get_collection() -> chromadb.Collection:
-    client = chromadb.PersistentClient(path=str(_DB_PATH))
-    return client.get_or_create_collection(
+    return get_client().get_or_create_collection(
         name=_COLLECTION,
         embedding_function=_EMBED_FN,
         metadata={"hnsw:space": "cosine"},
     )
+
+
+def _extract_stroemung_labels(stroemung: list) -> list[str]:
+    """Extracts flat label list from both old (list[str]) and new (list[dict]) format."""
+    labels = []
+    for item in stroemung:
+        if isinstance(item, dict):
+            labels.append(item.get("label", ""))
+        elif isinstance(item, str):
+            labels.append(item)
+    return [l for l in labels if l]
 
 
 def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
@@ -62,7 +72,8 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
             len(techniques) / analysis.get("word_count", 1) * 1000, 2
         ) if analysis.get("word_count", 0) > 0 else 0.0,
         "politische_stroemung": json.dumps(
-            analysis.get("politische_stroemung", ["neutral"]), ensure_ascii=False
+            _extract_stroemung_labels(analysis.get("politische_stroemung", ["neutral"])),
+            ensure_ascii=False
         ),
         "themenbereich":        analysis.get("themenbereich", "Sonstiges"),
         "manipulation_targets": json.dumps(
@@ -74,10 +85,15 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def store_result(article_text: str, analysis: dict[str, Any]) -> str:
-    """Embed article_text, attach analysis as metadata. Returns the doc ID."""
+def store_result(article_text: str, analysis: dict[str, Any], url: str | None = None) -> str:
+    """Embed article_text, attach analysis as metadata. Returns the doc ID.
+
+    url overrides analysis['source_url'] as the ChromaDB ID to prevent LLM
+    hallucinations from creating duplicate entries.
+    """
     collection = _get_collection()
-    doc_id = analysis.get("source_url", "unknown")
+    doc_id = url or analysis.get("source_url", "unknown")
+    analysis["source_url"] = doc_id  # keep metadata consistent
 
     # Upsert so re-running the same URL overwrites rather than duplicates.
     collection.upsert(

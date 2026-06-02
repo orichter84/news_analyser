@@ -17,7 +17,8 @@ from typing import Any
 import chromadb
 from chromadb.utils import embedding_functions
 
-_DB_PATH  = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
+from .chroma_client import get_client
+
 _DATA_DIR = Path(__file__).parent.parent / "data"
 _COLLECTION = "techniques"
 _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -37,8 +38,7 @@ _TECHNIQUES: list[dict[str, Any]] = _load_techniques()
 
 
 def _get_collection() -> chromadb.Collection:
-    client = chromadb.PersistentClient(path=str(_DB_PATH))
-    return client.get_or_create_collection(
+    return get_client().get_or_create_collection(
         name=_COLLECTION,
         embedding_function=_EMBED_FN,
         metadata={"hnsw:space": "cosine"},

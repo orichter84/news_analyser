@@ -18,7 +18,8 @@ from typing import Any
 import chromadb
 from chromadb.utils import embedding_functions
 
-_DB_PATH   = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
+from .chroma_client import get_client
+
 _COLLECTION = "orwell_anchors"
 _EMBED_FN   = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
@@ -29,8 +30,7 @@ K_RESULTS   = 3   # Anzahl ähnlicher Anker pro Anfrage
 
 
 def _get_collection() -> chromadb.Collection:
-    client = chromadb.PersistentClient(path=str(_DB_PATH))
-    return client.get_or_create_collection(
+    return get_client().get_or_create_collection(
         name=_COLLECTION,
         embedding_function=_EMBED_FN,
         metadata={"hnsw:space": "cosine"},

@@ -55,4 +55,8 @@ export class ApiService {
   getTechnique(id: string): Observable<Technique> {
     return this.http.get<Technique>(`${this.base}/techniques/${id}`);
   }
+
+  getConfig(): Observable<{ submit_enabled: boolean }> {
+    return this.http.get<{ submit_enabled: boolean }>(`${this.base}/config`);
+  }
 }

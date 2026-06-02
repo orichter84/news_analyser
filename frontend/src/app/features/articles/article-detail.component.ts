@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { ArticleDetail } from '../../core/models/article.model';
+import type { PolitischeStroemung } from '../../core/models/article.model';
 
 @Component({
   selector: 'app-article-detail',
@@ -20,6 +21,10 @@ export class ArticleDetailComponent implements OnInit {
 
   toTechniqueId(name: string): string {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  isStroemungObject(s: string | PolitischeStroemung): s is PolitischeStroemung {
+    return typeof s === 'object' && s !== null;
   }
 
   ngOnInit() {

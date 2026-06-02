@@ -20,10 +20,13 @@
 - [x] Themenbereich — Klassifikation (Politik, Wirtschaft, Technologie, …)
 - [x] Manipulation Targets — Entität, Richtung, Rolle (strukturiertes JSON) mit optionalen Zitat-Belegen (`direction_quote`, `rolle_quote`)
 - [x] Rollen-KB — 10 Rollen in `roles.json`, Lazy Loading via `role_store.py` + `{{ROLES}}`-Placeholder im Prompt, Fuzzy-Normalisierung
-- [x] Techniken-DB — 19 dokumentierte Techniken mit semantischer Normalisierung
+- [x] Techniken-DB — 24 dokumentierte Techniken mit semantischer Normalisierung
+- [x] Politische Strömung mit Zitat-Belegen — `pass2.md` gibt pro Label einen charakteristischen Textzitat zurück; Detailansicht zeigt Quote unter dem Label
+- [x] Modell-Metadaten — `llm_provider` und `llm_model` werden in jeder Analyse gespeichert; LM Studio erkennt das aktive Modell automatisch per `/api/v0/models`
 
 ### Datenbank & RAG
 - [x] ChromaDB lokal persistent (articles, orwell_anchors, techniques)
+- [x] ChromaDB HTTP-Server-Integration — alle Repositories nutzen `HttpClient` statt `PersistentClient`. Zentraler `chroma_client.py` liest `CHROMA_HOST` + `CHROMA_PORT` aus ENV (Standard: `localhost:8001`). Ermöglicht Netzwerkbetrieb ohne Code-Änderung.
 - [x] RAG-Anker-Korpus (anchor_store.py, lazy-loaded ab 5 Ankern)
 - [x] Techniken-Collection mit Auto-Seeding aus technique_store.py
 
@@ -65,7 +68,7 @@
 
 ### 🔴 Priorität
 
-- [ ] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB-Verbindung per ENV konfigurierbar machen (`CHROMA_MODE=local|server`, `CHROMA_HOST`, `CHROMA_PORT`). Neuer `/config`-Endpoint mit Feature-Flags (`SUBMIT_ENABLED=true|false`). Frontend blendet "Einreichen" basierend auf Flag aus. Ziel: MacBook = Entwickler-Modus (lokal, Submit aktiv), Mac Mini = Viewer-Modus (Netzwerk-ChromaDB, kein Submit). Mac Mini läuft als ChromaDB-Server + Read-Only-Frontend im Heimnetz.
+- [~] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB läuft als HTTP-Server, `CHROMA_HOST`/`CHROMA_PORT` per ENV konfigurierbar ✅. Offen: `/config`-Endpoint mit Feature-Flags (`SUBMIT_ENABLED=true|false`), Frontend blendet "Einreichen" je nach Flag aus. Ziel: Mac Mini = Viewer-Modus (Netzwerk-ChromaDB, kein Submit).
 
 ### Auswertung & Visualisierung
 - [ ] **entity_targeting und thema_bernays in /stats API** — Endpunkt exponieren und im Frontend visualisieren
@@ -80,6 +83,14 @@
 ### Datenerfassung
 - [ ] **Feed-Health-Check** — Beim Start prüfen ob alle Feed-URLs erreichbar sind, tote Feeds melden
 - [ ] **MSN-Feed** — MSN Deutschland als zentraler Aggregator testen
+- [ ] **Englische Feeds** — BBC, Reuters, AP, The Guardian als Gegenquellen zu deutschen Portalen. Spracherkennung im Scraper ergänzen (langdetect o.ä.), Keyword-Listen für Englisch.
+- [ ] **Russische Gegenquellen** — TASS English, RIA Novosti English als methodischen Spiegel. Nicht als Wahrheitsquelle, sondern zur Diskrepanzerkennung: gleicher Vorfall, andere Darstellung.
+
+### Cross-Source-Verifikation
+- [ ] **Ereignis-Clustering** — Semantisch ähnliche Artikel zum selben Vorfall in ChromaDB gruppieren (Query auf anonymisierten Text, Zeitfenster ±24h). Grundlage für Quellen-Vergleich.
+- [ ] **Diskrepanz-Detektor** — Für geclusterte Artikel: Orwell-Index, Techniken und Manipulation Targets vergleichen. Große Abweichungen zwischen Quellen als Warnsignal melden.
+- [ ] **Strategische Omission** — Erkennen wenn ein Ereignis in deutschen Quellen berichtet wird, aber wichtige Kontextinformationen fehlen die in englischen/nicht-westlichen Quellen vorhanden sind.
+- [ ] **Agentur-Bias-Erkennung** — Wenn alle deutschen Portale denselben Wortlaut verwenden (hohe semantische Ähnlichkeit), als "Agenturmeldung ohne Eigenrecherche" markieren. Konsens ≠ Wahrheit.
 
 ### Qualität & Tests
 - [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Schwarze/Weiße, Migranten/Einheimische, Linke/Rechte)

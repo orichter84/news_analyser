@@ -20,6 +20,10 @@ def _parse_meta(meta: dict[str, Any]) -> dict[str, Any]:
                 meta[field] = json.loads(meta[field])
             except Exception:
                 meta[field] = []
+    # Flatten politische_stroemung — always return list of strings for list view
+    ps = meta.get("politische_stroemung", [])
+    if ps and isinstance(ps[0], dict):
+        meta["politische_stroemung"] = [item.get("label", "") for item in ps if isinstance(item, dict)]
     return meta
 
 

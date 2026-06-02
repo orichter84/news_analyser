@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { ApiService } from './core/services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +9,11 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {}
+export class App implements OnInit {
+  private api = inject(ApiService);
+  submitEnabled = signal(true);
+
+  ngOnInit() {
+    this.api.getConfig().subscribe(cfg => this.submitEnabled.set(cfg.submit_enabled));
+  }
+}

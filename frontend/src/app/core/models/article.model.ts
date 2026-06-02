@@ -12,6 +12,11 @@ export interface FramingTarget {
   target_direction?: string;
 }
 
+export interface PolitischeStroemung {
+  label: string;
+  quote?: string | null;
+}
+
 export interface ArticleListItem {
   source_url: string;
   domain: string;
@@ -20,7 +25,7 @@ export interface ArticleListItem {
   orwell_index: number;
   bernays_score: number;
   dunning_kruger_index?: number;
-  politische_stroemung: string[];
+  politische_stroemung: (string | PolitischeStroemung)[];
   technique_names: string[];
   intended_sentiment?: string;
 }

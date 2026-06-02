@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,3 +28,10 @@ app.include_router(techniques.router)
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/config")
+def config() -> dict:
+    return {
+        "submit_enabled": os.environ.get("SUBMIT_ENABLED", "true").lower() != "false",
+    }
