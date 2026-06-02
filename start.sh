@@ -19,9 +19,10 @@ echo "[1/3] ChromaDB starten (${CHROMA_HOST}:${CHROMA_PORT}) ..."
 "$VENV/chroma" run --host "$CHROMA_HOST" --port "$CHROMA_PORT" --path "$BASE/data/chroma_db" &
 CHROMA_PID=$!
 
-# Warten bis ChromaDB antwortet
-for i in {1..20}; do
+# Warten bis ChromaDB antwortet (bis zu 60s — erster Start lädt sentence-transformers)
+for i in {1..60}; do
     curl -s "http://${CHROMA_HOST}:${CHROMA_PORT}/api/v2/heartbeat" > /dev/null 2>&1 && break
+    [ $i -eq 1 ] && echo "    (Erster Start lädt Embedding-Modell — bitte warten...)"
     sleep 1
 done
 echo "    ChromaDB bereit (PID $CHROMA_PID)"
