@@ -102,12 +102,33 @@
 - [ ] **MCP-Server** — Lokaler MCP-Server als Brücke zwischen Claude Desktop (Cloud-Scheduling) und lokalem Backend. Tools: `trigger_feed()`, `get_stats()`. Ermöglicht Remote-Trigger ohne öffentlich erreichbares Backend.
 
 ### Open Source / Internationalisierung
-- [ ] **README.md (Englisch)** — Projektbeschreibung, Architektur, Installation, Konfiguration auf Englisch
-- [ ] **Dokumentation übersetzen** — `docs/` Inhalte auf Englisch (oder zweisprachig)
 - [ ] **Frontend UI-Texte** — Alle deutschen Labels, Fehlermeldungen und Beschriftungen ins Englische übersetzen
-- [ ] **Code-Kommentare** — Deutsche Kommentare und Docstrings ins Englische übersetzen; deutsche Ausgabefelder (`politische_stroemung`, `themenbereich` etc.) umbenennen oder englische Aliases ergänzen
 - [ ] **spaCy Spracherkennung** — `langdetect` zur automatischen Spracherkennung; `de_core_news_md` vs. `en_core_web_md` dynamisch laden
 - [ ] **Keyword-Listen Englisch** — Englische Äquivalente für `keywords_extreme_left.txt`, `keywords_extreme_right.txt`, `keywords_general.txt` kuratieren
+
+### Übersetzung Dokumentation & Code
+
+**Markdown-Dokumentation:**
+- [ ] [README.md](../README.md) — Projektbeschreibung, Architektur, Installation, Konfiguration
+- [ ] [SETUP.md](../SETUP.md) — Setup-Anleitung, Fehlerbehandlung
+- [ ] [docs/project.md](project.md) — Architektur, API-Output, Konfiguration
+- [ ] [docs/web_architecture.md](web_architecture.md) — Stack, Projektstruktur, API-Endpunkte
+- [ ] [docs/analyse_architektur.md](analyse_architektur.md) — Indikatoren, Zwei-Pass-Architektur (technisch komplex)
+- [ ] [docs/todo.md](todo.md) — Roadmap
+
+**Python-Kommentare & Docstrings:**
+- [ ] [src/news_analyser/anonymizer.py](../src/news_analyser/anonymizer.py)
+- [ ] [src/news_analyser/feed.py](../src/news_analyser/feed.py)
+- [ ] [src/news_analyser/main.py](../src/news_analyser/main.py)
+- [ ] [src/llm_adapter/cli_adapter.py](../src/llm_adapter/cli_adapter.py)
+- [ ] [src/news_analyser/agents/analyzer.py](../src/news_analyser/agents/analyzer.py)
+- [ ] [src/news_analyser/repositories/anchor_store.py](../src/news_analyser/repositories/anchor_store.py)
+- [ ] [src/news_analyser/repositories/role_store.py](../src/news_analyser/repositories/role_store.py)
+- [ ] [backend/main.py](../backend/main.py)
+- [ ] [backend/routers/analyse.py](../backend/routers/analyse.py)
+
+**TypeScript-Kommentare:**
+- [ ] [frontend/src/app/features/stats/stats-verlauf.component.ts](../frontend/src/app/features/stats/stats-verlauf.component.ts)
 
 ### Export & Integration
 - [ ] **CSV/JSON-Export** — Alle gespeicherten Analysen exportieren
