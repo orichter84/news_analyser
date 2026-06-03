@@ -99,7 +99,7 @@
 
 ### Sprachmodelle & Lokale Modelle
 - [ ] **Lokale Modelle für Sprachspezialisierung anpassen**
-  - [ ] Modellnamen aus dem Code auslagern (`SPACY_MODEL`, `EMBEDDING_MODEL`) — aktuell hardcodiert in `anonymizer.py` und allen drei ChromaDB-Repositories; ENV-Variablen beim Start laden; Defaults + Beschreibung in `.env.example` eintragen
+  - [x] Modellnamen aus dem Code auslagern (`SPACY_MODEL`, `EMBEDDING_MODEL`) — aktuell hardcodiert in `anonymizer.py` und allen drei ChromaDB-Repositories; ENV-Variablen beim Start laden; Defaults + Beschreibung in `.env.example` eintragen
   - [ ] Passende deutschsprachige Modelle auswählen und als neue Defaults setzen — aktuell: `de_core_news_md` (spaCy, passt), `all-MiniLM-L6-v2` (Embeddings, nicht auf Deutsch spezialisiert); Kandidaten: `paraphrase-multilingual-MiniLM-L12-v2`, `intfloat/multilingual-e5-small`
 
 ### LLM-Betrieb

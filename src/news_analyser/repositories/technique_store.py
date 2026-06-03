@@ -11,6 +11,7 @@ Technique definitions are loaded from src/news_analyser/data/techniques.json.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ from .chroma_client import get_client
 _DATA_DIR = Path(__file__).parent.parent / "data"
 _COLLECTION = "techniques"
 _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="all-MiniLM-L6-v2"
+    model_name=os.environ.get("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 )
 # Cosine distance threshold: < 0.35 -> accept canonical mapping
 _MATCH_THRESHOLD = 0.35

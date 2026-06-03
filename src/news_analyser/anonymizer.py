@@ -9,6 +9,7 @@ Gibt anonymisierten Text + Mapping zurück (für Nachvollziehbarkeit).
 """
 
 from __future__ import annotations
+import os
 import re
 from functools import lru_cache
 from typing import TypedDict
@@ -82,7 +83,7 @@ _ENTITY_BLOCKLIST: set[str] = {
 
 @lru_cache(maxsize=1)
 def _load_nlp() -> spacy.language.Language:
-    return spacy.load("de_core_news_md")
+    return spacy.load(os.environ.get("SPACY_MODEL", "de_core_news_md"))
 
 
 def anonymize(text: str) -> AnonymizationResult:

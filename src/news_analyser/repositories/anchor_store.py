@@ -12,6 +12,7 @@ Lazy-Loading-Prinzip:
 
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ from .chroma_client import get_client
 
 _COLLECTION = "orwell_anchors"
 _EMBED_FN   = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="all-MiniLM-L6-v2"
+    model_name=os.environ.get("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 )
 
 MIN_ANCHORS = 5   # Mindestanzahl bevor RAG aktiv wird
