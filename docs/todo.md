@@ -100,7 +100,7 @@
 ### Sprachmodelle & Lokale Modelle
 - [ ] **Lokale Modelle für Sprachspezialisierung anpassen**
   - [x] Modellnamen aus dem Code auslagern (`SPACY_MODEL`, `EMBEDDING_MODEL`) — aktuell hardcodiert in `anonymizer.py` und allen drei ChromaDB-Repositories; ENV-Variablen beim Start laden; Defaults + Beschreibung in `.env.example` eintragen
-  - [ ] Passende deutschsprachige Modelle auswählen und als neue Defaults setzen — aktuell: `de_core_news_md` (spaCy, passt), `all-MiniLM-L6-v2` (Embeddings, nicht auf Deutsch spezialisiert); Kandidaten: `paraphrase-multilingual-MiniLM-L12-v2`, `intfloat/multilingual-e5-small`
+  - [x] Passende deutschsprachige Modelle auswählen und als neue Defaults setzen — `de_core_news_md` (spaCy, bleibt), `paraphrase-multilingual-MiniLM-L12-v2` (Embeddings, ersetzt `all-MiniLM-L6-v2`)
 
 ### LLM-Betrieb
 - [ ] **Hybrid-Provider** — Nach Pass 1: wenn `orwell_index > threshold` oder Domain in Prioritätsliste → tiefer Cloud-Provider (`LLM_PROVIDER_DEEP`), sonst lokales Modell (`LLM_PROVIDER`). Konfigurierbar via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Warten auf Apple Silicon Hardware für lokalen LLM-Betrieb.
