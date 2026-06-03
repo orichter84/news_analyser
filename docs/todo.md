@@ -97,12 +97,18 @@
 - [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Adapter-Interface
 - [ ] **Analyse-Validierung** — Prüfen ob zurückgegebene quote-Felder tatsächlich im Artikeltext enthalten sind
 
+### Sprachmodelle & Lokale Modelle
+- [ ] **Lokale Modelle für Sprachspezialisierung anpassen**
+  - [ ] Modellnamen aus dem Code auslagern (`SPACY_MODEL`, `EMBEDDING_MODEL`) — aktuell hardcodiert in `anonymizer.py` und allen drei ChromaDB-Repositories; ENV-Variablen beim Start laden; Defaults + Beschreibung in `.env.example` eintragen
+  - [ ] Passende deutschsprachige Modelle auswählen und als neue Defaults setzen — aktuell: `de_core_news_md` (spaCy, passt), `all-MiniLM-L6-v2` (Embeddings, nicht auf Deutsch spezialisiert); Kandidaten: `paraphrase-multilingual-MiniLM-L12-v2`, `intfloat/multilingual-e5-small`
+
 ### LLM-Betrieb
 - [ ] **Hybrid-Provider** — Nach Pass 1: wenn `orwell_index > threshold` oder Domain in Prioritätsliste → tiefer Cloud-Provider (`LLM_PROVIDER_DEEP`), sonst lokales Modell (`LLM_PROVIDER`). Konfigurierbar via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Warten auf Apple Silicon Hardware für lokalen LLM-Betrieb.
 - [ ] **MCP-Server** — Lokaler MCP-Server als Brücke zwischen Claude Desktop (Cloud-Scheduling) und lokalem Backend. Tools: `trigger_feed()`, `get_stats()`. Ermöglicht Remote-Trigger ohne öffentlich erreichbares Backend.
 
 ### Open Source / Internationalisierung
-- [ ] **Frontend UI-Texte** — Alle deutschen Labels, Fehlermeldungen und Beschriftungen ins Englische übersetzen
+- [ ] **UI Mehrsprachigkeit (DE/EN)** — Angular i18n oder ngx-translate integrieren; alle UI-Texte in Sprachdateien auslagern; Sprachwechsel im UI (DE/EN Toggle)
+- [ ] **Frontend UI-Texte** — Alle deutschen Labels, Fehlermeldungen und Beschriftungen ins Englische übersetzen (Voraussetzung für Mehrsprachigkeit)
 - [ ] **spaCy Spracherkennung** — `langdetect` zur automatischen Spracherkennung; `de_core_news_md` vs. `en_core_web_md` dynamisch laden
 - [ ] **Keyword-Listen Englisch** — Englische Äquivalente für `keywords_extreme_left.txt`, `keywords_extreme_right.txt`, `keywords_general.txt` kuratieren
 
