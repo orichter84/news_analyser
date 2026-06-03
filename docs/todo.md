@@ -27,6 +27,7 @@
 ### Datenbank & RAG
 - [x] ChromaDB lokal persistent (articles, orwell_anchors, techniques)
 - [x] ChromaDB HTTP-Server-Integration — alle Repositories nutzen `HttpClient` statt `PersistentClient`. Zentraler `chroma_client.py` liest `CHROMA_HOST` + `CHROMA_PORT` aus ENV (Standard: `localhost:8001`). Ermöglicht Netzwerkbetrieb ohne Code-Änderung.
+- [x] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB läuft als HTTP-Server, `CHROMA_HOST`/`CHROMA_PORT` per ENV konfigurierbar. `/config`-Endpoint mit Feature-Flag `SUBMIT_ENABLED`. Frontend blendet "Einreichen" je nach Flag aus. Mac Mini = Viewer-Modus.
 - [x] RAG-Anker-Korpus (anchor_store.py, lazy-loaded ab 5 Ankern)
 - [x] Techniken-Collection mit Auto-Seeding aus technique_store.py
 
@@ -65,10 +66,6 @@
 ---
 
 ## Offen
-
-### 🔴 Priorität
-
-- [~] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB läuft als HTTP-Server, `CHROMA_HOST`/`CHROMA_PORT` per ENV konfigurierbar ✅. Offen: `/config`-Endpoint mit Feature-Flags (`SUBMIT_ENABLED=true|false`), Frontend blendet "Einreichen" je nach Flag aus. Ziel: Mac Mini = Viewer-Modus (Netzwerk-ChromaDB, kein Submit).
 
 ### Auswertung & Visualisierung
 - [ ] **entity_targeting und thema_bernays in /stats API** — Endpunkt exponieren und im Frontend visualisieren
