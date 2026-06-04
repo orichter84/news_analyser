@@ -170,7 +170,7 @@ aber durch den sachlichen Rahmen abgefedert wird.
 Alle drei Tests wurden mit dem überarbeiteten System wiederholt:
 - Techniken-DB erweitert von 19 auf 23 (neu: False Cause, Halo Effect, Overgeneralization, Exaggeration)
 - Adapter: CLI (Claude Code, claude-opus-4-5)
-- Ausführung: `docs/konzept/run_symmetry_tests.py`
+- Ausführung: `docs/concept/run_symmetry_tests.py`
 
 ### Test 01 — Scapegoating (synthetisch)
 
@@ -248,7 +248,7 @@ Zweck: Vergleich der Symmetrie-Stabilität über verschiedene Modelle hinweg.
 
 - Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
 - Modell: `qwen/qwen3-14b` (MLX, 8-bit, Apple Silicon)
-- Ausführung: `docs/konzept/run_symmetry_tests.py`
+- Ausführung: `docs/concept/run_symmetry_tests.py`
 
 ### Test 01 — Scapegoating (synthetisch)
 
@@ -308,7 +308,7 @@ Die Uncensored-Variante ermöglicht die vollständige Analyse — bei deutlich h
 
 - Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
 - Modell: `openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx` (MLX, Apple Silicon)
-- Ausführung: `docs/konzept/run_symmetry_tests.py`
+- Ausführung: `docs/concept/run_symmetry_tests.py`
 
 ### Test 01 — Scapegoating (synthetisch)
 

@@ -166,7 +166,7 @@ Techniken und Labels müssen identisch oder begründbar verschieden sein.
 | Migranten / Ausländer | Einheimische / Deutsche |
 | Linke / Kommunisten | Rechte / Nationalisten |
 
-Ergebnisse aus `docs/konzept/bias-validation.md` (2026-05-26):
+Ergebnisse aus `docs/concept/bias-validation.md` (2026-05-26):
 
 | Metrik | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
 |---|---|---|---|

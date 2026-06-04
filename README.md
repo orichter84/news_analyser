@@ -252,4 +252,4 @@ news_analyser/
 | [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, two-pass architecture, bias mitigation |
 | [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
 | [docs/todo.md](docs/todo.md) | Open features and extension ideas |
-| [docs/konzept/](docs/konzept/) | Calibration tests and bias validation |
+| [docs/concept/](docs/concept/) | Calibration tests and bias validation |

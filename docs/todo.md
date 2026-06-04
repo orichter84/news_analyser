@@ -58,8 +58,8 @@
 - [x] "Über dieses Projekt" `/knowledge` — Methodik, Indikatoren, Quellen
 
 ### Dokumentation & Validierung
-- [x] Erster Konzepttest mit Kalibrierungsergebnissen (docs/konzept/base-tests.md)
-- [x] Bias-Validation: Symmetrie-Tests mit Gruppensubstitution (docs/konzept/bias-validation/)
+- [x] Erster Konzepttest mit Kalibrierungsergebnissen (docs/concept/base-tests.md)
+- [x] Bias-Validation: Symmetrie-Tests mit Gruppensubstitution (docs/concept/bias-validation/)
 - [x] Architektur-Dokumentation (docs/analyse_architektur.md)
 - [x] Refaktorierung Orwell-Index als Konsequenz der Symmetrie-Tests dokumentiert
 

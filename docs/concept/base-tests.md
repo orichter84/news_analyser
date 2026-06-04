@@ -249,4 +249,4 @@ Der unter "Modell-Bias" genannte Punkt wurde im Anschluss systematisch untersuch
 Die Ergebnisse der Bias-Validation sowie die daraus folgenden Architekturentscheidungen
 (Orwell-Index-Refaktorierung, Zwei-Pass-Anonymisierung) sind dokumentiert in:
 
-**`docs/konzept/bias-validation.md`**
+**`docs/concept/bias-validation.md`**
