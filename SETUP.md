@@ -1,26 +1,28 @@
-# Setup-Anleitung
+# Setup Guide
 
-## Voraussetzungen
+## Requirements
 
-- **Python ≥ 3.10** (empfohlen: 3.12) — Python 3.9 wird nicht unterstützt
-- **Node.js ≥ 18** — für Angular Frontend und Claude Code CLI
+- **Python 3.10–3.12** (recommended: 3.12) — Python 3.9 is not supported; 3.13+ may cause compatibility issues with ChromaDB
+- **Node.js ≥ 18** — for Angular frontend and Claude Code CLI
 
-## 1. Repository klonen
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/orichter84/news_analyser.git
 cd news_analyser
 ```
 
-## 2. Python-Umgebung einrichten
+## 2. Set up Python environment
 
 ```bash
 python3.12 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate      # Linux/macOS
+.venv\Scripts\activate         # Windows
 pip install -r requirements.txt -r requirements-api.txt
+python -m spacy download de_core_news_md
 ```
 
-## 3. Frontend-Abhängigkeiten installieren
+## 3. Install frontend dependencies
 
 ```bash
 cd frontend
@@ -28,40 +30,38 @@ npm install
 cd ..
 ```
 
-## 4. Konfiguration anlegen
+## 4. Create configuration
 
-`.env`-Datei im Projektroot erstellen (nicht im Repository enthalten):
+Copy `.env.example` to `.env` and fill in your values:
 
-### Allgemeine Einstellungen (empfohlen)
-
-```
-TOKENIZERS_PARALLELISM=false
+```bash
+cp .env.example .env
 ```
 
-Verhindert einen CPU-Deadlock beim ersten Laden des Embedding-Modells auf macOS.
+The most important setting is `LLM_PROVIDER`. Choose one of the options below:
 
-### Option A: Claude Code CLI (empfohlen, kein API-Key nötig)
+### Option A: Claude Code CLI (recommended, no API key required)
 
-```
-LLM_PROVIDER=cli
-OPENAI_MODEL=claude-sonnet-4-6
-```
+Prerequisite: Claude Code CLI must be installed and logged in.
 
-Voraussetzung: Claude Code CLI muss installiert und eingeloggt sein.
-
-Installation (Node.js ≥18 erforderlich):
+Installation (Node.js ≥ 18 required):
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-Einmalig einloggen (öffnet Browser zur OAuth-Authentifizierung):
+Login once (opens a browser for OAuth authentication):
 ```bash
 claude
 ```
 
-Prüfen ob alles funktioniert:
+Verify everything works:
 ```bash
 claude --version
+```
+
+Then set in `.env`:
+```
+LLM_PROVIDER=cli
 ```
 
 ### Option B: Anthropic API
@@ -80,37 +80,43 @@ OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o
 ```
 
-### Option D: Lokales Modell via LM Studio
+### Option D: Local model via LM Studio
 
 ```
 LLM_PROVIDER=lm_studio
-OPENAI_MODEL=<modellname-in-lm-studio>
+OPENAI_MODEL=<model-name-in-lm-studio>
 ```
 
-LM Studio muss unter `http://localhost:1234` laufen.
+LM Studio must be running at `http://localhost:1234`.
 
-## 5. Anwendung starten
+## 5. Start the application
 
-Den Full-Stack (ChromaDB + Backend + Frontend) mit einem Befehl starten:
+Start the full stack (ChromaDB + backend + frontend) with a single command:
 
+**Linux/macOS:**
 ```bash
 ./start.sh
 ```
 
-Die Services sind dann erreichbar unter:
+**Windows (PowerShell):**
+```powershell
+.\start.ps1
+```
+
+Services are then available at:
 - Frontend → http://localhost:4200
 - Backend → http://localhost:8000
 - ChromaDB → http://localhost:8001
 
-Mit `Ctrl+C` alle Services beenden.
+Stop all services with `Ctrl+C`.
 
-## 6. Erster Test
+## 6. First test
 
 ```bash
 python run.py --url https://www.tagesschau.de/ausland/europa/ukraine-krieg-100.html
 ```
 
-Erwartete Ausgabe:
+Expected output:
 ```
 [*] Fetching: https://...
 [*] Analyzing (...) 
@@ -118,48 +124,51 @@ Erwartete Ausgabe:
     Techniken: [...]
 ```
 
-## 7. Statistik-Report
+## 7. Statistics report
 
 ```bash
 python run.py --stats
 ```
 
-## 8. RSS-Feed-Collector (optional)
+## 8. RSS feed collector (optional)
 
-Einmaliger Lauf:
+Single run:
 ```bash
 python run.py --feed
 ```
 
-Dauerbetrieb (stündlich):
+Continuous mode (hourly):
 ```bash
 python run.py --feed --auto
 ```
 
-## 9. Textdatei direkt analysieren
+## 9. Analyse a text file directly
 
 ```bash
-python run.py --text-file artikel.txt --domain beispiel.de
+python run.py --text-file article.txt --domain example.com
 ```
 
 ---
 
-## Häufige Fehler
+## Common errors
 
 ### `OPENAI_API_KEY not set`
-→ `.env`-Datei fehlt oder `LLM_PROVIDER` ist nicht gesetzt. Schritt 3 prüfen.
+→ `.env` file missing or `LLM_PROVIDER` not set. Check step 4.
 
 ### `ModuleNotFoundError`
-→ Abhängigkeiten nicht installiert. Schritt 2 wiederholen.
+→ Dependencies not installed. Repeat step 2.
+
+### `[E050] Can't find model 'de_core_news_md'`
+→ spaCy language model not downloaded. Run: `python -m spacy download de_core_news_md`
 
 ### `TypeError: Unable to evaluate type annotation 'str | None'`
-→ Python-Version zu alt (3.9). Python ≥ 3.10 installieren und `.venv` neu anlegen (Schritt 2).
+→ Python version too old (3.9). Install Python ≥ 3.10 and recreate `.venv` (step 2).
 
-### `could not determine executable to run` (Frontend)
-→ `npm install` im `frontend/`-Verzeichnis wurde nicht ausgeführt. Schritt 3 wiederholen.
+### `could not determine executable to run` (frontend)
+→ `npm install` in the `frontend/` directory was not run. Repeat step 3.
 
-### `claude: command not found` (bei CLIAdapter)
-→ Claude Code CLI nicht installiert. Installation: https://claude.ai/code
+### `claude: command not found` (CLIAdapter)
+→ Claude Code CLI not installed. Installation: https://claude.ai/code
 
-### ChromaDB-Warnungen beim Start (`HF Hub unauthenticated`)
-→ Harmlos, kann ignoriert werden. Das Embedding-Modell lädt trotzdem korrekt.
+### ChromaDB warnings on startup (`HF Hub unauthenticated`)
+→ Harmless, can be ignored. The embedding model loads correctly regardless.
