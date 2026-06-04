@@ -1,130 +1,130 @@
-# ToDo & Ausbaustufen
+# Todo & Roadmap
 
-## Implementiert
+## Implemented
 
-### Analyse-Engine
-- [x] Artikel-Scraping (trafilatura + BeautifulSoup Fallback)
-- [x] Paywall-Erkennung: HTML-Marker (Piano/TinyPass, verlagsspezifisch) + Wortanzahl-Fallback
-- [x] Titel-Extraktion: og:title → h1 → title-Tag Fallback
-- [x] Zwei-Pass-LLM-Architektur (Anonymisierung + Originaltext)
-- [x] Anonymisierungs-Preprocessing via spaCy de_core_news_md
-- [x] Keyword-Signal als Extremismus-Vorfilter (keywords.py)
-- [x] Adapter-Abstraktion (OpenAI, Anthropic, CLI, LM Studio, M365 Copilot)
-- [x] Systemprompts als editierbare Markdown-Dateien (pass1.md, pass2.md)
+### Analysis Engine
+- [x] Article scraping (trafilatura + BeautifulSoup fallback)
+- [x] Paywall detection: HTML markers (Piano/TinyPass, publisher-specific) + word count fallback
+- [x] Title extraction: og:title → h1 → title tag fallback
+- [x] Two-pass LLM architecture (anonymisation + original text)
+- [x] Anonymisation preprocessing via spaCy de_core_news_md
+- [x] Keyword signal as extremism pre-filter (keywords.py)
+- [x] Adapter abstraction (OpenAI, Anthropic, CLI, LM Studio, M365 Copilot)
+- [x] System prompts as editable Markdown files (pass1.md, pass2.md)
 
-### Indikatoren
-- [x] Orwell-Index — reiner Extremismus-Indikator (0.0–1.0, richtungsblind)
-- [x] Bernays-Score — Manipulationstechniken pro 1000 Wörter
-- [x] Dunning-Kruger-Index — unbelegte Gewissheit (0.0–1.0)
-- [x] Politische Strömung — benannte Labels (`list[str]`)
-- [x] Themenbereich — Klassifikation (Politik, Wirtschaft, Technologie, …)
-- [x] Manipulation Targets — Entität, Richtung, Rolle (strukturiertes JSON) mit optionalen Zitat-Belegen (`direction_quote`, `rolle_quote`)
-- [x] Rollen-KB — 10 Rollen in `roles.json`, Lazy Loading via `role_store.py` + `{{ROLES}}`-Placeholder im Prompt, Fuzzy-Normalisierung
-- [x] Techniken-DB — 24 dokumentierte Techniken mit semantischer Normalisierung
-- [x] Politische Strömung mit Zitat-Belegen — `pass2.md` gibt pro Label einen charakteristischen Textzitat zurück; Detailansicht zeigt Quote unter dem Label
-- [x] Modell-Metadaten — `llm_provider` und `llm_model` werden in jeder Analyse gespeichert; LM Studio erkennt das aktive Modell automatisch per `/api/v0/models`
+### Indicators
+- [x] Orwell Index — pure extremism indicator (0.0–1.0, direction-blind)
+- [x] Bernays Score — manipulation techniques per 1000 words
+- [x] Dunning-Kruger Index — unsubstantiated certainty (0.0–1.0)
+- [x] Political leaning — named labels (`list[str]`)
+- [x] Topic area — classification (Politik, Wirtschaft, Technologie, …)
+- [x] Manipulation targets — entity, direction, role (structured JSON) with optional quote evidence (`direction_quote`, `rolle_quote`)
+- [x] Roles KB — 10 roles in `roles.json`, lazy loading via `role_store.py` + `{{ROLES}}` placeholder in prompt, fuzzy normalisation
+- [x] Techniques DB — 24 documented techniques with semantic normalisation
+- [x] Political leaning with quote evidence — `pass2.md` returns a characteristic text quote per label; detail view shows quote below the label
+- [x] Model metadata — `llm_provider` and `llm_model` stored with every analysis; LM Studio auto-detects the active model via `/api/v0/models`
 
-### Datenbank & RAG
-- [x] ChromaDB lokal persistent (articles, orwell_anchors, techniques)
-- [x] ChromaDB HTTP-Server-Integration — alle Repositories nutzen `HttpClient` statt `PersistentClient`. Zentraler `chroma_client.py` liest `CHROMA_HOST` + `CHROMA_PORT` aus ENV (Standard: `localhost:8001`). Ermöglicht Netzwerkbetrieb ohne Code-Änderung.
-- [x] **Netzwerk-Betrieb / Multi-Gerät** — ChromaDB läuft als HTTP-Server, `CHROMA_HOST`/`CHROMA_PORT` per ENV konfigurierbar. `/config`-Endpoint mit Feature-Flag `SUBMIT_ENABLED`. Frontend blendet "Einreichen" je nach Flag aus. Mac Mini = Viewer-Modus.
-- [x] RAG-Anker-Korpus (anchor_store.py, lazy-loaded ab 5 Ankern)
-- [x] Techniken-Collection mit Auto-Seeding aus technique_store.py
+### Database & RAG
+- [x] ChromaDB local persistent (articles, orwell_anchors, techniques)
+- [x] ChromaDB HTTP server integration — all repositories use `HttpClient` instead of `PersistentClient`. Central `chroma_client.py` reads `CHROMA_HOST` + `CHROMA_PORT` from ENV (default: `localhost:8001`). Enables network operation without code changes.
+- [x] **Network operation / multi-device** — ChromaDB runs as HTTP server, `CHROMA_HOST`/`CHROMA_PORT` configurable via ENV. `/config` endpoint with feature flag `SUBMIT_ENABLED`. Frontend hides "Submit" depending on flag. Mac Mini = viewer mode.
+- [x] RAG anchor corpus (anchor_store.py, lazy-loaded from 5 anchors)
+- [x] Techniques collection with auto-seeding from technique_store.py
 
-### Feed & Datenerfassung
-- [x] RSS-Feed-Collector mit Dedup-Check gegen DB
-- [x] Manueller und automatischer Feed-Modus (FEED_MODE env)
-- [x] Themenvorfilter (topic_filter.py, keyword-basiert, kein LLM-Call)
-- [x] FEED_TOPICS konfigurierbar per Env-Variable (inkl. `all` für kein Filter)
+### Feed & Data Collection
+- [x] RSS feed collector with dedup check against DB
+- [x] Manual and automatic feed mode (FEED_MODE env)
+- [x] Topic pre-filter (topic_filter.py, keyword-based, no LLM call)
+- [x] FEED_TOPICS configurable via env variable (incl. `all` for no filter)
 
-### Statistiken
-- [x] Statistik-Report (Top-Techniken, Bernays, Orwell, DK, Domains, Sentiments)
-- [x] Politische Strömung in stats.py
-- [x] Thema-Bernays-Auswertung (thema_bernays)
-- [x] Entity-Targeting-Auswertung (entity_targeting)
+### Statistics
+- [x] Statistics report (top techniques, Bernays, Orwell, DK, domains, sentiments)
+- [x] Political leaning in stats.py
+- [x] Topic-Bernays evaluation (thema_bernays)
+- [x] Entity targeting evaluation (entity_targeting)
 
-### Web-UI
-- [x] FastAPI Backend mit allen REST-Endpunkten
-- [x] Angular 17+ Frontend (Standalone Components, Lazy Loading)
-- [x] Dashboard — KPI-Kacheln, Top-Techniken, Top-Strömungen, letzte Artikel
-- [x] Artikel-Liste — filterbar nach Domain, Orwell-Range, Limit
-- [x] Artikel-Detail — Scores, Framing, Manipulation Targets, Techniken (verlinkt)
-- [x] Statistik-Seite — Sub-Navigation (Übersicht / Verlauf), Domain-Tabelle, Top-Techniken, Strömungen
-- [x] Statistik-Verlauf — Tagesbasierte Liniendiagramme (Orwell, Bernays, DK) mit Domain-Filter und Median/Maximum-Toggle (Chart.js)
-- [x] Paywall-Warnung beim manuellen Einreichen — eigener Job-Status `paywall` mit Hinweis im UI
-- [x] URL-Submission — Formular mit Job-Status-Polling
-- [x] Techniken-Übersicht `/techniques` — gruppiert nach Kategorie
-- [x] Techniken-Detail `/techniques/:id` — eigene URL pro Technik (verlinkbar)
-- [x] "Über dieses Projekt" `/knowledge` — Methodik, Indikatoren, Quellen
+### Web UI
+- [x] FastAPI backend with all REST endpoints
+- [x] Angular 17+ frontend (standalone components, lazy loading)
+- [x] Dashboard — KPI tiles, top techniques, top leanings, recent articles
+- [x] Article list — filterable by domain, Orwell range, limit
+- [x] Article detail — scores, framing, manipulation targets, techniques (linked)
+- [x] Statistics page — sub-navigation (overview / timeline), domain table, top techniques, leanings
+- [x] Statistics timeline — day-based line charts (Orwell, Bernays, DK) with domain filter and median/maximum toggle (Chart.js)
+- [x] Paywall warning on manual submission — dedicated job status `paywall` with notice in UI
+- [x] URL submission — form with job status polling
+- [x] Techniques overview `/techniques` — grouped by category
+- [x] Technique detail `/techniques/:id` — individual URL per technique (linkable)
+- [x] "About this project" `/knowledge` — methodology, indicators, sources
 
-### Dokumentation & Validierung
-- [x] Erster Konzepttest mit Kalibrierungsergebnissen (docs/concept/base-tests.md)
-- [x] Bias-Validation: Symmetrie-Tests mit Gruppensubstitution (docs/concept/bias-validation/)
-- [x] Architektur-Dokumentation (docs/analyse_architektur.md)
-- [x] Refaktorierung Orwell-Index als Konsequenz der Symmetrie-Tests dokumentiert
+### Documentation & Validation
+- [x] First concept test with calibration results (docs/concept/base-tests.md)
+- [x] Bias validation: symmetry tests with group substitution (docs/concept/bias-validation/)
+- [x] Architecture documentation (docs/analyse_architektur.md)
+- [x] Orwell Index refactoring documented as consequence of symmetry tests
 
 ---
 
-## Offen
+## Open
 
-### Auswertung & Visualisierung
-- [ ] **entity_targeting und thema_bernays in /stats API** — Endpunkt exponieren und im Frontend visualisieren
-- [ ] **Quellenvergleich** — Interaktives Balkendiagramm Domain × Orwell-Index (Chart.js)
-- [x] **Zeitverlauf** — Score-Entwicklung pro Quelle/Thema über Zeit (Liniendiagramm)
-- [ ] **Technik-Heatmap** — Domain × Technik als Matrix in der Stats-Ansicht
-- [ ] **Richtung/Rolle-Korrelation** — Empirische Auswertung: Hypothese "Passivität = Positiv" (positive Manipulation targets fast immer Opfer, kein handelnder positiver Akteur)
+### Evaluation & Visualisation
+- [ ] **entity_targeting and thema_bernays in /stats API** — expose endpoint and visualise in frontend
+- [ ] **Source comparison** — interactive bar chart domain × Orwell Index (Chart.js)
+- [x] **Timeline** — score development per source/topic over time (line chart)
+- [ ] **Technique heatmap** — domain × technique as matrix in the stats view
+- [ ] **Direction/role correlation** — empirical analysis: hypothesis "passivity = positive" (positive manipulation targets almost always victims, no acting positive agent)
 
 ### Frontend
-- [ ] **Pagination** — Artikel-Liste und Backend-Endpoint auf Cursor- oder Offset-Pagination umstellen (relevant ab ~500 Artikeln)
+- [ ] **Pagination** — switch article list and backend endpoint to cursor- or offset-based pagination (relevant from ~500 articles)
 
-### Datenerfassung
-- [ ] **Feed-Health-Check** — Beim Start prüfen ob alle Feed-URLs erreichbar sind, tote Feeds melden
-- [ ] **MSN-Feed** — MSN Deutschland als zentraler Aggregator testen
-- [ ] **Englische Feeds** — BBC, Reuters, AP, The Guardian als Gegenquellen zu deutschen Portalen. Spracherkennung im Scraper ergänzen (langdetect o.ä.), Keyword-Listen für Englisch.
-- [ ] **Russische Gegenquellen** — TASS English, RIA Novosti English als methodischen Spiegel. Nicht als Wahrheitsquelle, sondern zur Diskrepanzerkennung: gleicher Vorfall, andere Darstellung.
+### Data Collection
+- [ ] **Feed health check** — check on startup whether all feed URLs are reachable, report dead feeds
+- [ ] **MSN feed** — test MSN Germany as a central aggregator
+- [ ] **English feeds** — BBC, Reuters, AP, The Guardian as counter-sources to German outlets. Add language detection to scraper (langdetect etc.), keyword lists for English.
+- [ ] **Russian counter-sources** — TASS English, RIA Novosti English as a methodological mirror. Not as a truth source, but for discrepancy detection: same event, different framing.
 
-### Cross-Source-Verifikation
-- [ ] **Ereignis-Clustering** — Semantisch ähnliche Artikel zum selben Vorfall in ChromaDB gruppieren (Query auf anonymisierten Text, Zeitfenster ±24h). Grundlage für Quellen-Vergleich.
-- [ ] **Diskrepanz-Detektor** — Für geclusterte Artikel: Orwell-Index, Techniken und Manipulation Targets vergleichen. Große Abweichungen zwischen Quellen als Warnsignal melden.
-- [ ] **Strategische Omission** — Erkennen wenn ein Ereignis in deutschen Quellen berichtet wird, aber wichtige Kontextinformationen fehlen die in englischen/nicht-westlichen Quellen vorhanden sind.
-- [ ] **Agentur-Bias-Erkennung** — Wenn alle deutschen Portale denselben Wortlaut verwenden (hohe semantische Ähnlichkeit), als "Agenturmeldung ohne Eigenrecherche" markieren. Konsens ≠ Wahrheit.
+### Cross-Source Verification
+- [ ] **Event clustering** — group semantically similar articles about the same incident in ChromaDB (query on anonymised text, time window ±24h). Foundation for source comparison.
+- [ ] **Discrepancy detector** — for clustered articles: compare Orwell Index, techniques and manipulation targets. Flag large deviations between sources as a warning signal.
+- [ ] **Strategic omission** — detect when an event is reported in German sources but important context is missing that is present in English/non-western sources.
+- [ ] **Agency bias detection** — when all German outlets use the same wording (high semantic similarity), mark as "wire report without original research". Consensus ≠ truth.
 
-### Qualität & Tests
-- [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Migranten/Einheimische, Linke/Rechte)
-- [x] **Pass 0 — Dynamische Gruppenidentifikation** — Implementiert: LLM-Pass vor Anonymisierung identifiziert Gruppenmarker (`[{"term": "...", "type": "racial|ethnic_origin|..."}]`). Code ersetzt deterministisch mit `Gruppe-A` etc. Validiert durch Test 04 (Symmetrie Schwarze/Weiße, Δ Orwell 0.01, Δ Bernays 0.00).
-- [ ] **Ambige Rassenmerkmale anonymisieren** — `schwarz` und `weiß` als Rassenmerkmale werden durch Pass 0 dynamisch erkannt und ersetzt. Statische Liste als Fallback bleibt für klare Fälle erhalten. Residualproblem: Pass 0 könnte Farbadjektive fälschlicherweise als Rassenmerkmale klassifizieren — Validierung ausstehend.
-- [ ] **Keyword-Listen** — Gegner-Framing-Filter (Keywords in Anführungszeichen als "zitiert" markieren)
-- [ ] **Keyword Lazy-Update** — SQLite-DB speichert Keyword-Treffer mit Kontext-Satz; periodischer Job klassifiziert affirmativ vs. zitierend und schreibt Korrekturen zurück in die Keyword-Listen
-- [ ] **Manuell kuratierter Anker-Korpus** — Initiale Kuration mit verifizierten Referenzartikeln für bessere Cold-Start-Kalibrierung
-- [ ] **Unit Tests** — tests/ befüllen: Scraper-Mocks, JSON-Parser, Adapter-Interface
-- [ ] **Analyse-Validierung** — Prüfen ob zurückgegebene quote-Felder tatsächlich im Artikeltext enthalten sind
+### Quality & Tests
+- [ ] **Extend symmetry tests** — additional substitution pairs (migrants/natives, left/right)
+- [x] **Pass 0 — dynamic group identification** — implemented: LLM pass before anonymisation identifies group markers (`[{"term": "...", "type": "racial|ethnic_origin|..."}]`). Code replaces deterministically with `Gruppe-A` etc. Validated by test 04 (symmetry Black/White, Δ Orwell 0.01, Δ Bernays 0.00).
+- [ ] **Anonymise ambiguous racial attributes** — `schwarz` and `weiß` as racial attributes are dynamically detected and replaced by pass 0. Static list remains as fallback for clear cases. Residual problem: pass 0 might incorrectly classify colour adjectives as racial attributes — validation pending.
+- [ ] **Keyword lists** — adversarial framing filter (mark keywords in quotation marks as "cited")
+- [ ] **Keyword lazy update** — SQLite DB stores keyword hits with context sentence; periodic job classifies affirmative vs. citing and writes corrections back to keyword lists
+- [ ] **Manually curated anchor corpus** — initial curation with verified reference articles for better cold-start calibration
+- [ ] **Unit tests** — populate tests/: scraper mocks, JSON parser, adapter interface
+- [ ] **Analysis validation** — verify that returned quote fields are actually present in the article text
 
-### Sprachmodelle & Lokale Modelle
-- [ ] **Lokale Modelle für Sprachspezialisierung anpassen**
-  - [x] Modellnamen aus dem Code auslagern (`SPACY_MODEL`, `EMBEDDING_MODEL`) — aktuell hardcodiert in `anonymizer.py` und allen drei ChromaDB-Repositories; ENV-Variablen beim Start laden; Defaults + Beschreibung in `.env.example` eintragen
-  - [x] Passende deutschsprachige Modelle auswählen und als neue Defaults setzen — `de_core_news_md` (spaCy, bleibt), `paraphrase-multilingual-MiniLM-L12-v2` (Embeddings, ersetzt `all-MiniLM-L6-v2`)
+### Language Models & Local Models
+- [ ] **Adapt local models for language specialisation**
+  - [x] Externalise model names from code (`SPACY_MODEL`, `EMBEDDING_MODEL`) — previously hardcoded in `anonymizer.py` and all three ChromaDB repositories; load from ENV on startup; add defaults + descriptions to `.env.example`
+  - [x] Select appropriate German-language models as new defaults — `de_core_news_md` (spaCy, unchanged), `paraphrase-multilingual-MiniLM-L12-v2` (embeddings, replaces `all-MiniLM-L6-v2`)
 
-### LLM-Betrieb
-- [ ] **Hybrid-Provider** — Nach Pass 1: wenn `orwell_index > threshold` oder Domain in Prioritätsliste → tiefer Cloud-Provider (`LLM_PROVIDER_DEEP`), sonst lokales Modell (`LLM_PROVIDER`). Konfigurierbar via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Warten auf Apple Silicon Hardware für lokalen LLM-Betrieb.
-- [ ] **MCP-Server** — Lokaler MCP-Server als Brücke zwischen Claude Desktop (Cloud-Scheduling) und lokalem Backend. Tools: `trigger_feed()`, `get_stats()`. Ermöglicht Remote-Trigger ohne öffentlich erreichbares Backend.
+### LLM Operation
+- [ ] **Hybrid provider** — after pass 1: if `orwell_index > threshold` or domain in priority list → deep cloud provider (`LLM_PROVIDER_DEEP`), otherwise local model (`LLM_PROVIDER`). Configurable via `DEEP_ANALYSIS_THRESHOLD` in `.env`. Pending Apple Silicon hardware for local LLM operation.
+- [ ] **MCP server** — local MCP server as bridge between Claude Desktop (cloud scheduling) and local backend. Tools: `trigger_feed()`, `get_stats()`. Enables remote triggering without a publicly accessible backend.
 
-### Open Source / Internationalisierung
-- [ ] **UI Mehrsprachigkeit (DE/EN)** — Angular i18n oder ngx-translate integrieren; alle UI-Texte in Sprachdateien auslagern; Sprachwechsel im UI (DE/EN Toggle)
-- [ ] **Frontend UI-Texte** — Alle deutschen Labels, Fehlermeldungen und Beschriftungen ins Englische übersetzen (Voraussetzung für Mehrsprachigkeit)
-- [ ] **spaCy Spracherkennung** — `langdetect` zur automatischen Spracherkennung; `de_core_news_md` vs. `en_core_web_md` dynamisch laden
-- [ ] **Keyword-Listen Englisch** — Englische Äquivalente für `keywords_extreme_left.txt`, `keywords_extreme_right.txt`, `keywords_general.txt` kuratieren
+### Open Source / Internationalisation
+- [ ] **UI multilingual (DE/EN)** — integrate Angular i18n or ngx-translate; externalise all UI texts into language files; language switcher in UI (DE/EN toggle)
+- [ ] **Frontend UI texts** — translate all German labels, error messages and captions to English (prerequisite for multilingual support)
+- [ ] **spaCy language detection** — `langdetect` for automatic language detection; load `de_core_news_md` vs. `en_core_web_md` dynamically
+- [ ] **English keyword lists** — curate English equivalents for `keywords_extreme_left.txt`, `keywords_extreme_right.txt`, `keywords_general.txt`
 
-### Übersetzung Dokumentation & Code
+### Documentation & Code Translation
 
-**Markdown-Dokumentation:**
-- [x] [README.md](../README.md) — Projektbeschreibung, Architektur, Installation, Konfiguration
-- [x] [SETUP.md](../SETUP.md) — Setup-Anleitung, Fehlerbehandlung
-- [x] [docs/reference.md](reference.md) — Technische Referenz: JSON-Schema, Indikatoren, Paywall, Techniken-DB
-- [x] [docs/web_architecture.md](web_architecture.md) — Stack, Projektstruktur, API-Endpunkte
-- [x] [docs/analyse_architektur.md](analyse_architektur.md) — Indikatoren, Zwei-Pass-Architektur (technisch komplex)
-- [ ] [docs/todo.md](todo.md) — Roadmap
+**Markdown documentation:**
+- [x] [README.md](../README.md) — project overview, architecture, installation, configuration
+- [x] [SETUP.md](../SETUP.md) — setup guide, common errors
+- [x] [docs/reference.md](reference.md) — technical reference: JSON schema, indicators, paywall, techniques DB
+- [x] [docs/web_architecture.md](web_architecture.md) — stack, project structure, API endpoints
+- [x] [docs/analyse_architektur.md](analyse_architektur.md) — indicators, two-pass architecture (technically complex)
+- [x] [docs/todo.md](todo.md) — roadmap
 
-**Python-Kommentare & Docstrings:**
+**Python comments & docstrings:**
 - [ ] [src/news_analyser/anonymizer.py](../src/news_analyser/anonymizer.py)
 - [ ] [src/news_analyser/feed.py](../src/news_analyser/feed.py)
 - [ ] [src/news_analyser/main.py](../src/news_analyser/main.py)
@@ -135,10 +135,10 @@
 - [ ] [backend/main.py](../backend/main.py)
 - [ ] [backend/routers/analyse.py](../backend/routers/analyse.py)
 
-**TypeScript-Kommentare:**
+**TypeScript comments:**
 - [ ] [frontend/src/app/features/stats/stats-verlauf.component.ts](../frontend/src/app/features/stats/stats-verlauf.component.ts)
 
 ### Export & Integration
-- [ ] **CSV/JSON-Export** — Alle gespeicherten Analysen exportieren
-- [ ] **Authentifizierung** — Optionaler API-Key-Schutz für den Analyse-Endpunkt
-- [ ] **Logging** — Strukturiertes Logging in logs/ statt print()-Ausgaben
+- [ ] **CSV/JSON export** — export all stored analyses
+- [ ] **Authentication** — optional API key protection for the analysis endpoint
+- [ ] **Logging** — structured logging to logs/ instead of print() statements
