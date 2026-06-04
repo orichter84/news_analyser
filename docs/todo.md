@@ -117,7 +117,7 @@
 ### Übersetzung Dokumentation & Code
 
 **Markdown-Dokumentation:**
-- [ ] [README.md](../README.md) — Projektbeschreibung, Architektur, Installation, Konfiguration
+- [x] [README.md](../README.md) — Projektbeschreibung, Architektur, Installation, Konfiguration
 - [ ] [SETUP.md](../SETUP.md) — Setup-Anleitung, Fehlerbehandlung
 - [ ] [docs/project.md](project.md) — Architektur, API-Output, Konfiguration
 - [ ] [docs/web_architecture.md](web_architecture.md) — Stack, Projektstruktur, API-Endpunkte

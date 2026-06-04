@@ -1,34 +1,34 @@
 # News Analyser
 
-Analysiert Nachrichtenartikel auf Manipulationstechniken, rhetorischen Extremismus und politisches Framing. Die Analyse-Pipeline und Datenbank laufen lokal — für das LLM-Backend kann wahlweise ein lokales Modell (LM Studio) oder ein Cloud-Dienst (OpenAI, Anthropic, GitHub Copilot) verwendet werden.
+Analyses news articles for manipulation techniques, rhetorical extremism and political framing. The analysis pipeline and database run locally — for the LLM backend you can choose between a local model (LM Studio) or a cloud service (OpenAI, Anthropic, GitHub Copilot).
 
-**Indikatoren:** Orwell-Index (Extremismus), Bernays-Score (Manipulationsintensität), Dunning-Kruger-Index (unbelegte Gewissheit), politische Strömung, Manipulation Targets, 23 dokumentierte Techniken.
+**Indicators:** Orwell Index (extremism), Bernays Score (manipulation intensity), Dunning-Kruger Index (unsubstantiated certainty), political leaning, manipulation targets, 23 documented techniques.
 
-**Lizenz:** GNU Affero General Public License v3.0 — siehe [LICENSE](LICENSE)
+**License:** GNU Affero General Public License v3.0 — see [LICENSE](LICENSE)
 
 ---
 
-## Voraussetzungen
+## Requirements
 
-- Python 3.11+
-- [uv](https://github.com/astral-sh/uv) (empfohlener Package Manager — `pip install uv`)
-- Node.js 18+ (nur für das Frontend)
-- Zugang zu einem LLM-Backend (OpenAI, Anthropic, LM Studio, Claude CLI o.ä.)
+- Python 3.10–3.12 (recommended: 3.12) — 3.13+ may have compatibility issues with ChromaDB and PyTorch
+- [uv](https://github.com/astral-sh/uv) (recommended package manager — `pip install uv`)
+- Node.js 18+ (frontend only)
+- Access to an LLM backend (OpenAI, Anthropic, LM Studio, Claude CLI etc.)
 
 ---
 
 ## Installation
 
-### 1. Repository klonen
+### 1. Clone the repository
 
 ```bash
 git clone <repo-url>
 cd news_analyser
 ```
 
-### 2. Virtuelle Umgebung + Abhängigkeiten installieren
+### 2. Virtual environment & dependencies
 
-**Option A — mit uv (empfohlen):**
+**Option A — with uv (recommended):**
 
 ```bash
 uv venv
@@ -38,7 +38,7 @@ uv pip install -r requirements.txt -r requirements-api.txt
 python -m spacy download de_core_news_md
 ```
 
-**Option B — ohne uv (klassisch):**
+**Option B — without uv (classic):**
 
 ```bash
 python -m venv .venv
@@ -48,16 +48,16 @@ pip install -r requirements.txt -r requirements-api.txt
 python -m spacy download de_core_news_md
 ```
 
-> Beide Optionen erzeugen eine `.venv/`-Umgebung — eine davon reicht, nicht beide.
+> Both options create a `.venv/` environment — use one, not both.
 
-### 3. Umgebungsvariablen konfigurieren
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env
-# .env mit einem Editor öffnen und API-Key eintragen
+# Open .env in an editor and fill in your values
 ```
 
-Mindestens `LLM_PROVIDER` setzen. Je nach Provider wird zusätzlich ein API-Key benötigt — `cli` und `lm_studio` funktionieren ohne. Alle Optionen sind in `.env.example` dokumentiert.
+At minimum set `LLM_PROVIDER`. Depending on the provider an API key may be required — `cli` and `lm_studio` work without one. All options are documented in `.env.example`.
 
 ### 4. Frontend (optional)
 
@@ -68,74 +68,119 @@ npm install
 
 ---
 
-## Starten
+## Starting
 
-Backend und Frontend laufen parallel — am besten zwei separate Terminals im Projektverzeichnis öffnen.
+### All-in-one (recommended)
 
-### Terminal 1 — Backend (Port 8000)
+**Linux/macOS:**
+```bash
+./start.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+.\start.ps1
+```
+
+Starts ChromaDB, backend and frontend in the correct order. Stop all services with `Ctrl+C`.
+
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:4200 |
+| Backend  | http://localhost:8000 |
+| ChromaDB | http://localhost:8001 |
+
+### Manual startup (three terminals)
+
+ChromaDB must be started first — the backend connects to it on startup.
+
+**Terminal 1 — ChromaDB (Port 8001)**
 
 ```bash
+# Linux/macOS
+chroma run --host localhost --port 8001 --path data/chroma_db
+```
+```powershell
+# Windows
+.venv\Scripts\chroma.exe run --host localhost --port 8001 --path data\chroma_db
+```
+
+**Terminal 2 — Backend (Port 8000)**
+
+```bash
+# Linux/macOS
 cd backend
 uvicorn main:app --reload
 ```
+```powershell
+# Windows
+cd backend
+.venv\Scripts\uvicorn.exe main:app --reload
+```
 
-### Terminal 2 — Frontend (Port 4200)
+**Terminal 3 — Frontend (Port 4200)**
 
 ```bash
+# Linux/macOS
 cd frontend
 ng serve
 ```
+```powershell
+# Windows
+cd frontend
+npx ng serve --port 4200
+```
 
-Die Web-UI ist dann unter [http://localhost:4200](http://localhost:4200) erreichbar.  
-Die API-Docs unter [http://localhost:8000/docs](http://localhost:8000/docs).
+The web UI is available at [http://localhost:4200](http://localhost:4200).  
+The API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-### Watcher (RSS-Feed-Dauerbetrieb)
+### Watcher (RSS feed continuous mode)
 
 ```bash
-# Einmaliger Lauf
+# Single run
 python run.py --feed
 
-# Dauerbetrieb (Intervall aus .env: FEED_INTERVAL)
+# Continuous mode (interval from .env: FEED_INTERVAL)
 python run.py --feed --auto
 
-# Einzelnen Artikel analysieren
+# Analyse a single article
 python run.py --url https://www.spiegel.de/...
 ```
 
 ---
 
-## LLM-Backends
+## LLM Backends
 
-Über `LLM_PROVIDER` in der `.env` wird das Backend gewählt:
+The backend is selected via `LLM_PROVIDER` in `.env`:
 
-| Provider | Env-Variable | Beschreibung |
+| Provider | Env variable | Description |
 |---|---|---|
-| `openai` | `OPENAI_API_KEY` | OpenAI API (Standard) |
+| `openai` | `OPENAI_API_KEY` | OpenAI API (default) |
 | `anthropic` | `ANTHROPIC_API_KEY` | Anthropic API |
-| `cli` | — | Claude Code CLI (kein API-Key erforderlich) |
-| `lm_studio` | — | LM Studio lokaler Server |
+| `cli` | — | Claude Code CLI (no API key required) |
+| `lm_studio` | — | LM Studio local server |
 | `copilot` | `GITHUB_TOKEN` | GitHub Copilot |
 | `m365_copilot` | `M365_COPILOT_ACCESS_TOKEN` | Microsoft 365 Copilot |
 
 ### Claude Code CLI (`cli`)
 
-Der `cli`-Provider nutzt die lokal installierte [Claude Code CLI](https://claude.ai/code) als Subprocess — kein separater API-Key nötig, die Authentifizierung läuft über den CLI-Login.
+The `cli` provider uses the locally installed [Claude Code CLI](https://claude.ai/code) as a subprocess — no separate API key needed, authentication is handled via CLI login.
 
-**Installation (Node.js 18+ erforderlich):**
+**Installation (Node.js 18+ required):**
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-**Anmelden:**
+**Login:**
 
 ```bash
 claude login
 ```
 
-Ein Browser-Fenster öffnet sich zur Authentifizierung mit dem Anthropic-Account. Nach dem Login kann die CLI direkt verwendet werden.
+A browser window opens for authentication with your Anthropic account. After login the CLI can be used directly.
 
-**`.env` konfigurieren:**
+**Configure `.env`:**
 
 ```env
 LLM_PROVIDER=cli
@@ -143,63 +188,68 @@ LLM_PROVIDER=cli
 
 ### LM Studio (`lm_studio`)
 
-[LM Studio](https://lmstudio.ai) ermöglicht den Betrieb lokaler Sprachmodelle ohne Cloud-Anbindung — kein API-Key erforderlich.
+[LM Studio](https://lmstudio.ai) enables running local language models without cloud connectivity — no API key required.
 
 **Installation:**
 
-1. LM Studio von [lmstudio.ai](https://lmstudio.ai) herunterladen und installieren
-2. Im Tab **Discover** ein Modell herunterladen (empfohlen: Mistral 7B Q8 oder Llama 3 8B Q8)
-3. Im Tab **Local Server** das Modell laden und den Server starten — läuft standardmäßig auf Port 1234
+1. Download and install LM Studio from [lmstudio.ai](https://lmstudio.ai)
+2. In the **Discover** tab, download a model (recommended: Mistral 7B Q8 or Llama 3 8B Q8)
+3. In the **Local Server** tab, load the model and start the server — runs on port 1234 by default
 
-**`.env` konfigurieren:**
+**Configure `.env`:**
 
 ```env
 LLM_PROVIDER=lm_studio
 ```
 
-Das aktive Modell wird in LM Studio selbst festgelegt — `OPENAI_MODEL` hat keinen Effekt. Die `OPENAI_BASE_URL` muss ebenfalls nicht gesetzt werden, der Connector verwendet automatisch `http://localhost:1234/v1`.
+The active model is set within LM Studio itself — `OPENAI_MODEL` has no effect. `OPENAI_BASE_URL` does not need to be set either; the connector automatically uses `http://localhost:1234/v1`.
 
-> **Alternative: Ollama** — funktioniert ebenfalls lokal über den `openai`-Provider, da Ollama eine OpenAI-kompatible API anbietet:
+> **Alternative: Ollama** — also works locally via the `openai` provider, as Ollama offers an OpenAI-compatible API:
 > ```env
 > LLM_PROVIDER=openai
 > OPENAI_API_KEY=ollama
 > OPENAI_BASE_URL=http://localhost:11434/v1
 > OPENAI_MODEL=llama3.2
 > ```
-> Modell vorher herunterladen: `ollama pull llama3.2`
+> Download the model first: `ollama pull llama3.2`
 
 ---
 
-## Projektstruktur
+## Project Structure
 
 ```
 news_analyser/
-├── src/news_analyser/       Analyse-Pipeline (Python-Paket)
-│   ├── agents/              LLM-Analyse (Zwei-Pass-Architektur)
-│   ├── repositories/        ChromaDB-Zugriff (Artikel, Anker, Techniken)
-│   ├── prompts/             Editierbare System-Prompts (Markdown)
-│   └── data/                Keyword-Listen, Techniken-JSON, Feeds
-├── src/llm_adapter/         LLM-Backend-Abstraktionsschicht
-├── backend/                 FastAPI REST-API
-│   └── routers/             Endpunkte: articles, analyse, stats, search, techniques
+├── src/news_analyser/       Analysis pipeline (Python package)
+│   ├── agents/              LLM analysis (two-pass architecture)
+│   ├── repositories/        ChromaDB access (articles, anchors, techniques)
+│   ├── prompts/             Editable system prompts (Markdown)
+│   └── data/                Keyword lists, techniques JSON, feeds
+├── src/llm_adapter/         LLM backend abstraction layer
+├── backend/                 FastAPI REST API
+│   ├── routers/             Endpoints: articles, analyse, stats, search, techniques
+│   └── schemas/             Pydantic request/response models
 ├── frontend/                Angular 17+ SPA
-├── data/                    ChromaDB (lokal, persistent, nicht im Repo)
-├── config/                  Nutzer-Konfiguration (committed, kein Secret)
-│   ├── feeds.txt            RSS-Feed-URLs (eine pro Zeile, # für Kommentare)
-│   └── rerun_urls.txt       URLs für manuelle Wiederholung (--file)
-├── requirements.txt         Analyse-Pipeline-Dependencies
-├── requirements-api.txt     Backend-Dependencies (FastAPI etc.)
-└── .env.example             Konfigurationsvorlage (Secrets + Provider-Auswahl)
+├── docs/                    Architecture documentation and concept tests
+├── data/                    ChromaDB (local, persistent, not in repo)
+├── config/                  User configuration (committed, no secrets)
+│   ├── feeds.txt            RSS feed URLs (one per line, # for comments)
+│   └── rerun_urls.txt       URLs for manual re-analysis (--file)
+├── run.py                   CLI entry point (--url, --feed, --stats, --file)
+├── start.sh                 Start all services — Linux/macOS
+├── start.ps1                Start all services — Windows (PowerShell)
+├── requirements.txt         Analysis pipeline dependencies
+├── requirements-api.txt     Backend dependencies (FastAPI etc.)
+└── .env.example             Configuration template (secrets + provider selection)
 ```
 
 ---
 
-## Dokumentation
+## Documentation
 
-| Dokument | Inhalt |
+| Document | Contents |
 |---|---|
-| [docs/project.md](docs/project.md) | Konfigurationsreferenz, JSON-Schema, Indikatoren, Paywall-Erkennung |
-| [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indikatoren, Zwei-Pass-Architektur, Bias-Mitigierung |
-| [docs/web_architecture.md](docs/web_architecture.md) | API-Endpunkte, Frontend-Struktur |
-| [docs/todo.md](docs/todo.md) | Offene Features und Erweiterungsideen |
-| [docs/konzept/](docs/konzept/) | Kalibrierungstests und Bias-Validierung |
+| [docs/project.md](docs/project.md) | Configuration reference, JSON schema, indicators, paywall detection |
+| [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, two-pass architecture, bias mitigation |
+| [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
+| [docs/todo.md](docs/todo.md) | Open features and extension ideas |
+| [docs/konzept/](docs/konzept/) | Calibration tests and bias validation |
