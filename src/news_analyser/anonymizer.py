@@ -86,7 +86,7 @@ def _load_nlp() -> spacy.language.Language:
     return spacy.load(os.environ.get("SPACY_MODEL", "de_core_news_md"))
 
 
-def anonymize(text: str) -> AnonymizationResult:
+def anonymize(text: str, group_terms: list[dict[str, str]] | None = None) -> AnonymizationResult:
     """Anonymisiert Gruppenidentifikatoren im Text.
 
     Returns:
@@ -153,7 +153,21 @@ def anonymize(text: str) -> AnonymizationResult:
     for start, end, placeholder in sorted(replacements, key=lambda x: x[0], reverse=True):
         result = result[:start] + placeholder + result[end:]
 
-    # --- Schicht 2: Ideologische Deskriptoren ---
+    # --- Schicht 2: Dynamische Gruppenidentifikatoren (Pass 0) ---
+    group_counter = 0
+    if group_terms:
+        for item in group_terms:
+            term = item.get("term", "").strip()
+            if not term:
+                continue
+            pattern = re.compile(re.escape(term), re.IGNORECASE)
+            if pattern.search(result):
+                group_counter += 1
+                placeholder = f"Gruppe-{_num_to_letter(group_counter)}"
+                mapping[placeholder] = term
+                result = pattern.sub(placeholder, result)
+
+    # --- Schicht 3: Statische ideologische Deskriptoren ---
     for original, replacement in IDEOLOGICAL_TERMS:
         pattern = re.compile(re.escape(original), re.IGNORECASE)
         if pattern.search(result):

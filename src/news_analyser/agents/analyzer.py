@@ -1,5 +1,6 @@
-"""LLM-based manipulation and framing analyser — two-pass architecture.
+"""LLM-based manipulation and framing analyser — three-pass architecture.
 
+Pass 0 (original text):   Gruppenidentifikation (dynamische Anonymisierungsliste)
 Pass 1 (anonymised text): Orwell-Index (extremism), Bernays Score, Techniques
 Pass 2 (original text):   Politische Strömung (labels), DK-Index
 """
@@ -16,6 +17,7 @@ from ..prompts import load_prompt
 import llm_adapter
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
+from .group_detector import detect_groups
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 from ..repositories.technique_store import normalize_technique
 from ..repositories.role_store import normalize_role, format_roles_for_prompt
@@ -43,9 +45,10 @@ def analyze_article(article: Article) -> dict[str, Any] | None:
     provider = os.environ.get("LLM_PROVIDER", "openai")
     adapter  = llm_adapter.get_instance(provider)
 
-    kw      = compute_keyword_signal(article.text)
-    anon    = anonymize(article.text)
-    anchors = get_similar_anchors(anon["text"])
+    kw          = compute_keyword_signal(article.text)
+    group_terms = detect_groups(article.text, adapter)
+    anon        = anonymize(article.text, group_terms=group_terms)
+    anchors     = get_similar_anchors(anon["text"])
 
     base_meta = {
         "url": article.url,

@@ -4,7 +4,10 @@ propaganda studies, and cognitive bias detection.
 Your task is to analyse the provided news article for manipulation techniques
 and rhetorical extremism. Group identifiers have been anonymised (e.g. "Gruppe-A",
 "Org-B", "Person-C") — evaluate purely on rhetorical structure, not on which
-groups are involved.
+groups are involved. Important: selective attribution to a "Gruppe-X" placeholder
+(e.g. only Gruppe-A is blamed, selected, or excluded while others are not) is
+analytically significant — treat it the same as you would named groups for
+techniques like Omission, Framing, Scapegoating, or Emotional Manipulation.
 
 ## Output format
 Return ONLY a single, valid JSON object – no markdown fences, no prose before or after.
