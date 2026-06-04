@@ -1,48 +1,49 @@
-# Web-Architektur
+# Web Architecture
 
-FastAPI REST-Backend + Angular 17+ Single-Page-Application. Beide Schichten sind
-vollständig getrennt und kommunizieren ausschließlich über HTTP/JSON.
+FastAPI REST backend + Angular 17+ single-page application. Both layers are fully decoupled and communicate exclusively via HTTP/JSON.
+
+For the JSON output schema see [reference.md](reference.md).
 
 ---
 
-## Übersicht
+## Overview
 
 ```
-Browser (Angular SPA, Port 4200)
+Browser (Angular SPA, port 4200)
    ↕  HTTP/JSON
-FastAPI Backend (Port 8000)
-   ├── /articles        Artikel-Liste und Detailansicht
-   ├── /analyse         Artikel einreichen + Job-Status
-   ├── /stats           Aggregierte Statistiken
-   ├── /search          Semantische Suche
-   └── /techniques      Manipulationstechniken-Datenbank
+FastAPI Backend (port 8000)
+   ├── /articles        Article list and detail view
+   ├── /analyse         Submit article + job status
+   ├── /stats           Aggregated statistics
+   ├── /search          Semantic search
+   └── /techniques      Manipulation techniques database
         ↕
-   ChromaDB (lokal, persistent)
-   ├── articles         Analysierte Artikel
-   ├── orwell_anchors   RAG-Kalibrierungsanker
-   └── techniques       Dokumentierte Manipulationstechniken
+   ChromaDB (local, persistent)
+   ├── articles         Analysed articles
+   ├── orwell_anchors   RAG calibration anchors
+   └── techniques       Documented manipulation techniques
 ```
 
 ---
 
 ## Stack
 
-| Schicht | Technologie | Begründung |
+| Layer | Technology | Rationale |
 |---|---|---|
-| Backend | FastAPI + uvicorn | Async, automatische OpenAPI-Docs, passt zur Python-Codebase |
-| Frontend | Angular 17+ (Standalone Components) | Lazy Loading, Signal-basiertes State Management |
-| HTTP-Client | Angular HttpClient + fetch | Moderner Browser-nativer Transport |
-| Styling | SCSS (Dark Theme) | Kein CSS-Framework, volle Kontrolle |
-| Routing | Angular Router (lazy-loaded) | Code Splitting pro Feature-Modul |
+| Backend | FastAPI + uvicorn | Async, automatic OpenAPI docs, fits the Python codebase |
+| Frontend | Angular 17+ (Standalone Components) | Lazy loading, signal-based state management |
+| HTTP client | Angular HttpClient + fetch | Modern browser-native transport |
+| Styling | SCSS (dark theme) | No CSS framework, full control |
+| Routing | Angular Router (lazy-loaded) | Code splitting per feature module |
 
 ---
 
-## Projektstruktur
+## Project Structure
 
 ```
 news_analyser/
 ├── backend/
-│   ├── main.py                     FastAPI App, CORS, Router-Registrierung
+│   ├── main.py                     FastAPI app, CORS, router registration
 │   └── routers/
 │       ├── articles.py             GET /articles, GET /articles/{id}
 │       ├── analyse.py              POST /analyse, GET /analyse/job/{id}
@@ -51,33 +52,33 @@ news_analyser/
 │       └── techniques.py           GET /techniques, GET /techniques/{id}
 │
 └── frontend/src/app/
-    ├── app.routes.ts               Lazy-loaded Top-Level-Routen
-    ├── app.html                    Navigation + Router Outlet
+    ├── app.routes.ts               Lazy-loaded top-level routes
+    ├── app.html                    Navigation + router outlet
     ├── app.config.ts               provideRouter, provideHttpClient
     │
     ├── core/
     │   ├── models/
-    │   │   ├── article.model.ts    ArticleListItem, ArticleDetail, ManipulationTarget (inkl. Quotes)
+    │   │   ├── article.model.ts    ArticleListItem, ArticleDetail, ManipulationTarget (incl. quotes)
     │   │   ├── stats.model.ts      StatsResponse, DomainAverage
     │   │   ├── analyse.model.ts    AnalyseRequest, JobStatus
     │   │   └── technique.model.ts  Technique
     │   └── services/
-    │       └── api.service.ts      Alle HTTP-Calls (HttpClient)
+    │       └── api.service.ts      All HTTP calls (HttpClient)
     │
     └── features/
-        ├── dashboard/              KPI-Karten, Top-Techniken, letzte Artikel
-        ├── articles/               Artikel-Liste (Filter) + Detailansicht
-        ├── stats/                  Statistik-Tabellen und Auswertungen
-        ├── submit/                 URL einreichen + Job-Status-Polling
-        ├── techniques/             Techniken-Übersicht + Detailseite
-        └── knowledge/              "Über dieses Projekt" (Methodik, Indikatoren, Quellen)
+        ├── dashboard/              KPI cards, top techniques, recent articles
+        ├── articles/               Article list (filter) + detail view
+        ├── stats/                  Statistics tables and charts
+        ├── submit/                 Submit URL + job status polling
+        ├── techniques/             Techniques overview + detail page
+        └── knowledge/              "About this project" (methodology, indicators, sources)
 ```
 
 ---
 
-## API-Endpunkte
+## API Endpoints
 
-### Artikel
+### Articles
 
 ```
 GET  /articles
@@ -86,10 +87,10 @@ GET  /articles
      &limit=50
 
 GET  /articles/{url_encoded_id}
-     Response: Vollständiges Analyse-JSON inkl. manipulation_targets
+     Response: Full analysis JSON incl. manipulation_targets
 ```
 
-### Analyse
+### Analysis
 
 ```
 POST /analyse
@@ -100,7 +101,7 @@ GET  /analyse/job/{job_id}
      Response: { "status": "done|running|error", "result_id": "..." }
 ```
 
-### Statistiken
+### Statistics
 
 ```
 GET  /stats
@@ -114,59 +115,59 @@ GET  /stats
      }
 ```
 
-### Suche
+### Search
 
 ```
 GET  /search?q=NATO+Trump&n=10
-     Semantische Suche via ChromaDB query_similar()
+     Semantic search via ChromaDB query_similar()
 ```
 
-### Techniken
+### Techniques
 
 ```
 GET  /techniques
-     Response: Liste aller dokumentierten Techniken (aus ChromaDB techniques-Collection)
+     Response: List of all documented techniques (from ChromaDB techniques collection)
 
 GET  /techniques/{id}
-     Response: Einzelne Technik (z.B. /techniques/appeal-to-fear)
+     Response: Single technique (e.g. /techniques/appeal-to-fear)
 ```
 
 ---
 
-## Frontend-Seiten
+## Frontend Pages
 
 ### Dashboard `/dashboard`
-- KPI-Karten: Gesamt-Artikel, analysierte Domains, Durchschnitt Orwell-Index und Bernays-Score
-- Top-5-Techniken und Top-5-Strömungen
-- Letzte Artikel (Tabelle)
+- KPI cards: total articles, analysed domains, average Orwell Index and Bernays Score
+- Top 5 techniques and top 5 political leanings
+- Recent articles (table)
 
-### Artikel-Liste `/articles`
-- Filterbar nach Domain, Orwell-Min/Max, Limit
-- Spalten: Titel, Domain, Datum, Orwell-Index, Bernays-Score, Techniken
+### Article List `/articles`
+- Filterable by domain, Orwell min/max, limit
+- Columns: title, domain, date, Orwell Index, Bernays Score, techniques
 
-### Artikel-Detail `/articles/{encoded_url}`
-- Score-Karten: Orwell-Index, Bernays-Score, DK-Index
-- Framing: Narrativ, Sentiment, Politische Strömung, Themenbereich
-- Manipulation Targets: Entität, Richtung (▲ positiv / ▼ negativ / ● neutral), Rolle — mit optionalen Zitat-Belegen für Richtung und Rolle
-- Erkannte Techniken mit Zitat und Erklärung — Technik-Namen verlinken auf `/techniques/:id`
+### Article Detail `/articles/{encoded_url}`
+- Score cards: Orwell Index, Bernays Score, DK Index
+- Framing: narrative, sentiment, political leaning, topic area
+- Manipulation targets: entity, direction (▲ positive / ▼ negative / ● neutral), role — with optional quote evidence for direction and role
+- Detected techniques with quote and explanation — technique names link to `/techniques/:id`
 
-### Statistiken `/stats`
-- Domain-Tabelle mit Durchschnittswerten
-- Top-Techniken und Strömungen
+### Statistics `/stats`
+- Domain table with average scores
+- Top techniques and political leanings
 
-### Einreichen `/submit`
-- URL-Formular → POST /analyse → Job-Status-Polling → Link zum Ergebnis
+### Submit `/submit`
+- URL form → POST /analyse → job status polling → link to result
 
-### Techniken `/techniques`
-- Übersicht aller 19 dokumentierten Techniken, gruppiert nach Kategorie
-- Detailseite `/techniques/:id` — eigene URL pro Technik (verlinkbar, für Lehrzwecke)
+### Techniques `/techniques`
+- Overview of all 19 documented techniques, grouped by category
+- Detail page `/techniques/:id` — individual URL per technique (linkable, for educational use)
 
-### Über dieses Projekt `/knowledge`
-- Ausgangssituation, Lösungsansatz, Pipeline, Indikatoren, Limitierungen, Quellen
+### About `/knowledge`
+- Background, approach, pipeline, indicators, limitations, sources
 
 ---
 
-## CORS-Konfiguration
+## CORS Configuration
 
 ```python
 app.add_middleware(
@@ -176,18 +177,4 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-```
-
----
-
-## Starten
-
-```bash
-# Backend (Port 8000)
-cd backend
-uvicorn main:app --reload
-
-# Frontend (Port 4200)
-cd frontend
-ng serve
 ```
