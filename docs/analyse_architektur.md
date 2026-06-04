@@ -1,250 +1,258 @@
-# Analyse-Architektur: Indikatoren und Stabilisierungskonzept
+# Analysis Architecture: Indicators and Stabilisation Concept
 
 ## Problem
 
-Der Orwell-Index wurde initial ausschließlich durch das LLM geschätzt und maß zwei
-konzeptuell verschiedene Dinge auf einer Achse: **Extremismus** und **politische Richtung**.
-Das führte zu drei Schwächen:
+The Orwell Index was initially estimated exclusively by the LLM and measured two
+conceptually distinct things on a single axis: **extremism** and **political direction**.
+This led to three weaknesses:
 
-1. **Konzeptfehler:** Ein AfD-Artikel und ein Antifa-Artikel erhielten unterschiedliche
-   Orwell-Werte, obwohl sie rhetorisch gleich extrem sein können.
-2. **Kein intersubjektiver Standard:** Das Modell definierte "neutral" implizit durch sein Training.
-3. **Modell-Drift:** Bei Modellwechseln verschob sich die Kalibrierung ohne Warnung.
+1. **Conceptual error:** An AfD article and an Antifa article received different
+   Orwell values even though they can be rhetorically equally extreme.
+2. **No intersubjective standard:** The model implicitly defined "neutral" through its training.
+3. **Model drift:** When switching models, calibration shifted without warning.
 
 ---
 
-## Ziel-Schema: Drei orthogonale Werte
+## Target Schema: Four Orthogonal Values
 
-| Wert | Misst | Typ | Skala |
+| Value | Measures | Type | Scale |
 |---|---|---|---|
-| **Bernays Score** | Manipulationsintensität (Techniken / 1000 Wörter) | `float` | 0 → ∞ |
-| **Orwell-Index** | Extremismus / dystopische Rhetorik | `float` | 0.0 (sachlich) → 1.0 (extrem) |
-| **Politische Strömung** | Benannte ideologische Tendenz(en) | `list[str]` | Label(s) |
+| **Bernays Score** | Manipulation intensity (techniques / 1000 words) | `float` | 0 → ∞ |
+| **Orwell Index** | Extremism / dystopian rhetoric | `float` | 0.0 (factual) → 1.0 (extreme) |
+| **Dunning-Kruger Index** | Unsubstantiated certainty / epistemic overconfidence | `float` | 0.0 (qualified) → 1.0 (assertive without evidence) |
+| **Political Leaning** | Named ideological tendency/tendencies | `list[str]` | Label(s) |
 
-### Warum Labels statt einer numerischen Achse für die Richtung?
+Each value measures an independent dimension. A text can score high on Bernays Score (many techniques) while scoring low on the Orwell Index (moderate rhetoric). Similarly, a text can have high epistemic overconfidence (DK Index) without being politically extreme. The four values together give a multi-dimensional profile of a text's manipulative character.
 
-Eine numerische links/rechts-Achse scheitert an historischen und modernen Hybridphänomenen.
-Die NSDAP kombinierte sozialistische Arbeiterrhetorik mit Nationalismus — auf einer Skala
-wäre das entweder irreführend "neutral" oder beliebig platziert. Mit Labels ist die
-Einordnung ehrlich: `["sozialistisch", "nationalistisch"]`.
+### Why the Dunning-Kruger Index is orthogonal
 
-Dasselbe gilt für moderne Phänomene:
+The DK Index captures how confidently a text makes claims without backing them with sources, subjunctive mood, or qualifications — regardless of which group or ideology is the subject. A text that states *"vaccines cause autism"* and one that states *"immigration destroys our culture"* can both score equally high on the DK Index even though they are politically opposite. This group-blindness is by design and confirmed by symmetry tests: DK values show zero difference between mirrored texts on real articles (see [bias-validation](concept/bias-validation.md)).
+
+### Why labels instead of a numerical axis for direction?
+
+A numerical left/right axis fails on historical and modern hybrid phenomena.
+The NSDAP combined socialist worker rhetoric with nationalism — on a scale
+that would be either misleadingly "neutral" or arbitrarily placed. With labels the
+classification is honest: `["sozialistisch", "nationalistisch"]`.
+
+The same applies to modern phenomena:
 - BSW: `["sozialistisch", "nationalpopulistisch"]`
 - CSU: `["konservativ", "christdemokratisch"]`
 - FDP: `["liberal", "marktwirtschaftlich"]`
 
-Das LLM ist für genau diese Art begründeter Klassifikation trainiert und liefert
-nachvollziehbarere Ergebnisse als eine Zahl zwischen -1.0 und +1.0.
+The LLM is trained for exactly this kind of reasoned classification and delivers
+more traceable results than a number between -1.0 and +1.0.
 
-### Beispielhafte Label-Taxonomie
+### Example label taxonomy
 
 *liberal, konservativ, christdemokratisch, sozialdemokratisch, grün, sozialistisch,
 kommunistisch, nationalistisch, nationalpopulistisch, libertär, faschistisch, anarchistisch*
 
-Die Liste ist nicht abschließend — das LLM kann Labels kombinieren und bei Bedarf
-neue prägen. Mehrere Labels pro Artikel sind ausdrücklich erwünscht.
+The list is not exhaustive — the LLM can combine labels and coin new ones as needed.
+Multiple labels per article are explicitly encouraged.
 
 ---
 
-## Dreistufige Pipeline zur Orwell-Index-Stabilisierung
+## Three-Stage Pipeline for Orwell Index Stabilisation
 
 ```
-Text → [1] Keyword-Signal     (Extremismus-Indikator, 0.0–1.0)
-     → [2] Embedding-Suche    (RAG, dynamische Kalibrierungsanker)
-     → [3] LLM-Schätzung      (Gegner-Framing erkennen, finale Bewertung)
+Text → [1] Keyword signal     (extremism indicator, 0.0–1.0)
+     → [2] Embedding search   (RAG, dynamic calibration anchors)
+     → [3] LLM estimation     (detect adversarial framing, final scoring)
 ```
 
-Kein einzelnes Signal ist allein zuverlässig. Erst die Kombination aller drei gibt
-dem LLM genug Kontext für eine stabile, begründbare Einschätzung.
+No single signal is reliable on its own. Only the combination of all three gives
+the LLM enough context for a stable, explainable assessment.
 
 ---
 
-## Stufe 1: Keyword-Signal (implementiert)
+## Stage 1: Keyword Signal (implemented)
 
-Zählt Schlüsselwörter aus drei kuratierten Listen (extreme linke Rhetorik, extreme rechte
-Rhetorik, richtungsunabhängige Extremismus-Indikatoren) und berechnet einen Rohwert:
+Counts keywords from three curated lists (extreme left rhetoric, extreme right
+rhetoric, direction-independent extremism indicators) and computes a raw score:
 
 ```
 extremism_score = total_hits / (total_hits + 5)   ∈ [0.0, 1.0)
 ```
 
-Der Dämpfungsfaktor 5 sorgt für eine realistische Kurve:
-1 Treffer → 0.17 | 5 Treffer → 0.50 | 15 Treffer → 0.75
+The damping factor of 5 produces a realistic curve:
+1 hit → 0.17 | 5 hits → 0.50 | 15 hits → 0.75
 
-Das Signal ist ein reiner **Extremismus-Indikator**, kein Richtungsindikator.
-Hohe Trefferzahl auf einer Seite deutet auf extreme Rhetorik hin — unabhängig welcher.
-Links- und Rechtstreffer werden getrennt gezählt und beide an das LLM weitergegeben,
-das die Richtung im Kontext bewertet.
+The signal is a pure **extremism indicator**, not a direction indicator.
+A high hit count on one side indicates extreme rhetoric — regardless of which side.
+Left and right hits are counted separately and both passed to the LLM,
+which evaluates direction in context.
 
-**Gewichtung:** ca. 20–30 % des finalen Orwell-Index.
+**Weighting:** approximately 20–30% of the final Orwell Index.
 
-### Bekannte Schwäche: Gegner-Framing
+### Known weakness: adversarial framing
 
-Das Keyword-Signal unterscheidet nicht zwischen *affirmativer Verwendung* und
-*zitierender Kritik*. Ein Artikel der "Remigration" im Satz *"Die AfD fordert Remigration"*
-enthält, bekommt denselben `right_hit` wie ein Artikel der das Konzept selbst propagiert.
-Dasselbe gilt spiegelbildlich für linke Rhetorik die zitierend kritisiert wird.
+The keyword signal does not distinguish between *affirmative use* and
+*critical citation*. An article containing "Remigration" in the sentence *"The AfD demands remigration"*
+receives the same `right_hit` as an article that propagates the concept itself.
+The same applies symmetrically to left rhetoric that is cited critically.
 
-**Warum kein Filter?** Die Unterscheidung affirmativ/zitierend erfordert Satzkontextanalyse —
-das ist genau die Stärke des LLM in Stufe 3. Das LLM erhält die Treffer-Liste zusammen
-mit dem Text und korrigiert im Kontext. Das Keyword-Signal ist bewusst ein schwacher Prior,
-kein harter Filter.
+**Why no filter?** Distinguishing affirmative/citing requires sentence-level context analysis —
+that is exactly the LLM's strength in stage 3. The LLM receives the hit list together
+with the text and corrects in context. The keyword signal is intentionally a weak prior,
+not a hard filter.
 
-**Konsequenz:** Keyword-Treffer in Artikeln die Gegner-Rhetorik berichten (Qualitätspresse,
-Faktenchecks) führen zu einem leicht erhöhten `extremism_score` der vom LLM nach unten
-korrigiert wird. Akzeptabel solange der Prior-Anteil bei 20–30 % bleibt.
-
----
-
-## Stufe 2: Embedding-Suche via ChromaDB (implementiert)
-
-Anstelle statischer Few-Shot-Beispiele im Prompt werden **dynamisch die semantisch
-ähnlichsten Anker-Artikel** aus der ChromaDB-Collection `orwell_anchors` abgerufen.
-
-### Warum Embeddings für Orwell-Kalibrierung?
-
-Extremismus und politische Ideologie manifestieren sich primär im **Was** — welche
-Konzepte, Entitäten und Wertesysteme referenziert werden — nicht im **Wie** (Stil,
-Aggressivität). Semantische Embeddings erfassen Kookkurrenz-Muster ohne dass man
-diese explizit kodieren muss.
-
-### Anker-Korpus
-
-Die Collection wird durch analysierte Artikel automatisch befüllt. Pro Analyse werden
-die k=3 ähnlichsten Anker abgerufen und dynamisch in den Pass-1-Prompt eingebettet.
-
-**Cold-Start:** Bei leerer Datenbank läuft die Analyse ohne Anker (nur statische
-Kalibrierungsbeispiele im Prompt). Die Collection baut sich mit jedem analysierten
-Artikel auf.
+**Consequence:** Keyword hits in articles reporting adversarial rhetoric (quality press,
+fact checks) lead to a slightly elevated `extremism_score` that the LLM corrects downward.
+Acceptable as long as the prior contribution stays at 20–30%.
 
 ---
 
-## Stufe 3: LLM als finaler Arbiter (implementiert)
+## Stage 2: Embedding Search via ChromaDB (implemented)
 
-Das LLM erhält in Pass 1:
-- Den anonymisierten Artikeltext
-- Das Keyword-Signal aus Stufe 1 (extremism_score + Treffer-Listen)
-- Die k ähnlichsten Anker mit bekannten Orwell-Index-Werten aus Stufe 2
+Instead of static few-shot examples in the prompt, **the semantically most similar
+anchor articles** are dynamically retrieved from the ChromaDB collection `orwell_anchors`.
 
-**Kernaufgabe:** Gegner-Framing erkennen, Keyword-Prior im Kontext bewerten,
-finalen Orwell-Index und Bernays-Score ausgeben.
+### Why embeddings for Orwell calibration?
+
+Extremism and political ideology manifest primarily in the **what** — which
+concepts, entities and value systems are referenced — not in the **how** (style,
+aggressiveness). Semantic embeddings capture co-occurrence patterns without
+needing to encode them explicitly.
+
+### Anchor corpus
+
+The collection is populated automatically by analysed articles. Per analysis,
+the k=3 most similar anchors are retrieved and dynamically embedded in the pass-1 prompt.
+
+**Cold start:** With an empty database the analysis runs without anchors (only static
+calibration examples in the prompt). The collection builds up with each analysed article.
 
 ---
 
-## Kernlimitation: LLM-Trainingsbias
+## Stage 3: LLM as Final Arbiter (implemented)
 
-Dies betrifft primär die **Politische Strömung** und die **Techniken-Labels**, nicht den
-Orwell-Index. Der Orwell-Index misst rhetorischen Extremismus der per Definition
-symmetrisch ist: extreme Rhetorik ist extrem unabhängig davon gegen wen sie sich richtet.
+In pass 1 the LLM receives:
+- The anonymised article text
+- The keyword signal from stage 1 (extremism_score + hit lists)
+- The k most similar anchors with known Orwell Index values from stage 2
 
-Der Bias schlägt dort durch wo das LLM entscheidet ob es ein Label wie "Scapegoating"
-vergibt. LLMs werden auf Daten trainiert die politische Diskursnormen widerspiegeln in
-denen asymmetrische Schutzregeln für verschiedene Gruppen gelten.
+**Core task:** Detect adversarial framing, evaluate keyword prior in context,
+output final Orwell Index and Bernays Score.
 
-**Das systemische Risiko:** Das Tool würde exakt den Medienbias reproduzieren den es
-aufdecken soll — nur versteckt hinter scheinbar objektiven Metriken.
+---
 
-### Teststrategie: Symmetrie-Tests via Gruppensubstitution
+## Core Limitation: LLM Training Bias
 
-Ein einzelner Ausgangstext wird durch Gruppensubstitution gespiegelt. Alle Variablen
-bleiben identisch, nur die Zielgruppe wechselt.
+Full test results and methodology: [concept/bias-validation.md](concept/bias-validation.md) · [concept/base-tests.md](concept/base-tests.md)
+
+
+This primarily affects **political leaning** and **technique labels**, not the
+Orwell Index. The Orwell Index measures rhetorical extremism which by definition
+is symmetric: extreme rhetoric is extreme regardless of its target.
+
+The bias surfaces where the LLM decides whether to assign a label like "Scapegoating".
+LLMs are trained on data that reflects political discourse norms in which
+asymmetric protection rules apply to different groups.
+
+**The systemic risk:** The tool would reproduce exactly the media bias it is
+supposed to uncover — hidden behind seemingly objective metrics.
+
+### Test strategy: symmetry tests via group substitution
+
+A single source text is mirrored through group substitution. All variables
+remain identical, only the target group changes.
 
 ```
-Ausgangstext:  "Die Juden unterwandern unsere Institutionen."
-Spiegeltext:   "Die Weißen unterwandern unsere Institutionen."
+Source text:  "The Jews are infiltrating our institutions."
+Mirror text:  "The whites are infiltrating our institutions."
 ```
 
-Beide Texte werden unabhängig analysiert. Orwell-Index, Bernays Score,
-Techniken und Labels müssen identisch oder begründbar verschieden sein.
+Both texts are analysed independently. Orwell Index, Bernays Score,
+techniques and labels must be identical or explainably different.
 
-#### Substitutionspaare
+#### Substitution pairs
 
-| Gruppe A | Gruppe B |
+| Group A | Group B |
 |---|---|
-| Juden / Muslime | Christen / Westeuropäer |
-| Schwarze / People of Color | Weiße / Europäer |
-| Migranten / Ausländer | Einheimische / Deutsche |
-| Linke / Kommunisten | Rechte / Nationalisten |
+| Jews / Muslims | Christians / Western Europeans |
+| Black people / People of colour | White people / Europeans |
+| Migrants / Foreigners | Natives / Germans |
+| Left-wing / Communists | Right-wing / Nationalists |
 
-Ergebnisse aus `docs/concept/bias-validation.md` (2026-05-26):
+Results from `docs/concept/bias-validation.md` (2026-05-26):
 
-| Metrik | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
+| Metric | Text A (Muslims) | Text B (Western Europeans) | Difference |
 |---|---|---|---|
-| Orwell-Index | 0.95 | 0.75 | **-0.20** |
+| Orwell Index | 0.95 | 0.75 | **-0.20** |
 | Bernays Score | 122.45 | 102.04 | **-20.41** |
-| DK-Index | 0.97 | 0.88 | **-0.09** |
-| Anzahl Techniken | 6 | 5 | **-1** |
+| DK Index | 0.97 | 0.88 | **-0.09** |
+| Technique count | 6 | 5 | **-1** |
 
-Orwell-Index und Bernays Score zeigen deutlichen Bias. Der DK-Index weicht mit -0.09
-ebenfalls ab — jedoch deutlich schwächer als die anderen Metriken. Entscheidend sind
-die Folgetests an realen Artikeln (Tests 02 und 03): dort ist die DK-Differenz in
-beiden Fällen **0.00** — vollständige Stabilität unabhängig von Gruppenidentifikatoren.
+Orwell Index and Bernays Score show clear bias. The DK Index also deviates at -0.09
+— but significantly less than the other metrics. Decisive are the follow-up tests
+on real articles (tests 02 and 03): there the DK difference is **0.00** in both
+cases — complete stability regardless of group identifiers.
 
-Das ist konzeptuell begründet: unbelegte Gewissheit manifestiert sich in
-Satzkonstruktion und Modalverben, nicht in der Identität der Zielgruppe. Die
-Abweichung in Test 01 erklärt sich durch den synthetischen, konstruiert extremen
-Charakter des Ausgangstexts — bei realen Artikeln greift dieser Effekt nicht.
+This is conceptually justified: unsubstantiated certainty manifests in
+sentence structure and modal verbs, not in the identity of the target group. The
+deviation in test 01 is explained by the synthetic, deliberately extreme
+character of the source text — with real articles this effect does not apply.
 
-**Architekturentscheidung:** Der DK-Index wird daher in Pass 2 am Originaltext
-gemessen, ohne Anonymisierungs-Preprocessing. Er spart damit einen LLM-Aufruf
-und liefert bei realen Artikeln zuverlässig gruppenblinde Ergebnisse.
+**Architecture decision:** The DK Index is therefore measured in pass 2 on the original text,
+without anonymisation preprocessing. This saves one LLM call
+and delivers reliably group-blind results on real articles.
 
 ---
 
-## Lösungsansatz: Zwei-Pass-Architektur (implementiert)
+## Solution: Two-Pass Architecture (implemented)
 
-Alle Gruppenidentifikatoren werden vor Pass 1 durch neutrale Platzhalter ersetzt.
-Das LLM bewertet ausschließlich die rhetorische Struktur.
+All group identifiers are replaced by neutral placeholders before pass 1.
+The LLM evaluates exclusively the rhetorical structure.
 
 ```
-Original-Text
+Original text
     │
-    ├── Anonymisierung (spaCy NER)
+    ├── Anonymisation (spaCy NER)
     │       ↓
-    ├── [Pass 1] Anonymisiert → Orwell-Index, Bernays Score, Techniken  (strukturell, bias-frei)
+    ├── [Pass 1] Anonymised → Orwell Index, Bernays Score, techniques  (structural, bias-free)
     │
-    └── [Pass 2] Original     → Politische Strömung, DK-Index, Themenbereich, Manipulation Targets
+    └── [Pass 2] Original   → Political leaning, DK Index, topic area, manipulation targets
 ```
 
-**Entscheidender Vorteil:** Die Lösung ist modellunabhängig. Das Anonymisierungs-
-Preprocessing greift vor dem LLM-Call und funktioniert mit jedem Modell identisch,
-weil der Bias strukturell ausgeschlossen wird statt durch Anweisung unterdrückt.
+**Key advantage:** The solution is model-independent. The anonymisation
+preprocessing runs before the LLM call and works identically with any model,
+because the bias is structurally excluded rather than suppressed by instruction.
 
-**DK-Index als Sonderfall:** Symmetrie-Tests haben gezeigt dass der DK-Index über alle
-Testfälle hinweg stabil bleibt — epistemische Überzeugheit manifestiert sich in
-Satzkonstruktion und Modalverben, nicht in der Identität der Zielgruppe. Er ist von
-Natur aus gruppenblind und wird in Pass 2 am Originaltext gemessen.
+**DK Index as special case:** Symmetry tests have shown that the DK Index remains
+stable across all test cases — epistemic overconfidence manifests in
+sentence structure and modal verbs, not in the identity of the target group. It is
+inherently group-blind and is measured in pass 2 on the original text.
 
 ---
 
-## Offene Punkte
+## Open Items
 
-- **Manuell kuratierter Anker-Korpus:** Die Collection baut sich automatisch auf.
-  Eine initiale Kuration mit verifizierten Referenzartikeln würde die Kalibrierung
-  in der Cold-Start-Phase verbessern.
-- **Keyword-Listen:** Die aktuellen Listen decken die politischen Extreme ab. Für
-  Mitte-Vokabular (z.B. *Freiheit, Eigenverantwortung*) fehlt eine kontextabhängige
-  Bewertung — diese Wörter erscheinen links wie rechts.
-- **Gegner-Framing-Filter:** Langfristig wäre ein heuristischer Filter sinnvoll
-  (z.B. Keywords in Anführungszeichen als "zitiert" markieren). Aktuell korrigiert
-  das LLM in Stufe 3.
-- **Symmetrie-Tests erweitern:** Weitere Substitutionspaare und Modellwechsel-Tests.
+- **Manually curated anchor corpus:** The collection builds up automatically.
+  An initial curation with verified reference articles would improve calibration
+  during the cold-start phase.
+- **Keyword lists:** The current lists cover the political extremes. For
+  centrist vocabulary (e.g. *freedom, personal responsibility*) a context-dependent
+  evaluation is missing — these words appear on both left and right.
+- **Adversarial framing filter:** Long-term a heuristic filter would be useful
+  (e.g. marking keywords in quotation marks as "cited"). Currently the LLM corrects in stage 3.
+- **Extend symmetry tests:** Additional substitution pairs and model-switch tests.
 
 ---
 
 ## Status
 
-| Komponente | Status |
+| Component | Status |
 |---|---|
-| Bernays Score | ✅ implementiert |
-| Orwell-Index (LLM + Keyword-Prior + RAG-Anker) | ✅ implementiert |
-| Anonymisierung via spaCy NER (Zwei-Pass) | ✅ implementiert |
-| Politische Strömung als Labels | ✅ implementiert |
-| DK-Index | ✅ implementiert |
-| Themenbereich-Klassifikation | ✅ implementiert |
-| Manipulation Targets (Entität, Richtung, Rolle, Zitat-Belege) | ✅ implementiert |
-| Techniken-DB mit semantischer Normalisierung | ✅ implementiert |
-| RAG via ChromaDB (dynamische Anker) | ✅ implementiert |
-| Manuell kuratierter Anker-Korpus | ⏳ offen |
-| Keyword-Listen Gegner-Framing-Filter | ⏳ offen |
-| Symmetrie-Tests erweitern | ⏳ offen |
+| Bernays Score | ✅ implemented |
+| Orwell Index (LLM + keyword prior + RAG anchors) | ✅ implemented |
+| Anonymisation via spaCy NER (two-pass) | ✅ implemented |
+| Political leaning as labels | ✅ implemented |
+| DK Index | ✅ implemented |
+| Topic area classification | ✅ implemented |
+| Manipulation targets (entity, direction, role, quote evidence) | ✅ implemented |
+| Techniques DB with semantic normalisation | ✅ implemented |
+| RAG via ChromaDB (dynamic anchors) | ✅ implemented |
+| Manually curated anchor corpus | ⏳ open |
+| Keyword lists adversarial framing filter | ⏳ open |
+| Extend symmetry tests | ⏳ open |
