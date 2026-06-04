@@ -90,9 +90,9 @@
 - [ ] **Agentur-Bias-Erkennung** — Wenn alle deutschen Portale denselben Wortlaut verwenden (hohe semantische Ähnlichkeit), als "Agenturmeldung ohne Eigenrecherche" markieren. Konsens ≠ Wahrheit.
 
 ### Qualität & Tests
-- [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Schwarze/Weiße, Migranten/Einheimische, Linke/Rechte)
-- [ ] **Pass 0 — Dynamische Gruppenidentifikation** — Neuer LLM-Pass vor der Anonymisierung. Prompt identifiziert alle Gruppenidentifikatoren im Originaltext und gibt eine strukturierte Liste zurück: `[{"term": "schwarze Jugendliche", "type": "racial"}, ...]`. Typen: `racial`, `ethnic_origin`, `religious`, `gender_identity`, `sexual_orientation`, `national_origin`. Der Anonymizer-Code (kein LLM) weist deterministisch Platzhalter zu (`Gruppe-A`, `Gruppe-B` etc.) und ersetzt im Text. LLM entscheidet nur WAS ersetzt wird, nie WOMIT — eliminiert Bias in der Ersetzung. Typen können später für Statistiken genutzt werden (welche Gruppentypen werden in welchen Quellen als Manipulationsziel verwendet).
-- [ ] **Ambige Rassenmerkmale anonymisieren** — `schwarz` und `weiß` als Rassenmerkmale (z.B. "schwarze Jugendliche", "weiße Kinder") sind kontextabhängig und können nicht per String-Replacement anonymisiert werden. Lösung: spaCy-Dependency-Parsing nutzen um Nomen-Adjektiv-Paare zu erkennen, oder separates NER-Modell für Rassenmerkmale trainieren.
+- [ ] **Symmetrie-Tests erweitern** — Weitere Substitutionspaare (Migranten/Einheimische, Linke/Rechte)
+- [x] **Pass 0 — Dynamische Gruppenidentifikation** — Implementiert: LLM-Pass vor Anonymisierung identifiziert Gruppenmarker (`[{"term": "...", "type": "racial|ethnic_origin|..."}]`). Code ersetzt deterministisch mit `Gruppe-A` etc. Validiert durch Test 04 (Symmetrie Schwarze/Weiße, Δ Orwell 0.01, Δ Bernays 0.00).
+- [ ] **Ambige Rassenmerkmale anonymisieren** — `schwarz` und `weiß` als Rassenmerkmale werden durch Pass 0 dynamisch erkannt und ersetzt. Statische Liste als Fallback bleibt für klare Fälle erhalten. Residualproblem: Pass 0 könnte Farbadjektive fälschlicherweise als Rassenmerkmale klassifizieren — Validierung ausstehend.
 - [ ] **Keyword-Listen** — Gegner-Framing-Filter (Keywords in Anführungszeichen als "zitiert" markieren)
 - [ ] **Keyword Lazy-Update** — SQLite-DB speichert Keyword-Treffer mit Kontext-Satz; periodischer Job klassifiziert affirmativ vs. zitierend und schreibt Korrekturen zurück in die Keyword-Listen
 - [ ] **Manuell kuratierter Anker-Korpus** — Initiale Kuration mit verifizierten Referenzartikeln für bessere Cold-Start-Kalibrierung
