@@ -118,8 +118,8 @@
 
 **Markdown-Dokumentation:**
 - [x] [README.md](../README.md) — Projektbeschreibung, Architektur, Installation, Konfiguration
-- [ ] [SETUP.md](../SETUP.md) — Setup-Anleitung, Fehlerbehandlung
-- [ ] [docs/project.md](project.md) — Architektur, API-Output, Konfiguration
+- [x] [SETUP.md](../SETUP.md) — Setup-Anleitung, Fehlerbehandlung
+- [x] [docs/reference.md](reference.md) — Technische Referenz: JSON-Schema, Indikatoren, Paywall, Techniken-DB
 - [ ] [docs/web_architecture.md](web_architecture.md) — Stack, Projektstruktur, API-Endpunkte
 - [ ] [docs/analyse_architektur.md](analyse_architektur.md) — Indikatoren, Zwei-Pass-Architektur (technisch komplex)
 - [ ] [docs/todo.md](todo.md) — Roadmap

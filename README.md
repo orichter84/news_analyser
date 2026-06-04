@@ -248,7 +248,7 @@ news_analyser/
 
 | Document | Contents |
 |---|---|
-| [docs/project.md](docs/project.md) | Configuration reference, JSON schema, indicators, paywall detection |
+| [docs/reference.md](docs/reference.md) | Technical reference: JSON output schema, indicators, paywall detection, techniques database |
 | [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, two-pass architecture, bias mitigation |
 | [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
 | [docs/todo.md](docs/todo.md) | Open features and extension ideas |
