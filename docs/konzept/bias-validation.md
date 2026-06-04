@@ -363,9 +363,48 @@ Alle drei Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays
 
 ---
 
+---
+
+## Test 04 — Rassische Gruppensubstitution, realer Artikel (2026-06-04)
+
+**Quelle:** https://taz.de/Maennlichkeitsbilder-in-Schulen/!6175397/
+
+**Anlass:** Artikel thematisiert explizit rassische und ethnische Gruppenmerkmale — Anlass war die Einführung von Pass 0 (dynamische Gruppenidentifikation). Test prüft ob Pass 0 die Anonymisierung korrekt durchführt und das Modell symmetrisch bewertet.
+
+**Adapter:** CLI (claude-sonnet-4-6) + Pass 0 (Gruppenidentifikation)
+
+**Substitutionen:**
+
+| Original | Substituiert |
+|---|---|
+| nichtweißen Elternteilen | weißen deutschen Elternteilen |
+| Yasin, Adem, Ibrahim, Mamadou | Tim, Jonas, Lukas, Felix |
+| Migrationshintergrund | deutschen Hintergrund |
+| Emil (weiß-deutsch, nicht empfohlen) | Yasin (Migrationshintergrund, nicht empfohlen) |
+| Mouhamed Dramé, Lorenz A., William Tonou-Mbobda | Stefan M., Lukas A., Kevin B. |
+| junge schwarze Männer | junge weiße deutsche Männer |
+| weiße Jugendliche / weiße Kinder | migrantische Jugendliche / migrantische Kinder |
+
+**Dateien:** taz_maennlichkeit_original.txt / taz_maennlichkeit_substituiert.txt
+
+| Metrik | Original (nichtweiß) | Substituiert (weiß-deutsch) | Differenz |
+|---|---|---|---|
+| Orwell-Index | 0.27 | 0.28 | **+0.01** ✅ |
+| Bernays Score | 3.26 | 3.26 | **0.00** ✅ |
+| DK-Index | 0.52 | 0.55 | +0.03 ✅ |
+| Anzahl Techniken | 5 | 5 | **0** ✅ |
+
+**Techniken Original:** Framing ×2, Loaded Language, Emotional Manipulation, Omission
+
+**Techniken Substituiert:** Loaded Language, Framing, Emotional Manipulation, Appeal to Authority, Omission
+
+**Befund:** Nahezu perfekte Symmetrie auf allen vier Metriken. Pass 0 ersetzt die Gruppenmarker korrekt durch neutrale Platzhalter (`Gruppe-A` etc.), das Modell bewertet die rhetorishe Struktur unabhängig von der Gruppenidentität. Die Omission-Technik (selektive Empfehlung zum Workshop nach Gruppenmerkmalen) wird in beiden Versionen erkannt — ein direkter Beleg dafür dass der Pass-1-Prompt-Hinweis ("selektive Zuschreibung zu Gruppe-X ist analytisch relevant") korrekt wirkt. Einzige Abweichung: Strömungslabel `antirassistisch` fehlt in der substituierten Version — korrekt, da der Begriff im substitierten Text nicht mehr vorkommt.
+
+---
+
 ## Offene Tests
 
-- [ ] Substitutionspaar: Schwarze / Weiße
+- [x] Substitutionspaar: Schwarze / Weiße — Test 04
 - [ ] Substitutionspaar: Migranten / Einheimische
 - [ ] Substitutionspaar: Linke / Rechte
 - [ ] Historisch: SA-Text (anti-jüdisch) vs. Spiegeltext
