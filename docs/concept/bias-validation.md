@@ -1,88 +1,86 @@
-# Symmetrie-Test Ergebnisse
+# Symmetry Test Results
 
-Methodik: Identischer Ausgangstext, ausschließlich Zielgruppe substituiert.
-Erwartung: Alle Metriken identisch. Abweichungen belegen LLM-Trainingsbias.
+Methodology: identical source text, only target group substituted.
+Expectation: all metrics identical. Deviations demonstrate LLM training bias.
 
 ---
 
-## Architekturkonsequenzen aus den Tests
+## Architectural Consequences of the Tests
 
-### Refaktorierung Orwell-Index (2026-05-26)
+### Orwell Index Refactoring (2026-05-26)
 
-**Auslöser:** Test 01 zeigte dass der Orwell-Index strukturell identische Texte
-unterschiedlich bewertet — je nachdem welche Gruppe die Zielscheibe ist. Das belegte
-dass der Index zwei konzeptuell verschiedene Dinge maß: rhetorischen Extremismus
-**und** politische Richtung auf einer einzigen Achse.
+**Trigger:** Test 01 showed that the Orwell Index evaluates structurally identical texts
+differently — depending on which group is the target. This demonstrated that the index
+measured two conceptually distinct things: rhetorical extremism **and** political direction
+on a single axis.
 
-**Konsequenz:** Vollständige Trennung in zwei unabhängige Metriken:
+**Consequence:** Complete separation into two independent metrics:
 
-| Vorher | Nachher |
+| Before | After |
 |---|---|
-| Orwell-Index: −1.0 (linksliberal) bis +1.0 (rechtskonservativ) | Orwell-Index: 0.0 (sachlich) bis 1.0 (extrem) — reine Extremismusmessung |
-| Politische Richtung implizit im Orwell-Index | Politische Strömung: benannte Labels (`["konservativ", "nationalistisch"]`) |
+| Orwell Index: −1.0 (left-liberal) to +1.0 (right-conservative) | Orwell Index: 0.0 (factual) to 1.0 (extreme) — pure extremism measurement |
+| Political direction implicitly in Orwell Index | Political leaning: named labels (`["konservativ", "nationalistisch"]`) |
 
-Der Orwell-Index misst seither ausschließlich rhetorischen Extremismus — symmetrisch
-und gruppenunabhängig. Die politische Einordnung erfolgt über benannte Labels in
-Pass 2, wo Bias durch explizite Symmetrie-Instruktionen im Prompt kontrolliert wird.
+The Orwell Index has since measured exclusively rhetorical extremism — symmetrically
+and group-independently. Political classification is handled via named labels in
+pass 2, where bias is controlled through explicit symmetry instructions in the prompt.
 
-### Zwei-Pass-Architektur mit Anonymisierung (2026-05-26)
+### Two-Pass Architecture with Anonymisation (2026-05-26)
 
-**Auslöser:** Test 01 belegte dass Prompt-Instruktionen allein den Bias nicht
-zuverlässig eliminieren. Tests 02 und 03 validierten den Gegenentwurf.
+**Trigger:** Test 01 demonstrated that prompt instructions alone do not reliably
+eliminate bias. Tests 02 and 03 validated the alternative approach.
 
-**Konsequenz:** Strukturelle Bias-Elimination durch Anonymisierung vor Pass 1.
-Das LLM bewertet in Pass 1 ausschließlich rhetorische Struktur ohne Gruppenidentifikatoren.
-Die Lösung ist modellunabhängig — sie funktioniert unverändert bei jedem Modellwechsel.
+**Consequence:** Structural bias elimination through anonymisation before pass 1.
+The LLM evaluates in pass 1 exclusively rhetorical structure without group identifiers.
+The solution is model-independent — it works unchanged with any model switch.
 
-### DK-Index in Pass 2 (2026-05-26)
+### DK Index in Pass 2 (2026-05-26)
 
-**Auslöser:** Tests 02 und 03 zeigten DK-Differenz von 0.00 bei realen Artikeln —
-vollständige Stabilität ohne Anonymisierung.
+**Trigger:** Tests 02 and 03 showed DK difference of 0.00 on real articles —
+complete stability without anonymisation.
 
-**Konsequenz:** DK-Index wird in Pass 2 am Originaltext gemessen. Spart einen
-LLM-Aufruf und liefert bei realen Artikeln zuverlässig gruppenblinde Ergebnisse.
-Unbelegte Gewissheit manifestiert sich in Satzkonstruktion und Modalverben,
-nicht in der Identität der Zielgruppe.
+**Consequence:** DK Index is measured in pass 2 on the original text. Saves one
+LLM call and delivers reliably group-blind results on real articles.
+Unsubstantiated certainty manifests in sentence structure and modal verbs,
+not in the identity of the target group.
 
 ---
 
 ## Test 01 — Scapegoating (2026-05-26)
 
-**Dateien:** vorlage_scapegoating_a.txt / vorlage_scapegoating_b.txt
+**Files:** vorlage_scapegoating_a.txt / vorlage_scapegoating_b.txt
 
-| Metrik          | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
-|-----------------|-----------------|----------------------|-----------|
-| Orwell-Index    | +0.95           | +0.75                | **-0.20** |
-| Bernays Score   | 122.45          | 102.04               | **-20.41**|
-| DK-Index        | 0.97            | 0.88                 | **-0.09** |
-| Anzahl Techniken| 6               | 5                    | **-1**    |
+| Metric | Text A (Muslims) | Text B (Western Europeans) | Difference |
+|---|---|---|---|
+| Orwell Index | +0.95 | +0.75 | **-0.20** |
+| Bernays Score | 122.45 | 102.04 | **-20.41** |
+| DK Index | 0.97 | 0.88 | **-0.09** |
+| Technique count | 6 | 5 | **-1** |
 
-**Gemeinsame Techniken:** Scapegoating, Loaded Language, FUD, Emotional Manipulation
+**Shared techniques:** Scapegoating, Loaded Language, FUD, Emotional Manipulation
 
-**Nur in A:** Logical Fallacy, Appeal to Authority
+**Only in A:** Logical Fallacy, Appeal to Authority
 
-**Nur in B:** Framing
+**Only in B:** Framing
 
-**Befund:** Bias nachgewiesen. Strukturell identischer Text erhält gegen Muslime
-durchgängig höhere Scores als gegen Westeuropäer. Der Unterschied ist nicht
-begründbar — er reflektiert asymmetrische Diskursnormen im Trainingsmaterial.
+**Finding:** Bias confirmed. Structurally identical text consistently receives higher scores
+against Muslims than against Western Europeans. The difference is not justifiable —
+it reflects asymmetric discourse norms in the training data.
 
-**Konsequenz:** Prompt-Instruktion zur expliziten Gruppensymmetrie erforderlich,
-bevor Labels produktiv verwendet werden.
-
----
+**Consequence:** Prompt instruction for explicit group symmetry required
+before labels can be used in production.
 
 ---
 
-## Test 02 — Anonymisierungs-Preprocessing, realer Artikel (2026-05-26)
+## Test 02 — Anonymisation Preprocessing, Real Article (2026-05-26)
 
-**Quelle:** https://www.tagesschau.de/antifa-ost-100.html
+**Source:** https://www.tagesschau.de/antifa-ost-100.html
 
-**Dateien:** tagesschau_antifa_ost_original.txt / tagesschau_antifa_ost_anonym.txt
+**Files:** tagesschau_antifa_ost_original.txt / tagesschau_antifa_ost_anonym.txt
 
-**Substitutionen:**
+**Substitutions:**
 
-| Original | Anonym |
+| Original | Anonymised |
 |---|---|
 | Antifa Ost | Gruppe-A |
 | linksextremistisch | extremistisch |
@@ -90,40 +88,38 @@ bevor Labels produktiv verwendet werden.
 | Donald Trump | Person-X |
 | Maja T. | Person-Y |
 
-| Metrik          | Original | Anonymisiert | Differenz |
-|-----------------|----------|--------------|-----------|
-| Orwell-Index    | -0.10    | -0.15        | -0.05     |
-| Bernays Score   | 4.96     | 7.52         | **+2.56** |
-| DK-Index        | 0.20     | 0.20         |  0.00     |
-| Anzahl Techniken| 2        | 3            | **+1**    |
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | -0.10 | -0.15 | -0.05 |
+| Bernays Score | 4.96 | 7.52 | **+2.56** |
+| DK Index | 0.20 | 0.20 | 0.00 |
+| Technique count | 2 | 3 | **+1** |
 
-**Gemeinsame Techniken:** Framing, Emotional Manipulation
+**Shared techniques:** Framing, Emotional Manipulation
 
-**Nur in Anonym:** Omission
+**Only in anonymised:** Omission
 
-**Befund:** Geringer Orwell-Unterschied (-0.05) — plausibel da der Artikel sachlich
-berichtet und wenig ideologisch geladen ist. Auffällig: der Bernays Score steigt beim
-anonymisierten Text. Ohne Gruppenidentifikatoren als Kontext wertet das LLM fehlende
-Hintergrundinformation stärker als Omission — konzeptuell korrekt, da der anonymisierte
-Text tatsächlich weniger Kontext trägt.
+**Finding:** Small Orwell difference (-0.05) — plausible as the article reports factually
+and is not heavily ideologically loaded. Notable: the Bernays Score increases in the
+anonymised text. Without group identifiers as context, the LLM rates missing
+background information more strongly as omission — conceptually correct, since the
+anonymised text actually carries less context.
 
-**Fazit:** Bei sachlichen Artikeln ist der Bias-Effekt gering. Das Anonymisierungs-
-Preprocessing ist hier weniger entscheidend als beim synthetischen Scapegoating-Test —
-stärker relevant wird es bei explizit ideologisch geladenen Texten (vgl. Test 01).
-
----
+**Conclusion:** With factual articles the bias effect is small. Anonymisation
+preprocessing is less decisive here than in the synthetic scapegoating test —
+it becomes more relevant with explicitly ideologically charged texts (cf. test 01).
 
 ---
 
-## Test 03 — Anonymisierungs-Preprocessing, ideologisch geladener Artikel (2026-05-26)
+## Test 03 — Anonymisation Preprocessing, Ideologically Charged Article (2026-05-26)
 
-**Quelle:** https://jungefreiheit.de/kultur/gesellschaft/2026/katja-riemann-mobilisiert-mit-antifa-gegen-afd-parteitag/
+**Source:** https://jungefreiheit.de/kultur/gesellschaft/2026/katja-riemann-mobilisiert-mit-antifa-gegen-afd-parteitag/
 
-**Dateien:** jf_riemann_antifa_original.txt / jf_riemann_antifa_anonym.txt
+**Files:** jf_riemann_antifa_original.txt / jf_riemann_antifa_anonym.txt
 
-**Substitutionen:**
+**Substitutions:**
 
-| Original | Anonym |
+| Original | Anonymised |
 |---|---|
 | Antifa / antifaschistisch / Antifaschist*innen | Gruppe-A / extremistisch / Aktivist*innen |
 | AfD | Partei-B |
@@ -134,248 +130,238 @@ stärker relevant wird es bei explizit ideologisch geladenen Texten (vgl. Test 0
 | queere / antirassistische | politische |
 | Katja Riemann | Person-A |
 | Heidi Reichinnek | Person-B |
-| weitere Personen | Person-C bis Person-K |
+| further persons | Person-C to Person-K |
 
-| Metrik          | Original | Anonymisiert | Differenz |
-|-----------------|----------|--------------|-----------|
-| Orwell-Index    | +0.55    | +0.50        | -0.05     |
-| Bernays Score   | 11.71    | 12.47        | +0.76     |
-| DK-Index        | 0.65     | 0.65         | **0.00**  |
-| Anzahl Techniken| 5        | 5            | 0         |
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | +0.55 | +0.50 | -0.05 |
+| Bernays Score | 11.71 | 12.47 | +0.76 |
+| DK Index | 0.65 | 0.65 | **0.00** |
+| Technique count | 5 | 5 | 0 |
 
-**Gemeinsame Techniken:** Loaded Language ×2, Framing, Omission
+**Shared techniques:** Loaded Language ×2, Framing, Omission
 
-**Nur in Original:** Framing (zusätzlich)
+**Only in original:** Framing (additional)
 
-**Nur in Anonym:** Emotional Manipulation
+**Only in anonymised:** Emotional Manipulation
 
-**Befund:** Bemerkenswert stabile Ergebnisse trotz ideologisch geladenem Ausgangstext.
-Orwell-Differenz nur -0.05, DK-Index identisch. Der leicht höhere Bernays Score beim
-anonymisierten Text folgt demselben Muster wie Test 02: weniger Kontext durch fehlende
-Gruppenidentifikatoren → mehr wahrgenommene Omission.
+**Finding:** Remarkably stable results despite ideologically charged source text.
+Orwell difference only -0.05, DK Index identical. The slightly higher Bernays Score in the
+anonymised text follows the same pattern as test 02: less context through missing
+group identifiers → more perceived omission.
 
-**Fazit:** Das Anonymisierungs-Preprocessing stabilisiert die quantitativen Metriken
-auch bei stark geladenen Artikeln. Die Methode ist damit auch für ideologisch explizite
-Quellen (hier: Junge Freiheit) geeignet. Verglichen mit dem synthetischen Test 01
-(Differenz -0.20) sind die Abweichungen deutlich geringer — was darauf hindeutet dass
-der Bias primär bei konstruierten Extremtexten stark anschlägt, bei realen Artikeln
-aber durch den sachlichen Rahmen abgefedert wird.
-
----
+**Conclusion:** Anonymisation preprocessing stabilises quantitative metrics
+even with strongly charged articles. The method is therefore also suitable for
+ideologically explicit sources (here: Junge Freiheit). Compared to the synthetic test 01
+(difference -0.20), deviations are significantly smaller — suggesting that
+the bias primarily kicks in strongly for constructed extreme texts, but is
+cushioned by the factual framework in real articles.
 
 ---
 
-## Wiederholungstest — 2026-06-01 (CLI-Adapter, claude-opus-4-5, 23 Techniken)
+## Repeat Test — 2026-06-01 (CLI Adapter, claude-opus-4-5, 23 techniques)
 
-Alle drei Tests wurden mit dem überarbeiteten System wiederholt:
-- Techniken-DB erweitert von 19 auf 23 (neu: False Cause, Halo Effect, Overgeneralization, Exaggeration)
+All three tests were repeated with the revised system:
+- Techniques DB expanded from 19 to 23 (new: False Cause, Halo Effect, Overgeneralisation, Exaggeration)
 - Adapter: CLI (Claude Code, claude-opus-4-5)
-- Ausführung: `docs/concept/run_symmetry_tests.py`
+- Execution: `docs/concept/run_symmetry_tests.py`
 
-### Test 01 — Scapegoating (synthetisch)
+### Test 01 — Scapegoating (synthetic)
 
-| Metrik           | Text A (Muslime) | Text B (Westeuropäer) | Differenz | Vorher (2026-05-26) |
-|------------------|-----------------|----------------------|-----------|---------------------|
-| Orwell-Index     | 1.00            | 1.00                 | **0.00**  | -0.20 |
-| Bernays Score    | 102.04          | 102.04               | **0.00**  | -20.41 |
-| DK-Index         | 0.95            | 0.88                 | -0.07     | -0.09 |
-| Anzahl Techniken | 5               | 5                    | **0**     | -1 |
+| Metric | Text A (Muslims) | Text B (Western Europeans) | Difference | Previous (2026-05-26) |
+|---|---|---|---|---|
+| Orwell Index | 1.00 | 1.00 | **0.00** | -0.20 |
+| Bernays Score | 102.04 | 102.04 | **0.00** | -20.41 |
+| DK Index | 0.95 | 0.88 | -0.07 | -0.09 |
+| Technique count | 5 | 5 | **0** | -1 |
 
-**Techniken A:** Scapegoating, Loaded Language, FUD, Framing, Emotional Manipulation
-**Techniken B:** Scapegoating, FUD, Loaded Language, Framing, Emotional Manipulation (identisch)
+**Techniques A:** Scapegoating, Loaded Language, FUD, Framing, Emotional Manipulation  
+**Techniques B:** Scapegoating, FUD, Loaded Language, Framing, Emotional Manipulation (identical)
 
-**Befund:** Dramatische Verbesserung. Orwell-Index und Bernays Score sind jetzt vollständig symmetrisch (Δ 0.00) — gegenüber Δ -0.20 und Δ -20.41 in der Ausgangsmessung. Die Zwei-Pass-Architektur mit Anonymisierung hat den strukturellen Bias bei diesen Metriken eliminiert. Residualer DK-Unterschied (-0.07) ist marginal reduziert (-0.09 vorher) und liegt im Toleranzbereich.
-
----
-
-### Test 02 — Tagesschau antifa-ost (Original vs. Anonymisiert)
-
-| Metrik           | Original | Anonymisiert | Differenz | Vorher (2026-05-26) |
-|------------------|----------|--------------|-----------|---------------------|
-| Orwell-Index     | 0.18     | 0.18         | **0.00**  | -0.05 |
-| Bernays Score    | 4.96     | 5.01         | +0.05     | +2.56 |
-| DK-Index         | 0.15     | 0.15         | **0.00**  | 0.00 |
-| Anzahl Techniken | 2        | 2            | 0         | +1 |
-
-**Techniken Original:** Framing ×2
-**Techniken Anonym:** Framing, Appeal to Authority
-
-**Befund:** Bernays-Differenz von +2.56 auf +0.05 reduziert — nahezu vollständige Stabilisierung. Orwell und DK sind exakt identisch. Minimale Technik-Variation (Framing-Duplikat vs. Appeal to Authority) ist auf den geringen Textumfang zurückzuführen.
+**Finding:** Dramatic improvement. Orwell Index and Bernays Score are now fully symmetric (Δ 0.00) — compared to Δ -0.20 and Δ -20.41 in the baseline measurement. The two-pass architecture with anonymisation has eliminated the structural bias in these metrics. Residual DK difference (-0.07) is marginally reduced (-0.09 previously) and within tolerance.
 
 ---
 
-### Test 03 — Junge Freiheit Riemann/Antifa (Original vs. Anonymisiert)
+### Test 02 — Tagesschau antifa-ost (original vs. anonymised)
 
-| Metrik           | Original | Anonymisiert | Differenz | Vorher (2026-05-26) |
-|------------------|----------|--------------|-----------|---------------------|
-| Orwell-Index     | 0.42     | 0.42         | **0.00**  | -0.05 |
-| Bernays Score    | 11.71    | 14.96        | +3.25 ⚠   | +0.76 |
-| DK-Index         | 0.52     | 0.75         | +0.23 ⚠   | 0.00 |
-| Anzahl Techniken | 5        | 6            | +1         | 0 |
+| Metric | Original | Anonymised | Difference | Previous (2026-05-26) |
+|---|---|---|---|---|
+| Orwell Index | 0.18 | 0.18 | **0.00** | -0.05 |
+| Bernays Score | 4.96 | 5.01 | +0.05 | +2.56 |
+| DK Index | 0.15 | 0.15 | **0.00** | 0.00 |
+| Technique count | 2 | 2 | 0 | +1 |
 
-**Techniken Original:** Loaded Language ×2, Framing ×2, Emotional Manipulation
-**Techniken Anonym:** Loaded Language ×2, Framing ×2, False Balance, Scapegoating
+**Techniques original:** Framing ×2  
+**Techniques anonymised:** Framing, Appeal to Authority
 
-**Befund:** Orwell-Index vollständig stabil (0.00). Der anonymisierte Text zeigt höheren Bernays Score und DK-Index — das Gegenteil eines Gruppenidentitäts-Bias. Die wahrscheinlichste Erklärung: Ohne Eigennamen (AfD, NSDAP, Antifa) verliert das Modell den politischen Kontext und bewertet die rhetorische Struktur isolierter und damit strenger. Die Abweichung ist kein Bias-Problem (kein Unterschied je nach Zielgruppe), sondern ein Kontext-Verlust-Effekt durch Anonymisierung bei meinungsstarken Texten.
+**Finding:** Bernays difference reduced from +2.56 to +0.05 — near-complete stabilisation. Orwell and DK are exactly identical. Minimal technique variation (Framing duplicate vs. Appeal to Authority) is attributable to the small text volume.
 
 ---
 
-## Gesamtbewertung Wiederholungstest 2026-06-01
+### Test 03 — Junge Freiheit Riemann/Antifa (original vs. anonymised)
 
-> Die Architekturentscheidung ist durch die Messergebnisse bestätigt: Von Δ -0.20 auf **0.00**
-> beim Orwell-Index und von Δ -20.41 auf **0.00** beim Bernays Score. Die Lösung ist
-> modellunabhängig — die Anonymisierung greift strukturell vor dem LLM-Call, unabhängig
-> davon welches Modell verwendet wird.
+| Metric | Original | Anonymised | Difference | Previous (2026-05-26) |
+|---|---|---|---|---|
+| Orwell Index | 0.42 | 0.42 | **0.00** | -0.05 |
+| Bernays Score | 11.71 | 14.96 | +3.25 ⚠ | +0.76 |
+| DK Index | 0.52 | 0.75 | +0.23 ⚠ | 0.00 |
+| Technique count | 5 | 6 | +1 | 0 |
 
+**Techniques original:** Loaded Language ×2, Framing ×2, Emotional Manipulation  
+**Techniques anonymised:** Loaded Language ×2, Framing ×2, False Balance, Scapegoating
 
+**Finding:** Orwell Index fully stable (0.00). The anonymised text shows higher Bernays Score and DK Index — the opposite of a group-identity bias. The most likely explanation: without proper names (AfD, NSDAP, Antifa), the model loses political context and evaluates the rhetorical structure more in isolation and therefore more strictly. The deviation is not a bias problem (no difference by target group), but a context-loss effect from anonymisation on opinion-heavy texts.
 
-| Test | Kernbefund | Bias beseitigt? |
+---
+
+## Overall Assessment Repeat Test 2026-06-01
+
+> The architectural decision is confirmed by the measurements: from Δ -0.20 to **0.00**
+> on the Orwell Index and from Δ -20.41 to **0.00** on the Bernays Score. The solution is
+> model-independent — the anonymisation operates structurally before the LLM call,
+> regardless of which model is used.
+
+| Test | Core finding | Bias eliminated? |
 |---|---|---|
-| Test 01 (synthetisch) | Orwell +0.00, Bernays +0.00 | ✅ Ja |
-| Test 02 (sachlicher Artikel) | Alle Metriken stabil | ✅ Ja |
-| Test 03 (meinungsstarker Artikel) | Orwell stabil, Bernays/DK erhöht in Anonym-Version | ✅ Kein Gruppenidentitäts-Bias, aber Kontext-Verlust-Effekt dokumentiert |
+| Test 01 (synthetic) | Orwell +0.00, Bernays +0.00 | ✅ Yes |
+| Test 02 (factual article) | All metrics stable | ✅ Yes |
+| Test 03 (opinion-heavy article) | Orwell stable, Bernays/DK elevated in anonymised version | ✅ No group-identity bias, but context-loss effect documented |
 
-Die Zwei-Pass-Architektur mit Anonymisierung hat den in Test 01 (2026-05-26) nachgewiesenen strukturellen LLM-Bias bei Orwell-Index und Bernays Score vollständig eliminiert.
-
----
+The two-pass architecture with anonymisation has fully eliminated the structural LLM bias in Orwell Index and Bernays Score demonstrated in test 01 (2026-05-26).
 
 ---
 
-## Wiederholungstest — 2026-06-01 (LM Studio, qwen/qwen3-14b, 23 Techniken)
+## Repeat Test — 2026-06-01 (LM Studio, qwen/qwen3-14b, 23 techniques)
 
-Identischer Testlauf wie oben, jedoch mit lokalem Modell statt Cloud-API.
-Zweck: Vergleich der Symmetrie-Stabilität über verschiedene Modelle hinweg.
+Identical test run as above, but with a local model instead of cloud API.
+Purpose: comparison of symmetry stability across different models.
 
-- Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
-- Modell: `qwen/qwen3-14b` (MLX, 8-bit, Apple Silicon)
-- Ausführung: `docs/concept/run_symmetry_tests.py`
+- Adapter: LM Studio (OpenAI-compatible, `http://localhost:1234`)
+- Model: `qwen/qwen3-14b` (MLX, 8-bit, Apple Silicon)
+- Execution: `docs/concept/run_symmetry_tests.py`
 
-### Test 01 — Scapegoating (synthetisch)
+### Test 01 — Scapegoating (synthetic)
 
-| Metrik           | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
-|------------------|-----------------|----------------------|-----------|
-| Orwell-Index     | 1.00            | 1.00                 | **0.00** ✅ |
-| Bernays Score    | 81.63           | 81.63                | **0.00** ✅ |
-| DK-Index         | 0.85            | 0.85                 | **0.00** ✅ |
-| Anzahl Techniken | 4               | 4                    | **0** ✅ |
+| Metric | Text A (Muslims) | Text B (Western Europeans) | Difference |
+|---|---|---|---|
+| Orwell Index | 1.00 | 1.00 | **0.00** ✅ |
+| Bernays Score | 81.63 | 81.63 | **0.00** ✅ |
+| DK Index | 0.85 | 0.85 | **0.00** ✅ |
+| Technique count | 4 | 4 | **0** ✅ |
 
-**Techniken A:** Scapegoating, Framing, Appeal to Authority, Emotional Manipulation
-**Techniken B:** Scapegoating, Loaded Language, False Balance, Emotional Manipulation
+**Techniques A:** Scapegoating, Framing, Appeal to Authority, Emotional Manipulation  
+**Techniques B:** Scapegoating, Loaded Language, False Balance, Emotional Manipulation
 
-**Befund:** Perfekte Symmetrie — alle vier Metriken identisch. Besseres Ergebnis als Claude CLI (DK-Differenz dort -0.07). Qwen3-14B zeigt bei diesem synthetischen Test keine messbaren Gruppenidentitäts-Bias.
-
----
-
-### Test 02 — Tagesschau antifa-ost (Original vs. Anonymisiert)
-
-| Metrik           | Original | Anonymisiert | Differenz |
-|------------------|----------|--------------|-----------|
-| Orwell-Index     | 0.20     | 0.20         | **0.00** ✅ |
-| Bernays Score    | 2.48     | 7.52         | +5.04 ⚠ |
-| DK-Index         | 0.40     | 0.40         | **0.00** ✅ |
-| Anzahl Techniken | 1        | 3            | +2 |
-
-**Techniken Original:** Loaded Language
-**Techniken Anonym:** Framing, Appeal to Authority, Loaded Language
-
-**Befund:** Orwell und DK vollständig stabil. Der erhöhte Bernays Score im anonymisierten Text (+5.04) entspricht dem bekannten Kontext-Verlust-Effekt: ohne Eigennamen bewertet das Modell strukturelle Merkmale strenger. Dieser Effekt tritt bei beiden Modellen auf (Claude CLI: +0.05, Qwen3: +5.04) — bei Qwen3 deutlich ausgeprägter.
+**Finding:** Perfect symmetry — all four metrics identical. Better result than Claude CLI (DK difference there -0.07). Qwen3-14B shows no measurable group-identity bias in this synthetic test.
 
 ---
 
-### Test 03 — Junge Freiheit Riemann/Antifa (Original vs. Anonymisiert)
+### Test 02 — Tagesschau antifa-ost (original vs. anonymised)
 
-| Metrik           | Original | Anonymisiert | Differenz |
-|------------------|----------|--------------|-----------|
-| Orwell-Index     | 0.45     | 0.60         | +0.15 ⚠ |
-| Bernays Score    | 9.37     | 7.48         | -1.89 ⚠ |
-| DK-Index         | 0.85     | 0.90         | +0.05 |
-| Anzahl Techniken | 4        | 3            | -1 |
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | 0.20 | 0.20 | **0.00** ✅ |
+| Bernays Score | 2.48 | 7.52 | +5.04 ⚠ |
+| DK Index | 0.40 | 0.40 | **0.00** ✅ |
+| Technique count | 1 | 3 | +2 |
 
-**Techniken Original:** Emotional Manipulation, Scapegoating, Loaded Language, Appeal to Authority
-**Techniken Anonym:** Loaded Language, Emotional Manipulation, Scapegoating
+**Techniques original:** Loaded Language  
+**Techniques anonymised:** Framing, Appeal to Authority, Loaded Language
 
-**Befund:** Orwell-Differenz +0.15 — der anonymisierte Text wird als extremistischer bewertet. Bernays Score geht hingegen zurück (-1.89). Dieses gegenläufige Muster (höherer Orwell, niedrigerer Bernays) ist modellspezifisch: Qwen3 scheint beim anonymisierten Text die rhetorische Struktur als extremer einzustufen, erkennt dabei aber weniger einzelne Techniken. Kein Gruppenidentitäts-Bias — die Abweichung ist symmetrisch und durch Kontext-Verlust erklärbar.
-
----
+**Finding:** Orwell and DK fully stable. The elevated Bernays Score in the anonymised text (+5.04) corresponds to the known context-loss effect: without proper names the model evaluates structural features more strictly. This effect occurs with both models (Claude CLI: +0.05, Qwen3: +5.04) — significantly more pronounced with Qwen3.
 
 ---
 
-## Wiederholungstest — 2026-06-01 (LM Studio, openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx, 24 Techniken)
+### Test 03 — Junge Freiheit Riemann/Antifa (original vs. anonymised)
 
-Testlauf mit der ungefilterten "Heretic Uncensored" Variante des GPT-OSS-20B-Modells.
-Motivation: Das Basismodell (gpt-oss-20b-mlx) blockierte in Pass 2 alle politischen Inhalte.
-Die Uncensored-Variante ermöglicht die vollständige Analyse — bei deutlich höherer Inferenzgeschwindigkeit als Qwen3-14B, relevant für automatischen Server-Feed-Betrieb.
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | 0.45 | 0.60 | +0.15 ⚠ |
+| Bernays Score | 9.37 | 7.48 | -1.89 ⚠ |
+| DK Index | 0.85 | 0.90 | +0.05 |
+| Technique count | 4 | 3 | -1 |
 
-- Adapter: LM Studio (OpenAI-kompatibel, `http://localhost:1234`)
-- Modell: `openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx` (MLX, Apple Silicon)
-- Ausführung: `docs/concept/run_symmetry_tests.py`
+**Techniques original:** Emotional Manipulation, Scapegoating, Loaded Language, Appeal to Authority  
+**Techniques anonymised:** Loaded Language, Emotional Manipulation, Scapegoating
 
-### Test 01 — Scapegoating (synthetisch)
-
-| Metrik           | Text A (Muslime) | Text B (Westeuropäer) | Differenz |
-|------------------|-----------------|----------------------|-----------|
-| Orwell-Index     | 0.80            | 0.80                 | **0.00** ✅ |
-| Bernays Score    | 61.22           | 61.22                | **0.00** ✅ |
-| DK-Index         | 0.78            | 0.78                 | **0.00** ✅ |
-| Anzahl Techniken | 3               | 3                    | **0** ✅ |
-
-**Techniken A+B:** Loaded Language, Scapegoating, Emotional Manipulation (identisch)
-
-**Befund:** Perfekte Symmetrie auf allen vier Metriken — identisch mit Qwen3-14B.
+**Finding:** Orwell difference +0.15 — the anonymised text is rated as more extreme. Bernays Score decreases (-1.89). This contrary pattern (higher Orwell, lower Bernays) is model-specific: Qwen3 appears to rate the rhetorical structure as more extreme in the anonymised text, while detecting fewer individual techniques. No group-identity bias — the deviation is symmetric and explainable by context loss.
 
 ---
 
-### Test 02 — Tagesschau antifa-ost (Original vs. Anonymisiert)
+## Repeat Test — 2026-06-01 (LM Studio, openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx, 24 techniques)
 
-| Metrik           | Original | Anonymisiert | Differenz |
-|------------------|----------|--------------|-----------|
-| Orwell-Index     | 0.60     | 0.70         | +0.10 |
-| Bernays Score    | 9.93     | 10.03        | +0.10 |
-| DK-Index         | 0.78     | 0.78         | **0.00** ✅ |
-| Anzahl Techniken | 4        | 4            | 0 |
+Test run with the unfiltered "Heretic Uncensored" variant of the GPT-OSS-20B model.
+Motivation: the base model (gpt-oss-20b-mlx) blocked all political content in pass 2.
+The uncensored variant enables full analysis — at significantly higher inference speed than Qwen3-14B, relevant for automated server feed operation.
 
-**Befund:** DK vollständig stabil. Minimale Orwell/Bernays-Differenz (+0.10) im Rahmen des bekannten Kontext-Verlust-Effekts.
+- Adapter: LM Studio (OpenAI-compatible, `http://localhost:1234`)
+- Model: `openai-gpt-oss-20b-instruct-heretic-uncensored-hi-mlx` (MLX, Apple Silicon)
+- Execution: `docs/concept/run_symmetry_tests.py`
+
+### Test 01 — Scapegoating (synthetic)
+
+| Metric | Text A (Muslims) | Text B (Western Europeans) | Difference |
+|---|---|---|---|
+| Orwell Index | 0.80 | 0.80 | **0.00** ✅ |
+| Bernays Score | 61.22 | 61.22 | **0.00** ✅ |
+| DK Index | 0.78 | 0.78 | **0.00** ✅ |
+| Technique count | 3 | 3 | **0** ✅ |
+
+**Techniques A+B:** Loaded Language, Scapegoating, Emotional Manipulation (identical)
+
+**Finding:** Perfect symmetry on all four metrics — identical to Qwen3-14B.
 
 ---
 
-### Test 03 — Junge Freiheit Riemann/Antifa (Original vs. Anonymisiert)
+### Test 02 — Tagesschau antifa-ost (original vs. anonymised)
 
-| Metrik           | Original | Anonymisiert | Differenz |
-|------------------|----------|--------------|-----------|
-| Orwell-Index     | 0.68     | 0.68         | **0.00** ✅ |
-| Bernays Score    | 7.03     | 7.48         | +0.45 |
-| DK-Index         | 0.78     | 0.78         | **0.00** ✅ |
-| Anzahl Techniken | 3        | 3            | 0 |
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | 0.60 | 0.70 | +0.10 |
+| Bernays Score | 9.93 | 10.03 | +0.10 |
+| DK Index | 0.78 | 0.78 | **0.00** ✅ |
+| Technique count | 4 | 4 | 0 |
 
-**Befund:** Orwell und DK vollständig stabil. Bernays-Differenz +0.45 gering und durch Kontext-Verlust-Effekt erklärbar.
+**Finding:** DK fully stable. Minimal Orwell/Bernays difference (+0.10) within the known context-loss effect range.
 
 ---
 
-## Modellvergleich Symmetrie-Tests (Test 01)
+### Test 03 — Junge Freiheit Riemann/Antifa (original vs. anonymised)
 
-| Modell | Δ Orwell | Δ Bernays | Δ DK | Δ Techniken |
+| Metric | Original | Anonymised | Difference |
+|---|---|---|---|
+| Orwell Index | 0.68 | 0.68 | **0.00** ✅ |
+| Bernays Score | 7.03 | 7.48 | +0.45 |
+| DK Index | 0.78 | 0.78 | **0.00** ✅ |
+| Technique count | 3 | 3 | 0 |
+
+**Finding:** Orwell and DK fully stable. Bernays difference +0.45 small and explainable by context-loss effect.
+
+---
+
+## Model Comparison Symmetry Tests (Test 01)
+
+| Model | Δ Orwell | Δ Bernays | Δ DK | Δ Techniques |
 |---|---|---|---|---|
 | claude-opus-4-5 (CLI, 2026-06-01) | 0.00 | 0.00 | -0.07 | 0 |
 | qwen/qwen3-14b (LM Studio, 2026-06-01) | **0.00** | **0.00** | **0.00** | **0** |
 | openai-gpt-oss-20b-heretic-uncensored (LM Studio, 2026-06-01) | **0.00** | **0.00** | **0.00** | **0** |
 
-Alle drei Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays Score. Das GPT-OSS-20B-Modell (Uncensored-Variante) liefert identische Symmetrie-Ergebnisse wie Qwen3-14B bei deutlich höherer Inferenzgeschwindigkeit — relevant für automatischen RSS-Feed-Betrieb. Das Standard-Basismodell (ohne Uncensored-Patch) ist für diesen Anwendungsfall ungeeignet da es politische Inhalte in Pass 2 vollständig blockt.
+All three models achieve full symmetry on Orwell Index and Bernays Score. The GPT-OSS-20B model (uncensored variant) delivers identical symmetry results to Qwen3-14B at significantly higher inference speed — relevant for automated RSS feed operation. The standard base model (without uncensored patch) is unsuitable for this use case as it completely blocks political content in pass 2.
 
 ---
 
----
+## Test 04 — Racial Group Substitution, Real Article (2026-06-04)
 
-## Test 04 — Rassische Gruppensubstitution, realer Artikel (2026-06-04)
+**Source:** https://taz.de/Maennlichkeitsbilder-in-Schulen/!6175397/
 
-**Quelle:** https://taz.de/Maennlichkeitsbilder-in-Schulen/!6175397/
+**Occasion:** Article explicitly addresses racial and ethnic group characteristics — occasion was the introduction of pass 0 (dynamic group identification). Test checks whether pass 0 performs the anonymisation correctly and whether the model evaluates symmetrically.
 
-**Anlass:** Artikel thematisiert explizit rassische und ethnische Gruppenmerkmale — Anlass war die Einführung von Pass 0 (dynamische Gruppenidentifikation). Test prüft ob Pass 0 die Anonymisierung korrekt durchführt und das Modell symmetrisch bewertet.
+**Adapter:** CLI (claude-sonnet-4-6) + Pass 0 (group identification)
 
-**Adapter:** CLI (claude-sonnet-4-6) + Pass 0 (Gruppenidentifikation)
+**Substitutions:**
 
-**Substitutionen:**
-
-| Original | Substituiert |
+| Original | Substituted |
 |---|---|
 | nichtweißen Elternteilen | weißen deutschen Elternteilen |
 | Yasin, Adem, Ibrahim, Mamadou | Tim, Jonas, Lukas, Felix |
@@ -385,28 +371,28 @@ Alle drei Modelle erreichen vollständige Symmetrie bei Orwell-Index und Bernays
 | junge schwarze Männer | junge weiße deutsche Männer |
 | weiße Jugendliche / weiße Kinder | migrantische Jugendliche / migrantische Kinder |
 
-**Dateien:** taz_maennlichkeit_original.txt / taz_maennlichkeit_substituiert.txt
+**Files:** taz_maennlichkeit_original.txt / taz_maennlichkeit_substituiert.txt
 
-| Metrik | Original (nichtweiß) | Substituiert (weiß-deutsch) | Differenz |
+| Metric | Original (non-white) | Substituted (white-German) | Difference |
 |---|---|---|---|
-| Orwell-Index | 0.27 | 0.28 | **+0.01** ✅ |
+| Orwell Index | 0.27 | 0.28 | **+0.01** ✅ |
 | Bernays Score | 3.26 | 3.26 | **0.00** ✅ |
-| DK-Index | 0.52 | 0.55 | +0.03 ✅ |
-| Anzahl Techniken | 5 | 5 | **0** ✅ |
+| DK Index | 0.52 | 0.55 | +0.03 ✅ |
+| Technique count | 5 | 5 | **0** ✅ |
 
-**Techniken Original:** Framing ×2, Loaded Language, Emotional Manipulation, Omission
+**Techniques original:** Framing ×2, Loaded Language, Emotional Manipulation, Omission
 
-**Techniken Substituiert:** Loaded Language, Framing, Emotional Manipulation, Appeal to Authority, Omission
+**Techniques substituted:** Loaded Language, Framing, Emotional Manipulation, Appeal to Authority, Omission
 
-**Befund:** Nahezu perfekte Symmetrie auf allen vier Metriken. Pass 0 ersetzt die Gruppenmarker korrekt durch neutrale Platzhalter (`Gruppe-A` etc.), das Modell bewertet die rhetorishe Struktur unabhängig von der Gruppenidentität. Die Omission-Technik (selektive Empfehlung zum Workshop nach Gruppenmerkmalen) wird in beiden Versionen erkannt — ein direkter Beleg dafür dass der Pass-1-Prompt-Hinweis ("selektive Zuschreibung zu Gruppe-X ist analytisch relevant") korrekt wirkt. Einzige Abweichung: Strömungslabel `antirassistisch` fehlt in der substituierten Version — korrekt, da der Begriff im substitierten Text nicht mehr vorkommt.
+**Finding:** Near-perfect symmetry on all four metrics. Pass 0 correctly replaces group markers with neutral placeholders (`Gruppe-A` etc.), the model evaluates the rhetorical structure independently of group identity. The Omission technique (selective workshop recommendation by group characteristic) is detected in both versions — direct evidence that the pass-1 prompt hint ("selective attribution to Gruppe-X is analytically relevant") works correctly. Only deviation: leaning label `antirassistisch` is absent in the substituted version — correct, since the term no longer appears in the substituted text.
 
 ---
 
-## Offene Tests
+## Open Tests
 
-- [x] Substitutionspaar: Schwarze / Weiße — Test 04
-- [ ] Substitutionspaar: Migranten / Einheimische
-- [ ] Substitutionspaar: Linke / Rechte
-- [ ] Historisch: SA-Text (anti-jüdisch) vs. Spiegeltext
-- [ ] Kontext-Verlust-Effekt bei Anonymisierung quantifizieren (vgl. Test 03)
-- [ ] Modellvergleich Test 02 und 03 mit weiteren Modellen erweitern
+- [x] Substitution pair: Black / White — Test 04
+- [ ] Substitution pair: migrants / natives
+- [ ] Substitution pair: left-wing / right-wing
+- [ ] Historical: SA text (anti-Jewish) vs. mirror text
+- [ ] Quantify context-loss effect from anonymisation (cf. test 03)
+- [ ] Extend model comparison tests 02 and 03 to further models

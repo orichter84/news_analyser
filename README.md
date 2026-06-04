@@ -252,4 +252,6 @@ news_analyser/
 | [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, two-pass architecture, bias mitigation |
 | [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
 | [docs/todo.md](docs/todo.md) | Open features and extension ideas |
-| [docs/concept/](docs/concept/) | Calibration tests and bias validation |
+| [docs/concept/bias-validation.md](docs/concept/bias-validation.md) | Bias validation: symmetry tests with group substitution |
+| [docs/concept/base-tests.md](docs/concept/base-tests.md) | Calibration tests and initial results |
+| [docs/concept/bias-test-cases/](docs/concept/bias-test-cases/) | Test data: original and substituted article texts, symmetry test results |
