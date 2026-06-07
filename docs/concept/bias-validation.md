@@ -420,6 +420,29 @@ All three models achieve full symmetry on Orwell Index and Bernays Score. The GP
 
 ---
 
+## Pass 0 Anonymisation Rule Set — Gemini Proposal (2026-06-07)
+
+**Context:** After Test 05 surfaced that the production anonymisation never actually applied gender neutralisation (the single-call rewrite-based Pass 0 prompt regularly exceeded the CLI adapter's 180s timeout, causing fallback to the unmodified original text), the user separately tested Gemini with the same German-grammar gender-leak problem (Genuskongruenz, Pronomen, genusmarkierte Suffixe). Gemini converged on a working rule set that resolved the problem reliably and quickly. It is documented here for reference, independent of whether it ends up adopted in this codebase.
+
+Gemini's rule set consists of four rules:
+
+1. **Coreference clustering:** Before assigning any placeholder, cluster *all* surface forms in the text that refer to the same entity or group — proper names, common nouns, pronouns, possessives — into one cluster, and replace every member of the cluster with the same placeholder.
+   - Example: "Sohn" = "Yasin" = "er" = "ihm" = "sein" → one cluster, one placeholder.
+
+2. **Forced grammatical neuter:** Treat every placeholder as grammatically neuter ("es" / "das" / "dessen"), regardless of the grammatical gender of the noun it replaces. This sidesteps the need to track and reproduce the original gender across articles, pronouns, and adjective endings — the mechanism that made the user's original proposal (*"Der Mann → Die Person_1"*, i.e. adapting the article to match the placeholder's assigned gender) hard to execute reliably for an LLM. Forced neuter achieves the same goal (no gender leakage via grammar) without per-instance gender bookkeeping.
+   - Example: "Mir würde es gelingen, einen tollen Mann aus ihm zu machen" → "Mir würde es gelingen, ein tolles Gruppe-A aus ihm [Gruppe-A] zu machen."
+
+3. **De-gendering role-proxy nouns:** Replace nouns that strongly evoke a gendered mental image — even when they are not themselves the anonymisation target — with neutral, functional equivalents.
+   - Examples: "Vater"/"Mutter" → "Elternteil", "Mitschüler"/"Mitschülerinnen" → "Mitlernende", "Junge"/"Mädchen" → "Kind"/"Jugendliche:r".
+
+4. **Minimal syntactic invasiveness:** Preserve sentence structure, clause order, punctuation, and the author's exact rhetorical vocabulary. Make only the cosmetic grammatical adjustments that the substitution mechanically requires — nothing else. This keeps the anonymised text close enough to the original that Pass 1's technique detection isn't confounded by unrelated rewriting.
+
+**Relation to the user's own proposal:** Rule 2 (forced neuter) is a variant of the user's original idea ("Der Mann → Die Person_1" — adapt the article to match the placeholder), addressing the same underlying problem (grammatical gender leakage) via a mechanically simpler route: instead of tracking which gender each placeholder should carry and adapting articles/pronouns/suffixes accordingly, it eliminates gender from the grammar entirely.
+
+**Status:** These four rules were incorporated into `pass0.md` on 2026-06-07 (replacing the earlier gender-matching rule with forced neuter, and adding the role-proxy rule). An empirical test on the taz.de "Männlichkeitsbilder" article confirmed that, *when the LLM call succeeds*, the rules work as intended — gender terms are correctly clustered, neutralised, and de-proxied (e.g. "Mein Sohn wird ein Mann" → "Mein Kind wird ein Gruppe-A", with consistent neuter grammar throughout). However, the call took ~360 seconds, still exceeding the CLI adapter's 180s timeout, so the underlying performance/timeout problem (Open Tests item, see below) persists regardless of the rule set used — and the test additionally surfaced a new layering conflict between the LLM's anonymisation and the downstream spaCy NER pass (spaCy can overwrite placeholders the LLM already inserted). Whether to keep or revert this architecture is still an open decision pending resolution of these issues.
+
+---
+
 ## Open Tests
 
 - [x] Substitution pair: Black / White — Test 04
