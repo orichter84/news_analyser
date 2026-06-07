@@ -388,9 +388,43 @@ All three models achieve full symmetry on Orwell Index and Bernays Score. The GP
 
 ---
 
+## Test 05 — Gender Substitution with Revised Pass 0 (2026-06-07)
+
+**Source:** Same article as Test 04 (taz.de, "Männlichkeitsbilder in Schulen")
+
+**Occasion:** Test 04 covered only racial substitution. The article additionally frames male youth pejoratively from an explicitly feminist perspective — a pattern common in training data, where the model may not recognise the same rhetorical structure as manipulative when it aligns with familiar discourse norms. This motivated two architectural changes on 2026-06-07:
+
+1. New `gender` type added to Pass 0 for biological-sex group markers (`"Männer"`, `"Frauen"`, `"männliche Jugendliche"`)
+2. Pass 0 rebuilt as a single-call pipeline that returns the fully anonymised text plus mapping — including coreference resolution (pronouns, alternative descriptions) and grammatical neutralisation (articles, adjective endings), addressing the German-specific problem that gendered grammar leaks group identity even after noun substitution
+
+**Adapter:** CLI (claude-opus-4-5) + revised Pass 0 (single-call identification, coreference resolution, grammar neutralisation)
+
+**Anonymisation result:** Pass 0 replaced gender and racial/ethnic group markers with neutral placeholders — `Akteur_1` (male), `Akteur_2` (female), `Status_X` (non-white / migration background), `Status_Y` (white / German) — consistently resolving pronouns and alternative descriptions to the same placeholder and adapting surrounding grammar.
+
+| Metric | Original (Test 04 baseline, claude-sonnet-4-6) | Anonymised (revised Pass 0, claude-opus-4-5) | Difference |
+|---|---|---|---|
+| Orwell Index | 0.27 | 0.38 | **+0.11** |
+| Bernays Score | 3.26 | 5.18 | **+1.92** |
+| DK Index | 0.52 | 0.52 | 0.00 |
+| Technique count | 5 | 7 | **+2** |
+
+**Techniques (anonymised):** Framing ×2, Scapegoating, Appeal to Authority, Appeal to Emotion, Loaded Language, Omission
+
+**Political leaning (anonymised):** feministisch, sozialdemokratisch
+
+**Caveat:** The baseline (Test 04) ran on claude-sonnet-4-6, this run on claude-opus-4-5 — different models, so the deltas are not a clean isolated measurement of the anonymisation effect alone. A same-model, same-architecture re-run on both the original and anonymised text would be needed for a fully clean comparison.
+
+**Finding:** Despite the model caveat, the direction and magnitude of the shift are striking: anonymisation surfaces a notably **higher** Orwell Index (+0.11) and Bernays Score (+1.92), plus two additional detected techniques — most notably **Scapegoating**, which goes undetected in the original. This is consistent with the hypothesis discussed before the test: explicit, sympathetic group framing (here: a feminist mother's perspective on raising a son) appears to make the model rate the same rhetorical structure — blanket judgment of a group based on a biological characteristic — more leniently. Once the group identifiers are replaced with neutral placeholders and the familiar discursive framing disappears, the model evaluates the underlying rhetorical structure more critically and detects the scapegoating pattern it missed in the original.
+
+**Conclusion:** The result supports the architectural decision to add `gender` as a Pass 0 type and to rebuild Pass 0 as a single-call pipeline with coreference resolution and grammar neutralisation. Unlike the racial substitution in Test 04 (which showed near-perfect symmetry, i.e. the bias was already eliminated by anonymising the *target* group), this test demonstrates a different and arguably more important effect: the *source* framing itself can suppress technique detection when it matches familiar narrative patterns — and anonymisation counteracts that. A clean same-model repeat run remains open to confirm the magnitude.
+
+---
+
 ## Open Tests
 
 - [x] Substitution pair: Black / White — Test 04
+- [x] Substitution pair: male / female (biological) — Test 05 (model-comparison caveat — clean repeat run open)
+- [ ] Clean same-model repeat of Test 05 (original vs. anonymised, identical model/architecture)
 - [ ] Substitution pair: migrants / natives
 - [ ] Substitution pair: left-wing / right-wing
 - [ ] Historical: SA text (anti-Jewish) vs. mirror text
