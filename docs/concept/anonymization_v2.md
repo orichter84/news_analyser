@@ -73,6 +73,47 @@ Instead of LLM: word lists similar to `IDEOLOGICAL_TERMS`, split by category:
 
 ---
 
+## Fallback: Adaptive Strategy
+
+If the curated-list approach does not reach the benchmark (≥ 6 technique instances),
+the `replace_groups()` step can be escalated to an LLM selectively.
+
+### Trigger: topic-based detection
+
+Topic keywords are checked on the raw text before anonymization — no extra LLM call needed.
+
+```python
+_LLM_TOPICS: set[str] = {
+    "feminismus", "feministische", "gender", "männlichkeit",
+    "rassismus", "migration", "islamophobie",
+}
+
+def _needs_llm(text: str) -> bool:
+    text_lower = text.lower()
+    return any(topic in text_lower for topic in _LLM_TOPICS)
+```
+
+### Why not use Bernays Score / Orwell-Index as trigger?
+
+These indicators are produced by Pass 1 — after anonymization has already run.
+They cannot influence the current article's strategy. Possible use: trigger a
+**second pass** with LLM strategy if the first result looks suspicious.
+
+### Architecture
+
+`AdaptiveStrategy` wraps `SpacyStrategy` and `LLMStrategy`. Only `replace_groups()`
+is escalated — `normalize()`, `ner()`, and `correct()` always use the spaCy path.
+
+```
+AdaptiveStrategy
+  ├── normalize()       → SpacyStrategy (always)
+  ├── ner()             → SpacyStrategy (always)
+  ├── replace_groups()  → SpacyStrategy / LLMStrategy (topic-dependent)
+  └── correct()         → SpacyStrategy (always)
+```
+
+---
+
 ## ToDo
 
 - [ ] Port kinship terms from feature branch (`GENDERED_KINSHIP_TERMS`)
