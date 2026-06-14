@@ -5,7 +5,8 @@ import re
 
 import spacy
 
-from ._normalizations import IDEOLOGICAL_TERMS, _ENTITY_BLOCKLIST
+from ._grammar import fix_article_agreement, fix_pronouns, _match_case
+from ._normalizations import GENDERED_KINSHIP_TERMS, IDEOLOGICAL_TERMS, _ENTITY_BLOCKLIST
 from ._result import AnonymizationResult
 from .strategy import AnonymizationStrategy
 
@@ -30,15 +31,31 @@ class SpacyStrategy(AnonymizationStrategy):
                 text = pattern.sub(
                     lambda m, r=replacement: _match_case(m.group(0), r), text
                 )
+        for original, replacement in GENDERED_KINSHIP_TERMS:
+            pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
+            if pattern.search(text):
+                mapping[replacement] = original
+                text = pattern.sub(
+                    lambda m, r=replacement: _match_case(m.group(0), r), text
+                )
         return text, mapping
+
+    def correct(self, text: str) -> str:
+        # "Frau Müller" → normalize: "Erwachsene Müller" → ner: "Erwachsene Person-A"
+        # Remove the kinship placeholder left in front of a NER placeholder.
+        text = re.sub(
+            r"\bErwachsene[r]?\s+((?:Person|Org|Gruppe)-[A-Z]+)\b",
+            r"\1",
+            text,
+        )
+        text = fix_pronouns(text)
+        return fix_article_agreement(text)
 
     def ner(self, text: str) -> tuple[str, dict[str, str]]:
         seen_per: dict[str, str] = {}
         seen_org: dict[str, str] = {}
-        seen_geo: dict[str, str] = {}
         person_counter = 0
         org_counter = 0
-        geo_counter = 0
 
         doc = self._load_nlp()(text)
         replacements: list[tuple[int, int, str]] = []
@@ -68,19 +85,11 @@ class SpacyStrategy(AnonymizationStrategy):
                     seen_org[key] = f"Org-{_num_to_letter(org_counter)}"
                 replacements.append((ent.start_char, ent.end_char, seen_org[key]))
 
-            elif ent.label_ in ("LOC", "GPE"):
-                key = surface_lower.rstrip(".,;:!?")
-                if key not in seen_geo:
-                    geo_counter += 1
-                    seen_geo[key] = f"Geo-{_num_to_letter(geo_counter)}"
-                replacements.append((ent.start_char, ent.end_char, seen_geo[key]))
-
         mapping: dict[str, str] = {
             ph: surface
             for surface, ph in {
                 **{v: k for k, v in seen_per.items()},
                 **{v: k for k, v in seen_org.items()},
-                **{v: k for k, v in seen_geo.items()},
             }.items()
         }
 
@@ -117,13 +126,6 @@ class SpacyStrategy(AnonymizationStrategy):
         if self._nlp is None:
             self._nlp = spacy.load(self._model_name)
         return self._nlp
-
-
-def _match_case(original: str, replacement: str) -> str:
-    """Preserve capitalisation: if original starts uppercase, capitalise replacement."""
-    if original and original[0].isupper():
-        return replacement[0].upper() + replacement[1:]
-    return replacement
 
 
 def _last_token(text: str) -> str:

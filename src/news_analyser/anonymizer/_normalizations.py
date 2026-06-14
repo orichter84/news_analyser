@@ -51,6 +51,53 @@ IDEOLOGICAL_TERMS: list[tuple[str, str]] = [
     ("sed",                "regierungspartei"),
 ]
 
+# ---------------------------------------------------------------------------
+# Gendered kinship terms — require word boundaries to avoid matching inside
+# compound nouns (e.g. "Kaufmann", "Frauenhaus").
+# Longer/plural forms first to prevent partial matches.
+# ---------------------------------------------------------------------------
+
+GENDERED_KINSHIP_TERMS: list[tuple[str, str]] = [
+    ("herren",     "Erwachsene"),
+    ("damen",      "Erwachsene"),
+    ("herr",       "Erwachsener"),
+    ("dame",       "Erwachsene"),
+    ("töchter",    "Kinder"),
+    ("söhne",      "Kinder"),
+    ("sohnes",     "Kindes"),
+    ("sohns",      "Kindes"),
+    ("tochter",    "Kind"),
+    ("sohn",       "Kind"),
+    ("männer",     "Erwachsene"),
+    ("mannes",     "Erwachsenen"),
+    ("manns",      "Erwachsenen"),
+    ("frauen",     "Erwachsene"),
+    ("mann",       "Erwachsener"),
+    ("frau",       "Erwachsene"),
+    ("schwestern", "Geschwister"),
+    ("brüder",     "Geschwister"),
+    ("bruders",    "Geschwisterkindes"),
+    ("schwester",  "Geschwister"),
+    ("bruder",     "Geschwister"),
+    ("mütter",     "Elternteile"),
+    ("väter",      "Elternteile"),
+    ("vaters",     "Elternteils"),
+    ("mutter",     "Elternteil"),
+    ("vater",      "Elternteil"),
+    ("enkelinnen", "Enkelkinder"),
+    ("enkelin",    "Enkelkind"),
+    ("enkels",     "Enkelkindes"),
+    ("enkel",      "Enkelkinder"),
+    ("nichten",    "Geschwisterkinder"),
+    ("neffen",     "Geschwisterkinder"),
+    ("nichte",     "Geschwisterkind"),
+    ("neffe",      "Geschwisterkind"),
+    ("onkels",     "Verwandten"),
+    ("tanten",     "Verwandte"),
+    ("onkel",      "Verwandte"),
+    ("tante",      "Verwandte"),
+]
+
 # Words that spaCy incorrectly tags as named entities.
 _ENTITY_BLOCKLIST: frozenset[str] = frozenset({
     "faschismus", "kommunismus", "nationalismus", "extremismus",
