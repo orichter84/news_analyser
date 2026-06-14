@@ -116,11 +116,12 @@ AdaptiveStrategy
 
 ## ToDo
 
-- [ ] Port kinship terms from feature branch (`GENDERED_KINSHIP_TERMS`)
-- [ ] Port article agreement correction (`_fix_article_agreement`)
-- [ ] Port pronoun replacement (`_replace_pronouns`)
+- [x] Port kinship terms from feature branch (`GENDERED_KINSHIP_TERMS`)
+- [x] Port article agreement correction (`_fix_article_agreement`)
+- [x] Port pronoun replacement (`_replace_pronouns`)
+- [x] Port debug notebook (`notebooks/anonymizer_debug.ipynb`)
 - [ ] Restrict Pass 0 prompt to NER (PER/ORG/LOC) only — remove group detection
 - [ ] Curate group word lists (racial, gender_role, religious etc.)
-- [ ] Port debug notebook (`notebooks/ner_debug.ipynb`)
-- [ ] UI progress indicator (pipeline steps): detecting terms → anonymising → analysing
 - [ ] Regression test: benchmark ≥ 6 technique instances on taz Männlichkeit article
+- [ ] UI progress indicator (pipeline steps): detecting terms → anonymising → analysing
+- [ ] Implement `AdaptiveStrategy` with LLM-based `replace_groups()` (candidate: small Gemma 4, fits 8GB M1)
