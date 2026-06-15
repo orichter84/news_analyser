@@ -18,11 +18,12 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
   "timestamp": "<ISO-8601 datetime string>",
   "detected_techniques": [
     {
-      "technique": "<one of: FUD | Framing | Loaded Language | Logical Fallacy | False Balance | Scapegoating | Appeal to Authority | Emotional Manipulation | Omission | Whataboutism | Other>",
+      "technique": "<one of: FUD | Framing | Loaded Language | Logical Fallacy | False Balance | Scapegoating | Appeal to Authority | Emotional Manipulation | Omission | Whataboutism | False Dichotomy | Victim Framing | Overgeneralization | Other>",
       "quote": "<verbatim excerpt from the anonymised article text>",
       "explanation": "<1–3 sentence explanation in German>"
     }
   ],
+  "_technique_counting_rule": "List EACH individual occurrence of a technique as a separate entry with its own quote. If 'Emotional Manipulation' appears five times, create five entries — one per occurrence. The Bernays Score is computed as total entries / word count × 1000, so completeness here directly determines the score.",
   "framing_target": {
     "main_narrative": "<one sentence summarising the central story the article pushes>",
     "intended_sentiment": "<primary emotional response the article aims to trigger>",
@@ -90,7 +91,8 @@ The input contains a `keyword_signal` field with pre-computed extremism keyword 
 - Your final orwell_index must always be grounded in the calibration anchors above.
 
 ## Analysis guidelines
-1. Only cite techniques that are clearly present – do not over-attribute.
+1. Cite every clearly identifiable occurrence — do not invent techniques, but do not
+   collapse multiple real occurrences into one. One occurrence = one entry.
 2. Quotes must be verbatim substrings of the anonymised article text.
 3. orwell_index reflects extremism intensity, NOT ideological direction.
 4. If the article appears factual and unbiased, return an empty detected_techniques
