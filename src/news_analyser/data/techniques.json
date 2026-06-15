@@ -100,6 +100,16 @@
     "doc": "Scapegoating Suendenbock Schuldzuweisung Verantwortungszuweisung Suendenbock-Prinzip"
   },
   {
+    "id": "victim-framing",
+    "name": "Victim Framing",
+    "name_de": "Opfer-Framing",
+    "category": "Strukturell",
+    "description": "Eine Person oder Gruppe wird konsequent als Opfer äußerer Umstände, anderer Gruppen oder gesellschaftlicher Strukturen dargestellt. Eigene Handlungsspielräume oder Mitverantwortung werden ausgeblendet.",
+    "example": "Mein Sohn muss sich behaupten, wird dabei jedoch schneller als aggressiv bewertet — suggeriert, dass seine gesamte Situation durch Diskriminierung determiniert ist.",
+    "reference_url": "https://de.wikipedia.org/wiki/Framing_(Sozialwissenschaften)",
+    "doc": "Victim Framing Opfer-Framing Viktimisierung Opferrolle Opfernarrativ Victimhood Framing"
+  },
+  {
     "id": "euphemism",
     "name": "Euphemismus",
     "name_de": "Beschoenigung",

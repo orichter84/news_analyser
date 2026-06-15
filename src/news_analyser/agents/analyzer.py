@@ -41,14 +41,19 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
     return parsed if isinstance(parsed, dict) else None
 
 
-def analyze_article(article: Article) -> dict[str, Any] | None:
+def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str, Any] | None:
     provider = os.environ.get("LLM_PROVIDER", "openai")
     adapter  = llm_adapter.get_instance(provider)
 
-    kw          = compute_keyword_signal(article.text)
-    group_terms = detect_groups(article.text, adapter)
-    anon        = anonymize(article.text, group_terms=group_terms)
-    anchors     = get_similar_anchors(anon["text"])
+    kw = compute_keyword_signal(article.text)
+
+    if skip_anonymize:
+        anon = {"text": article.text, "mapping": {}}
+    else:
+        group_terms = detect_groups(article.text, adapter)
+        anon        = anonymize(article.text, group_terms=group_terms)
+
+    anchors = get_similar_anchors(anon["text"])
 
     base_meta = {
         "url": article.url,
