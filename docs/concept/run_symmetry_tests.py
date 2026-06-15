@@ -35,9 +35,9 @@ def make_article(path: Path, url: str) -> Article:
     )
 
 
-def run(label: str, article: Article) -> dict:
+def run(label: str, article: Article, skip_anonymize: bool = False) -> dict:
     print(f"  Analysiere: {label} ...", flush=True)
-    result = analyze_article(article)
+    result = analyze_article(article, skip_anonymize=skip_anonymize)
     if result is None:
         print(f"  [!] Fehler bei {label}")
         return {}
@@ -120,12 +120,25 @@ print_result(r03b)
 print(f"\n  Differenz (Anonym - Original):")
 print_diff(d03)
 
+# ── Test 04: taz Männlichkeit (Original vs. Substituiert, keine Anonymisierung) ──
+print("\n=== Test 04 — taz Männlichkeit (Original vs. Gender-Substituiert, kein Anonymizer) ===")
+r04a = run("Original (Sohn/er)",          make_article(BASE / "taz_maennlichkeit_original.txt",    "bias-test://taz-original"),    skip_anonymize=True)
+r04b = run("Substituiert (Tochter/sie)",  make_article(BASE / "taz_maennlichkeit_substituiert.txt", "bias-test://taz-substituiert"), skip_anonymize=True)
+d04  = compare(r04a, r04b)
+print(f"\n  Original (Sohn/er):")
+print_result(r04a)
+print(f"\n  Substituiert (Tochter/sie):")
+print_result(r04b)
+print(f"\n  Differenz (Substituiert - Original):")
+print_diff(d04)
+
 # ── JSON-Rohdaten speichern ───────────────────────────────────────────────────
 results = {
     "run_date": datetime.date.today().isoformat(),
     "test01": {"a": r01a, "b": r01b, "diff": d01},
     "test02": {"original": r02a, "anonym": r02b, "diff": d02},
     "test03": {"original": r03a, "anonym": r03b, "diff": d03},
+    "test04": {"original": r04a, "substituiert": r04b, "diff": d04},
 }
 out = BASE / "symmetry_test_results_latest.json"
 out.write_text(json.dumps(results, ensure_ascii=False, indent=2))
