@@ -42,6 +42,7 @@ class OpenAIAdapter(LLMAdapter):
         "model":           "gpt-4o",
         "temperature":     0.2,
         "max_tokens":      2048,
+        "timeout":         120,
         "api_key_env":     "OPENAI_API_KEY",
         "api_key_default": None,
         "base_url":        None,
@@ -79,6 +80,13 @@ class OpenAIAdapter(LLMAdapter):
             tokens_raw = os.environ.get("LLM_MAX_TOKENS")
         self._max_tokens: int = (
             int(tokens_raw) if tokens_raw is not None else self._DEFAULTS["max_tokens"]
+        )
+
+        timeout_raw = config.get("timeout")
+        if timeout_raw is None:
+            timeout_raw = os.environ.get("LLM_TIMEOUT")
+        self._timeout: float = (
+            float(timeout_raw) if timeout_raw is not None else self._DEFAULTS["timeout"]
         )
 
         self._adapter_name: str   = config.get("adapter_name",    self._DEFAULTS["adapter_name"])
@@ -148,5 +156,6 @@ class OpenAIAdapter(LLMAdapter):
             max_tokens=self._max_tokens,
             temperature=self._temperature,
             messages=messages,
+            timeout=self._timeout,
         )
         return response.choices[0].message.content.strip()
