@@ -19,7 +19,7 @@ from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from .group_detector import detect_groups
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
-from ..repositories.technique_store import normalize_technique
+from ..repositories.technique_store import normalize_technique, format_techniques_for_prompt
 from ..repositories.role_store import normalize_role, format_roles_for_prompt
 
 
@@ -82,7 +82,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     }
 
     # Dynamische Anker in Prompt einbetten wenn vorhanden
-    pass1_prompt = load_prompt("system", "pass1")
+    pass1_prompt = load_prompt("system", "pass1", context={"TECHNIQUES": format_techniques_for_prompt()})
     anchor_section = format_anchors_for_prompt(anchors)
     if anchor_section:
         pass1_prompt = pass1_prompt + "\n\n" + anchor_section

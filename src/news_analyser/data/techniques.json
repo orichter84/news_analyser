@@ -17,7 +17,8 @@
     "description": "Gezielte Nutzung von Angst, Empörung, Mitleid oder Hilflosigkeit um Schlussfolgerungen zu stützen, ohne rationale Argumente zu liefern. Umfasst FUD (Fear, Uncertainty, Doubt) sowie Appeal to Fear.",
     "example": "Wenn wir jetzt nicht handeln, werden unsere Kinder in einer Welt ohne Zukunft aufwachsen — und es wird zu spät sein.",
     "reference_url": "https://de.wikipedia.org/wiki/Emotionale_Manipulation",
-    "doc": "Emotional Manipulation emotionale Manipulation FUD Fear Uncertainty Doubt Angstmache Appeal to Fear Angst Hilflosigkeit Empörung Mitleid"
+    "doc": "Emotional Manipulation emotionale Manipulation FUD Fear Uncertainty Doubt Angstmache Appeal to Fear Angst Hilflosigkeit Empörung Mitleid",
+    "prompt": true
   },
   {
     "id": "selective-empathy",
@@ -27,7 +28,8 @@
     "description": "Mitgefühl, Solidarität oder moralische Empörung werden nur für bestimmte Gruppen aufgebracht, während vergleichbares Leid anderer Gruppen ignoriert oder relativiert wird. Auch bekannt als Identity Shopping.",
     "example": "Die Opfer auf unserer Seite werden ausführlich betrauert — die Opfer der anderen Seite kommen im Artikel nicht vor.",
     "reference_url": "https://de.wikipedia.org/wiki/Empathie",
-    "doc": "Selective Empathy selektives Mitgefühl Identity Shopping Opferempathie Gruppenempathie asymmetrisches Mitgefühl selektive Solidarität"
+    "doc": "Selective Empathy selektives Mitgefühl Identity Shopping Opferempathie Gruppenempathie asymmetrisches Mitgefühl selektive Solidarität",
+    "prompt": true
   },
   {
     "id": "omission",
@@ -37,7 +39,8 @@
     "description": "Relevante Gegeninformationen, Kontext oder Gegenpositionen werden systematisch weggelassen. Anders als Cherry Picking geht es nicht um Datenselektion, sondern um das strukturelle Fehlen ausgleichender Perspektiven.",
     "example": "Der Artikel beschreibt ausführlich die Nachteile der Reform, erwähnt aber mit keinem Wort die Probleme des Status quo.",
     "reference_url": "https://de.wikipedia.org/wiki/Auslassung_(Rhetorik)",
-    "doc": "Omission Auslassung Weglassen Perspektivlosigkeit fehlender Kontext einseitige Berichterstattung strukturelle Auslassung"
+    "doc": "Omission Auslassung Weglassen Perspektivlosigkeit fehlender Kontext einseitige Berichterstattung strukturelle Auslassung",
+    "prompt": true
   },
   {
     "id": "whataboutism",
@@ -67,7 +70,8 @@
     "description": "Komplexe Sachverhalte werden auf genau zwei Optionen reduziert, obwohl weitere Alternativen existieren. Zwingt den Leser in eine kuenstliche Entweder-oder-Entscheidung.",
     "example": "Entweder bist du fuer uns oder gegen uns.",
     "reference_url": "https://de.wikipedia.org/wiki/Falsche_Dichotomie",
-    "doc": "False Dichotomy falsche Dichotomie Entweder-oder Schwarz-Weiss-Denken False Binary false alternative"
+    "doc": "False Dichotomy falsche Dichotomie Entweder-oder Schwarz-Weiss-Denken False Binary false alternative",
+    "prompt": true
   },
   {
     "id": "loaded-language",
@@ -77,7 +81,8 @@
     "description": "Emotional aufgeladene Begriffe werden bewusst statt neutraler Beschreibungen eingesetzt, um beim Leser eine vorgewuenschte emotionale Reaktion auszuloesen.",
     "example": "Invasoren statt Migranten -- Gesinnungsschnueffelei statt Datenschutzpruefung.",
     "reference_url": "https://de.wikipedia.org/wiki/Reizwort",
-    "doc": "Loaded Language wertbeladene Sprache emotiv emotionale Sprache Stigmatisierung Weasel Words Konnotation"
+    "doc": "Loaded Language wertbeladene Sprache emotiv emotionale Sprache Stigmatisierung Weasel Words Konnotation",
+    "prompt": true
   },
   {
     "id": "bandwagon",
@@ -127,7 +132,8 @@
     "description": "Eine Gruppe, Person oder Institution wird fuer komplexe Probleme verantwortlich gemacht, die tatsaechlich viele Ursachen haben. Vereinfacht und lenkt von systemischen Ursachen ab.",
     "example": "Die Migranten sind schuld an der Wohnungsnot.",
     "reference_url": "https://de.wikipedia.org/wiki/S%C3%BCndenbock",
-    "doc": "Scapegoating Suendenbock Schuldzuweisung Verantwortungszuweisung Suendenbock-Prinzip"
+    "doc": "Scapegoating Suendenbock Schuldzuweisung Verantwortungszuweisung Suendenbock-Prinzip",
+    "prompt": true
   },
   {
     "id": "victim-framing",
@@ -137,7 +143,8 @@
     "description": "Eine Person oder Gruppe wird konsequent als Opfer äußerer Umstände, anderer Gruppen oder gesellschaftlicher Strukturen dargestellt. Eigene Handlungsspielräume oder Mitverantwortung werden ausgeblendet.",
     "example": "Mein Sohn muss sich behaupten, wird dabei jedoch schneller als aggressiv bewertet — suggeriert, dass seine gesamte Situation durch Diskriminierung determiniert ist.",
     "reference_url": "https://de.wikipedia.org/wiki/Framing_(Sozialwissenschaften)",
-    "doc": "Victim Framing Opfer-Framing Viktimisierung Opferrolle Opfernarrativ Victimhood Framing"
+    "doc": "Victim Framing Opfer-Framing Viktimisierung Opferrolle Opfernarrativ Victimhood Framing",
+    "prompt": true
   },
   {
     "id": "euphemism",
@@ -177,7 +184,8 @@
     "description": "Der interpretative Rahmen, in dem ein Thema praesentiert wird, steuert, wie es verstanden und bewertet wird -- ohne dass die Fakten selbst veraendert werden muessen.",
     "example": "Denselben Steueranstieg als Belastung fuer Familien oder als Investition in Bildung zu bezeichnen.",
     "reference_url": "https://de.wikipedia.org/wiki/Framing_(Sozialwissenschaften)",
-    "doc": "Framing Deutungsrahmen Perspektive Praesentation Spin narrative Rahmen"
+    "doc": "Framing Deutungsrahmen Perspektive Praesentation Spin narrative Rahmen",
+    "prompt": true
   },
   {
     "id": "false-balance",
@@ -197,7 +205,8 @@
     "description": "Expertenmeinungen oder Autoritaetspersonen werden als Beweis statt als Indiz eingesetzt -- besonders problematisch wenn die Expertise nicht einschlaeig ist.",
     "example": "Laut Experten ist diese Politik die einzig richtige.",
     "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_verecundiam",
-    "doc": "Appeal to Authority Autoritaetsargument Expertenmeinung Autoritaetsbeweis Namesdropping"
+    "doc": "Appeal to Authority Autoritaetsargument Expertenmeinung Autoritaetsbeweis Namesdropping",
+    "prompt": true
   },
   {
     "id": "repetition",
@@ -257,7 +266,8 @@
     "description": "Einzelne Faelle oder Ereignisse werden als repraesentativ fuer eine gesamte Gruppe oder ein System dargestellt, ohne dass eine belastbare Datenbasis vorliegt.",
     "example": "Ein Asylbewerber begeht eine Straftat -- also sind Asylbewerber kriminell.",
     "reference_url": "https://de.wikipedia.org/wiki/Verallgemeinerung",
-    "doc": "Overgeneralization Überverallgemeinerung Verallgemeinerung Pauschalurteil Stereotypisierung Einzelfall Repraesentativitaet"
+    "doc": "Overgeneralization Überverallgemeinerung Verallgemeinerung Pauschalurteil Stereotypisierung Einzelfall Repraesentativitaet",
+    "prompt": true
   },
   {
     "id": "exaggeration",

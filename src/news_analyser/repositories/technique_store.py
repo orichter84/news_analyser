@@ -68,6 +68,12 @@ def _ensure_seeded(col: chromadb.Collection) -> None:
     print(f"[techniques] {len(_TECHNIQUES)} Techniken in DB gespeichert.")
 
 
+def format_techniques_for_prompt() -> str:
+    """Returns pipe-separated technique names flagged with prompt:true, plus Other."""
+    names = [t["name"] for t in _TECHNIQUES if t.get("prompt")]
+    return " | ".join(names) + " | Other"
+
+
 def normalize_technique(name: str) -> str:
     """Sucht den semantisch naechsten kanonischen Techniken-Namen.
     Gibt den Original-Namen zurueck wenn keine gute Uebereinstimmung gefunden wird."""
