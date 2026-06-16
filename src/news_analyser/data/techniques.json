@@ -7,7 +7,8 @@
     "description": "Bedrohungsszenarien werden eingesetzt, um emotionale Abwehrreaktionen zu erzeugen. Der Leser soll durch Angst statt durch rationale Argumente zu einer Schlussfolgerung gefuehrt werden.",
     "example": "Wenn wir jetzt nicht handeln, werden unsere Kinder in einem Land ohne Zukunft aufwachsen.",
     "reference_url": "https://de.wikipedia.org/wiki/Furchtappell",
-    "doc": "Appeal to Fear Angst-Appell Bedrohungsappell FUD Fear Uncertainty Doubt Angstmache Panik Bedrohung"
+    "doc": "Appeal to Fear Angst-Appell Bedrohungsappell FUD Fear Uncertainty Doubt Angstmache Panik Bedrohung",
+    "prompt": false
   },
   {
     "id": "emotional-manipulation",
@@ -50,7 +51,8 @@
     "description": "Ablenkung von einer Kritik durch den Verweis auf ein (angebliches) Fehlverhalten der anderen Seite. Die eigentliche Frage wird nicht beantwortet, sondern umgelenkt.",
     "example": "Was ist mit den Verbrechen der USA? Warum reden wir nicht darueber?",
     "reference_url": "https://de.wikipedia.org/wiki/Whataboutism",
-    "doc": "Whataboutism Whataboutismus Ablenkung Tu quoque Gegenfrage Seitenwechsel"
+    "doc": "Whataboutism Whataboutismus Ablenkung Tu quoque Gegenfrage Seitenwechsel",
+    "prompt": true
   },
   {
     "id": "cherry-picking",
@@ -60,7 +62,8 @@
     "description": "Nur Fakten und Studien, die die eigene Position stuetzen, werden praesentiert. Widerlegende oder einschraenkende Belege werden weggelassen oder ignoriert.",
     "example": "Einen Temperaturrekord hervorheben, waehrend der langfristige Trend verschwiegen wird.",
     "reference_url": "https://de.wikipedia.org/wiki/Rosinenpicken_(Argumentationstheorie)",
-    "doc": "Cherry Picking Rosinenpicken selektive Evidenz selektive Wahrnehmung Datenauswahl Omission Auslassung"
+    "doc": "Cherry Picking Rosinenpicken selektive Evidenz selektive Wahrnehmung Datenauswahl Omission Auslassung",
+    "prompt": false
   },
   {
     "id": "false-dichotomy",
@@ -92,7 +95,8 @@
     "description": "Soziale Akzeptanz wird als Argument eingesetzt: Da es alle tun oder denken, muss es richtig sein. Nutzt den menschlichen Wunsch, zur Mehrheit zu gehoeren.",
     "example": "Immer mehr Experten sind sich einig, dass ...",
     "reference_url": "https://de.wikipedia.org/wiki/Mitl%C3%A4ufereffekt",
-    "doc": "Bandwagon Mitlaeufereffekt Herdenmentalitaet Mehrheitsmeinung Konsens Appeal to Popularity"
+    "doc": "Bandwagon Mitlaeufereffekt Herdenmentalitaet Mehrheitsmeinung Konsens Appeal to Popularity",
+    "prompt": true
   },
   {
     "id": "ad-hominem",
@@ -102,7 +106,8 @@
     "description": "Die Person, die ein Argument vorbringt, wird angegriffen statt das Argument selbst zu widerlegen. Diskreditierung ersetzt inhaltliche Auseinandersetzung.",
     "example": "Was weiss ein Politiker, der nie gearbeitet hat, schon von Wirtschaft?",
     "reference_url": "https://de.wikipedia.org/wiki/Argumentum_ad_hominem",
-    "doc": "Ad Hominem Angriff Person Diskreditierung persoenlicher Angriff Diffamierung"
+    "doc": "Ad Hominem Angriff Person Diskreditierung persoenlicher Angriff Diffamierung",
+    "prompt": true
   },
   {
     "id": "straw-man",
@@ -112,7 +117,8 @@
     "description": "Die Position des Gegners wird verzerrt, vereinfacht oder uebertrieben dargestellt -- in einer Form, die leichter angreifbar ist als die tatsaechliche Position.",
     "example": "Die Opposition will, dass wir alle Grenzen oeffnen und niemanden mehr kontrollieren -- obwohl sie differenziertere Reformen fordert.",
     "reference_url": "https://de.wikipedia.org/wiki/Strohmann-Argument",
-    "doc": "Straw Man Strohmann Verzerrung falsche Darstellung Karikatur Uebertreibung"
+    "doc": "Straw Man Strohmann Verzerrung falsche Darstellung Karikatur Uebertreibung",
+    "prompt": true
   },
   {
     "id": "slippery-slope",
@@ -122,7 +128,8 @@
     "description": "Eine Handlung wird als zwangslaefige Ursache einer Kette von immer extremeren Folgen dargestellt, ohne dass diese Kausalitaet belegt wird.",
     "example": "Wenn wir Tempolimit 130 einfuehren, werden wir bald gar kein Auto mehr fahren duerfen.",
     "reference_url": "https://de.wikipedia.org/wiki/Dammbruchargument",
-    "doc": "Slippery Slope Dammbruch-Argument schiefe Ebene Kettenreaktion Domino-Effekt"
+    "doc": "Slippery Slope Dammbruch-Argument schiefe Ebene Kettenreaktion Domino-Effekt",
+    "prompt": false
   },
   {
     "id": "scapegoating",
@@ -154,7 +161,8 @@
     "description": "Negative Sachverhalte werden durch mildere, verharmlosende Ausdruecke beschrieben, um die emotionale Wirkung abzuschwaechen oder Kritik zu erschweren.",
     "example": "Kollateralschaeden statt zivile Todesopfer.",
     "reference_url": "https://de.wikipedia.org/wiki/Euphemismus",
-    "doc": "Euphemismus Beschoenigung Verharmlosung Abschwaeachung Sprachverhuelling"
+    "doc": "Euphemismus Beschoenigung Verharmlosung Abschwaeachung Sprachverhuelling",
+    "prompt": false
   },
   {
     "id": "dysphemism",
@@ -164,7 +172,8 @@
     "description": "Sachverhalte werden durch absichtlich negative, abwertende Formulierungen beschrieben, um Ablehnung zu erzeugen -- das Gegenteil des Euphemismus.",
     "example": "Rentner-Rabatte statt Seniorenermaeßigungen.",
     "reference_url": "https://de.wikipedia.org/wiki/Dysphemismus",
-    "doc": "Dysphemismus abwertende Sprache Abwertung negative Konnotation Diffamierung"
+    "doc": "Dysphemismus abwertende Sprache Abwertung negative Konnotation Diffamierung",
+    "prompt": false
   },
   {
     "id": "agenda-setting",
@@ -174,7 +183,8 @@
     "description": "Durch die selektive Auswahl von Themen wird beeinflusst, welche Fragen die Oeffentlichkeit fuer wichtig haelt. Was nicht berichtet wird, existiert in der oeffentlichen Wahrnehmung kaum.",
     "example": "Wochenlange Berichterstattung ueber Auslaenderkriminalitaet erhoet die wahrgenommene Bedrohung unabhaengig von der Statistik.",
     "reference_url": "https://de.wikipedia.org/wiki/Agenda-Setting",
-    "doc": "Agenda Setting Themensetzung Themenauswahl Framing Priming selektive Berichterstattung"
+    "doc": "Agenda Setting Themensetzung Themenauswahl Framing Priming selektive Berichterstattung",
+    "prompt": false
   },
   {
     "id": "framing",
@@ -195,7 +205,8 @@
     "description": "Zwei Positionen werden als gleichwertig dargestellt, obwohl sie empirisch oder argumentativ stark unterschiedlich fundiert sind. Erzeugt kuenstliche Kontroverse.",
     "example": "Klimawandel-Skeptiker werden gleichwertig neben dem wissenschaftlichen Konsens praesentiert.",
     "reference_url": "https://de.wikipedia.org/wiki/False_Balance",
-    "doc": "False Balance falsche Ausgewogenheit Bothsidesism falsche Gleichwertigkeit kuenstliche Kontroverse"
+    "doc": "False Balance falsche Ausgewogenheit Bothsidesism falsche Gleichwertigkeit kuenstliche Kontroverse",
+    "prompt": true
   },
   {
     "id": "appeal-to-authority",
@@ -216,7 +227,8 @@
     "description": "Durch wiederholte Aussagen -- auch unabhaengig von ihrem Wahrheitsgehalt -- entsteht der Eindruck von Wahrheit. Der Illusorische-Wahrheit-Effekt wirkt auch bei kritischem Publikum.",
     "example": "Eine Schlagzeile, die taeglich variiert wiederholt wird, bis sie als Fakt gilt.",
     "reference_url": "https://de.wikipedia.org/wiki/Wahrheitseffekt",
-    "doc": "Repetition Wiederholung illusorische Wahrheit Hammering message repetition"
+    "doc": "Repetition Wiederholung illusorische Wahrheit Hammering message repetition",
+    "prompt": true
   },
   {
     "id": "presuppositional-framing",
@@ -226,7 +238,8 @@
     "description": "Behauptungen werden als selbstverstaendliche Praemisse in einen Satz eingebettet statt offen ausgesprochen. Der Leser akzeptiert die Praemisse unbewusst.",
     "example": "Trotz Waffenruhe: Iran feuert auf US-Drohne -- setzt voraus, dass Iran die Waffenruhe verletzt, ohne dies zu belegen.",
     "reference_url": "https://de.wikipedia.org/wiki/Pr%C3%A4supposition",
-    "doc": "Presuppositional Framing Praesupposition implizite Annahme Trotz obwohl eingebettete Behauptung"
+    "doc": "Presuppositional Framing Praesupposition implizite Annahme Trotz obwohl eingebettete Behauptung",
+    "prompt": false
   },
   {
     "id": "appeal-to-emotion",
@@ -236,7 +249,8 @@
     "description": "Emotionen werden angesprochen um eine Schlussfolgerung zu stuetzen, ohne rationale Argumente oder Belege zu liefern. Kann positiv (Hoffnung, Stolz) oder negativ (Empoerung, Ekel) sein.",
     "example": "Denk an die Kinder. Kannst du das wirklich verantworten?",
     "reference_url": "https://de.wikipedia.org/wiki/Pathos",
-    "doc": "Appeal to Emotion emotionaler Appell Gefuehlsappell Mitleid Empoerung Ekel Hoffnung Pathos"
+    "doc": "Appeal to Emotion emotionaler Appell Gefuehlsappell Mitleid Empoerung Ekel Hoffnung Pathos",
+    "prompt": false
   },
   {
     "id": "false-cause",
@@ -246,7 +260,8 @@
     "description": "Ein Zusammenhang zwischen zwei Ereignissen wird als Ursache-Wirkungs-Beziehung dargestellt, obwohl nur Korrelation oder Koinzidenz vorliegt. Haeufig in Form von Post-hoc-Schlussfolgerungen.",
     "example": "Seit die Regierung das neue Gesetz verabschiedet hat, steigt die Kriminalitaet -- also ist das Gesetz schuld.",
     "reference_url": "https://de.wikipedia.org/wiki/Post_hoc_ergo_propter_hoc",
-    "doc": "False Cause falscher Kausalzusammenhang Post hoc Korrelation Kausalitaet Scheinzusammenhang Ursache Wirkung"
+    "doc": "False Cause falscher Kausalzusammenhang Post hoc Korrelation Kausalitaet Scheinzusammenhang Ursache Wirkung",
+    "prompt": true
   },
   {
     "id": "halo-effect",
@@ -256,7 +271,8 @@
     "description": "Positive oder negative Eigenschaften einer Person oder Institution werden auf andere, fachfremde Bereiche uebertragen. Unterschied zu Appeal to Authority: es geht um Strahlkraft, nicht um Fachkompetenz.",
     "example": "Der erfolgreiche Unternehmer fordert eine Rentenreform -- als waere wirtschaftlicher Erfolg ein Beleg fuer sozialpolitisches Urteilsvermoegen.",
     "reference_url": "https://de.wikipedia.org/wiki/Halo-Effekt",
-    "doc": "Halo Effect Halo-Effekt Heiligenschein Strahlkraft Sympathieübertragung Prominenz Glaubwürdigkeit Übertragung"
+    "doc": "Halo Effect Halo-Effekt Heiligenschein Strahlkraft Sympathieübertragung Prominenz Glaubwürdigkeit Übertragung",
+    "prompt": false
   },
   {
     "id": "overgeneralization",
@@ -277,7 +293,8 @@
     "description": "Fakten, Risiken oder Auswirkungen werden weit ueber das durch Belege gerechtfertigte Mass hinaus vergroessert dargestellt, um emotionale Wirkung oder Dringlichkeit zu erzeugen.",
     "example": "Diese Entscheidung wird unser Land fuer immer zerstoeren.",
     "reference_url": "https://de.wikipedia.org/wiki/Hyperbel_(Rhetorik)",
-    "doc": "Exaggeration Übertreibung Dramatisierung Hyperbel Sensationalismus alarmistisch Katastrophisierung"
+    "doc": "Exaggeration Übertreibung Dramatisierung Hyperbel Sensationalismus alarmistisch Katastrophisierung",
+    "prompt": true
   },
   {
     "id": "anchoring",
@@ -287,6 +304,7 @@
     "description": "Eine erste Zahl, Aussage oder Bewertung wird prominent platziert und dient als Referenzpunkt fuer alle nachfolgenden Informationen. Spaetere Fakten werden unbewusst relativ zu diesem Anker bewertet.",
     "example": "\"Ueber 80 Prozent der Bevoelkerung unterstuetzen die Reform\" — danach wirken 60 Prozent Zustimmung bei einer anderen Massnahme bereits wie ein Misserfolg.",
     "reference_url": "https://de.wikipedia.org/wiki/Ankereffekt",
-    "doc": "Anchoring Ankereffekt Ankerpunkt Referenzpunkt erste Zahl Ausgangswert Benchmark Framing Zahl"
+    "doc": "Anchoring Ankereffekt Ankerpunkt Referenzpunkt erste Zahl Ausgangswert Benchmark Framing Zahl",
+    "prompt": false
   }
 ]
