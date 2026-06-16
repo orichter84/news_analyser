@@ -15,6 +15,7 @@ Return ONLY a single, valid JSON object. Kein Markdown, kein zusätzlicher Text.
   "source_url": "<string>",
   "domain": "<string>",
   "timestamp": "<ISO-8601>",
+  "_technique_counting_rule": "Jede einzelne Instanz einer Technik als separaten Eintrag. Tritt 'Loaded Language' dreimal auf, drei Einträge erstellen. Der Bernays Score = Anzahl Einträge / Wörter × 1000.",
   "detected_techniques": [
     {
       "technique": "<one of: Emotional Manipulation | Victim Framing | Scapegoating | Loaded Language | Framing | Omission | False Dichotomy | Overgeneralization | Selective Empathy | Appeal to Authority | Other>",
