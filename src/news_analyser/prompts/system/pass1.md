@@ -31,17 +31,6 @@ Return ONLY a single, valid JSON object. Kein Markdown, kein zusätzlicher Text.
   "symmetry_note": "<kurzer Vermerk zur Symmetrie, z.B. 'Symmetrisch bewertet' oder 'leichte Asymmetrie korrigiert'>"
 }
 
-## Wichtige Techniken
-- Emotional Manipulation / Appeal to Fear
-- Victim Framing (besonders selektiv oder asymmetrisch)
-- Scapegoating
-- Loaded Language
-- Framing / Selective Framing
-- Omission
-- False Dichotomy
-- Overgeneralization
-- Selective Empathy / Identity Shopping
-
 **Zählregel:** Jede klare Instanz einer Technik wird separat gezählt. Mehrfachvorkommen = mehrere Einträge. Das bestimmt den Bernays Score.
 
 ## Orwell-Index (rein rhetorische Extremismus-Stärke, richtungsneutral)
