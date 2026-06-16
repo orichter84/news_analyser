@@ -10,9 +10,20 @@ from __future__ import annotations
 import json
 import os
 import re
+from pathlib import Path
 from typing import Any
 
 from ..scraper import Article
+
+_DEBUG_DIR = Path(__file__).resolve().parents[3] / "data" / "debug_last_run"
+
+
+def _write_debug(filename: str, content: str) -> None:
+    try:
+        _DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+        (_DEBUG_DIR / filename).write_text(content, encoding="utf-8")
+    except Exception:
+        pass
 from ..prompts import load_prompt
 import llm_adapter
 from ..keywords import compute_keyword_signal
@@ -52,6 +63,11 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     else:
         group_terms = detect_groups(article.text, adapter)
         anon        = anonymize(article.text, group_terms=group_terms)
+        _write_debug("01_detected_terms.json", json.dumps(group_terms, ensure_ascii=False, indent=2))
+        _write_debug("03_anonymization_mapping.json", json.dumps(anon["mapping"], ensure_ascii=False, indent=2))
+
+    _write_debug("00_original_text.txt", article.text)
+    _write_debug("02_anonymized_text.txt", anon["text"])
 
     anchors = get_similar_anchors(anon["text"])
 
@@ -96,6 +112,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         print(f"[analyzer] Pass 1 error: {exc}")
         return None
 
+    _write_debug("04_pass1_raw_response.txt", raw1)
     result1 = _extract_json(raw1)
     if result1 is None:
         return None
@@ -129,6 +146,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         print(f"[analyzer] Pass 2 error: {exc}")
         return None
 
+    _write_debug("05_pass2_raw_response.txt", raw2)
     result2 = _extract_json(raw2)
     if result2 is None:
         return None
@@ -162,6 +180,8 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         "llm_provider":          adapter.name,
         "llm_model":             adapter.model,
     }
+
+    _write_debug("06_final_result.json", json.dumps(result, ensure_ascii=False, indent=2))
 
     # Artikel als Anker für zukünftige Analysen speichern
     add_anchor(
