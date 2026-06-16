@@ -441,6 +441,64 @@ Gemini's rule set consists of four rules:
 
 ---
 
+---
+
+## Test 06 — Gender Symmetry Without Anonymisation (2026-06-16)
+
+**Source:** Same article as Tests 04 and 05 (taz.de, "Männlichkeitsbilder in Schulen")
+
+**Occasion:** Previous tests (04/05) always combined anonymisation with group substitution. The open question was whether the symmetry rule in the pass 1 prompt alone achieves gender symmetry — without any anonymisation preprocessing. If yes, gender anonymisation would be architecturally redundant for the symmetry goal and could be removed (at the cost of some detection completeness, but with a gain in context quality).
+
+**Adapter:** CLI (claude-sonnet-4-6), `skip_anonymize=True` for original and substituted variants.
+
+**Substitutions (gender only):**
+
+| Original | Substituted |
+|---|---|
+| Sohn | Tochter |
+| er / ihm / sein | sie / ihr / ihr |
+| Männer / männliche Jugendliche | Frauen / weibliche Jugendliche |
+| Jungs | Mädchen |
+
+| Metric | Original (Sohn/er) | Substituted (Tochter/sie) | Difference |
+|---|---|---|---|
+| Technique count | 14 | 15 | **+1** ✅ |
+
+**Techniques original (14):** Loaded Language ×3, Overgeneralization ×2, Emotional Manipulation ×3, Selective Empathy ×2, Framing ×2, Victim Framing, Appeal to Authority, Straw Man, Exaggeration, False Dichotomy
+
+**Techniques substituted (15):** Loaded Language ×3, Overgeneralization, Selective Empathy, Scapegoating, Appeal to Authority, Emotional Manipulation ×2, Victim Framing, Framing ×2, False Dichotomy, Omission
+
+**Finding:** Δ = 1 — within the stochastic variation range for this text length. Both variants detect the same core techniques; divergences (one Scapegoating only in substituted, one Straw Man only in original) are attributable to model stochasticity, not systematic bias. The symmetry rule in the pass 1 prompt achieves gender symmetry without anonymisation.
+
+**Comparison — anonymised version (same article, same session):**
+
+| Version | Technique count |
+|---|---|
+| Original (no anonymisation) | 14 |
+| Substituted (no anonymisation) | 15 |
+| Anonymised (pass 0) | 19 |
+
+The anonymised version finds more techniques (+5 vs. original), confirming that anonymisation has a different value than symmetry: **noise reduction**. Without proper names and group identifiers, the model focuses more on rhetorical structure and finds additional patterns. However, it also loses context that is necessary for certain techniques (e.g. Selective Empathy requires identity markers to be detectable).
+
+**Also run in this session — Test 01 repeat without anonymisation:**
+
+| Metric | Text A (Muslime) | Text B (Westeuropäer) | Difference |
+|---|---|---|---|
+| Technique count | 15 | 11 | **-4** ⚠ |
+
+Group-based bias persists without anonymisation (Δ 4) — confirming that the symmetry rule alone is **insufficient** for group/ethnicity terms.
+
+**Architectural conclusion:**
+
+| Bias type | Symmetry rule sufficient? | Anonymisation needed? |
+|---|---|---|
+| Gender (Männer/Frauen, Sohn/Tochter) | ✅ Yes (Δ 1) | No |
+| Group/ethnicity (Muslime, Westeuropäer) | ❌ No (Δ 4) | Yes |
+
+**Consequence:** Gender anonymisation is removed from pass 0. Pass 0 continues to anonymise group/ethnicity terms and person names. The gain: less context loss in pass 1 (e.g. Selective Empathy detection quality improves), shorter pass 0 output, faster pipeline.
+
+---
+
 ## Open Tests
 
 - [x] Substitution pair: Black / White — Test 04

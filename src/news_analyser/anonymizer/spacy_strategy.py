@@ -5,8 +5,8 @@ import re
 
 import spacy
 
-from ._grammar import fix_article_agreement, fix_pronouns, _match_case
-from ._normalizations import GENDERED_KINSHIP_TERMS, IDEOLOGICAL_TERMS, _ENTITY_BLOCKLIST
+from ._grammar import _match_case
+from ._normalizations import IDEOLOGICAL_TERMS, _ENTITY_BLOCKLIST
 from ._result import AnonymizationResult
 from .strategy import AnonymizationStrategy
 
@@ -31,25 +31,7 @@ class SpacyStrategy(AnonymizationStrategy):
                 text = pattern.sub(
                     lambda m, r=replacement: _match_case(m.group(0), r), text
                 )
-        for original, replacement in GENDERED_KINSHIP_TERMS:
-            pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
-            if pattern.search(text):
-                mapping[replacement] = original
-                text = pattern.sub(
-                    lambda m, r=replacement: _match_case(m.group(0), r), text
-                )
         return text, mapping
-
-    def correct(self, text: str) -> str:
-        # "Frau Müller" → normalize: "Erwachsene Müller" → ner: "Erwachsene Person-A"
-        # Remove the kinship placeholder left in front of a NER placeholder.
-        text = re.sub(
-            r"\bErwachsene[r]?\s+((?:Person|Org|Gruppe)-[A-Z]+)\b",
-            r"\1",
-            text,
-        )
-        text = fix_pronouns(text)
-        return fix_article_agreement(text)
 
     def ner(self, text: str) -> tuple[str, dict[str, str]]:
         seen_per: dict[str, str] = {}
@@ -64,7 +46,7 @@ class SpacyStrategy(AnonymizationStrategy):
             surface = ent.text.strip()
             surface_lower = surface.lower()
 
-            if surface_lower in _ENTITY_BLOCKLIST or len(surface) < 3:
+            if surface_lower in _ENTITY_BLOCKLIST or _last_token(surface_lower) in _ENTITY_BLOCKLIST or len(surface) < 3:
                 continue
 
             if ent.label_ == "PER":
