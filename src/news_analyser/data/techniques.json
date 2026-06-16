@@ -10,6 +10,36 @@
     "doc": "Appeal to Fear Angst-Appell Bedrohungsappell FUD Fear Uncertainty Doubt Angstmache Panik Bedrohung"
   },
   {
+    "id": "emotional-manipulation",
+    "name": "Emotional Manipulation",
+    "name_de": "Emotionale Manipulation",
+    "category": "Emotional",
+    "description": "Gezielte Nutzung von Angst, Empörung, Mitleid oder Hilflosigkeit um Schlussfolgerungen zu stützen, ohne rationale Argumente zu liefern. Umfasst FUD (Fear, Uncertainty, Doubt) sowie Appeal to Fear.",
+    "example": "Wenn wir jetzt nicht handeln, werden unsere Kinder in einer Welt ohne Zukunft aufwachsen — und es wird zu spät sein.",
+    "reference_url": "https://de.wikipedia.org/wiki/Emotionale_Manipulation",
+    "doc": "Emotional Manipulation emotionale Manipulation FUD Fear Uncertainty Doubt Angstmache Appeal to Fear Angst Hilflosigkeit Empörung Mitleid"
+  },
+  {
+    "id": "selective-empathy",
+    "name": "Selective Empathy",
+    "name_de": "Selektives Mitgefühl",
+    "category": "Strukturell",
+    "description": "Mitgefühl, Solidarität oder moralische Empörung werden nur für bestimmte Gruppen aufgebracht, während vergleichbares Leid anderer Gruppen ignoriert oder relativiert wird. Auch bekannt als Identity Shopping.",
+    "example": "Die Opfer auf unserer Seite werden ausführlich betrauert — die Opfer der anderen Seite kommen im Artikel nicht vor.",
+    "reference_url": "https://de.wikipedia.org/wiki/Empathie",
+    "doc": "Selective Empathy selektives Mitgefühl Identity Shopping Opferempathie Gruppenempathie asymmetrisches Mitgefühl selektive Solidarität"
+  },
+  {
+    "id": "omission",
+    "name": "Omission",
+    "name_de": "Auslassung",
+    "category": "Strukturell",
+    "description": "Relevante Gegeninformationen, Kontext oder Gegenpositionen werden systematisch weggelassen. Anders als Cherry Picking geht es nicht um Datenselektion, sondern um das strukturelle Fehlen ausgleichender Perspektiven.",
+    "example": "Der Artikel beschreibt ausführlich die Nachteile der Reform, erwähnt aber mit keinem Wort die Probleme des Status quo.",
+    "reference_url": "https://de.wikipedia.org/wiki/Auslassung_(Rhetorik)",
+    "doc": "Omission Auslassung Weglassen Perspektivlosigkeit fehlender Kontext einseitige Berichterstattung strukturelle Auslassung"
+  },
+  {
     "id": "whataboutism",
     "name": "Whataboutism",
     "name_de": "Whataboutismus",
