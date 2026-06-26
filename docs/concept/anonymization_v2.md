@@ -1,4 +1,4 @@
-# Anonymization v2 — Concept and Roadmap
+# Anonymization v2 — Concept and Status
 
 ## Background
 
@@ -6,13 +6,7 @@ The branch `feature/gender_anonymization` was abandoned after testing.
 Core problem: a unified LLM pass for NER + group identification was too aggressive
 and degraded analysis quality (Bernays Score: 3.92 → 3.26/1000w).
 
-### Benchmark Reference (taz Männlichkeit article)
-
-| Version | Technique instances | Bernays Score |
-|---|---|---|
-| Gemini gender-swap (ideal) | 7 | — |
-| Master (current) | 6 | 3.92/1000w |
-| feature/gender_anonymization | 5 | 3.26/1000w |
+The lessons learned were ported manually into master via `feature/anonymizer-v2`.
 
 ---
 
@@ -27,101 +21,87 @@ and degraded analysis quality (Bernays Score: 3.92 → 3.26/1000w).
 - Articles with many kinship terms: 2+ minutes runtime
 - Unreliable corrections when processing long sentence lists
 
----
+### Gendered kinship term replacement (Python)
+Ported from `feature/gender_anonymization` and later **removed** (2026-06-26).
 
-## What worked (to be ported)
+Reason: Test 06 (bias-validation.md) showed that gender symmetry (Δ technique count = 1)
+is achieved by the symmetry rule in the pass 1 prompt alone — without any anonymisation.
+The kinship replacement caused context loss (specific names, identity markers needed for
+Selective Empathy detection) without providing a measurable symmetry benefit.
 
-These components from the feature branch are complete and tested:
-
-### Python kinship term replacement
-Neutralises gendered family terms without loss of meaning:
-- `Sohn/Töchter` → `Kind/Kinder`
-- `Vater/Mutter` → `Elternteil/Elternteile`
-- `Mann/Frau` → `Erwachsener/Erwachsene`
-- `Bruder/Schwester` → `Geschwister`
-- Full list in `anonymizer.py` `GENDERED_KINSHIP_TERMS`
-
-### Python article agreement correction
-Deterministically fixes grammatical gender after kinship replacement:
-- `der/einen/meinen Kind` → `das/ein/mein Kind`
-- `die/eine/meine Kind` → `das/ein/mein Kind`
-- `einen tollen Erwachsener` → `einen tollen Erwachsenen`
-
-### Python pronoun replacement
-In sentences containing `Person-X` placeholders:
-- `er/ihn/ihm` → `sie/sie/ihr`
-- `sein/seine/seinen/seinem` → `ihr/ihre/ihren/ihrem`
+Removed components:
+- `GENDERED_KINSHIP_TERMS` list in `_normalizations.py`
+- Kinship replacement loop in `SpacyStrategy.normalize()`
+- `fix_article_agreement()` and `fix_pronouns()` calls in `SpacyStrategy.correct()`
+- `_grammar.py` (retained as dead code for reference)
 
 ---
 
-## New approach (v2)
+## Current architecture (as of 2026-06-26)
 
-### Principle: curated lists > LLM for group identification
+### Pipeline: SpacyStrategy
 
-| Layer | Method | Purpose |
+| Step | Method | Purpose |
 |---|---|---|
-| NER (PER/ORG/LOC) | LLM Pass 0 | Named entities — LLM remains reliable here |
-| Groups | Curated lists | No LLM, no risk of verb misidentification |
-| Kinship terms | Python (GENDERED_KINSHIP_TERMS) | Deterministic, fast |
-| Grammar fix | Python (articles + pronouns) | No LLM pass needed |
+| 1 | `normalize()` | Replace ideological terms (IDEOLOGICAL_TERMS) with neutral equivalents |
+| 2 | `ner()` | spaCy NER: replace PER → Person-X, ORG → Org-X |
+| 3 | `replace_groups()` | Replace group terms from Pass 0 output → Gruppe-X |
+| 4 | `correct()` | No-op (grammar correction removed with kinship terms) |
 
-### Group detection without LLM
-Instead of LLM: word lists similar to `IDEOLOGICAL_TERMS`, split by category:
-- Racial / ethnic terms
-- Gender role terms (Jungs, Mädchen etc.)
-- Religious designations
+### Pass 0 (group detection)
+
+LLM-based identification of group identifiers per article. Returns a list of
+`{term, type}` objects. Types currently detected:
+
+- `racial` — perceived race or skin colour
+- `ethnic_origin` — ethnic or national origin
+- `religious` — religious affiliation
+- `gender_identity` — non-binary / transgender identities
+- `sexual_orientation` — sexual orientation
+- `national_origin` — country of origin as group marker
+
+**Not anonymised:** binary gender terms (Männer/Frauen, Jungen/Mädchen).
+Rationale: see Test 06 in bias-validation.md — prompt symmetry rule is sufficient.
+
+### Entity blocklist
+
+Common nouns that spaCy incorrectly tags as PER are blocked in `_ENTITY_BLOCKLIST`:
+- Political/abstract terms: Faschismus, Demokratie, Partei, …
+- Kinship nouns: Sohn, Tochter, Vater, Mutter, Mann, Frau, … (added 2026-06-26
+  to prevent false PER-tagging after kinship replacement was removed)
 
 ---
 
-## Fallback: Adaptive Strategy
+## Benchmark
 
-If the curated-list approach does not reach the benchmark (≥ 6 technique instances),
-the `replace_groups()` step can be escalated to an LLM selectively.
+| Date | Version | Technique instances | Bernays Score | Model |
+|---|---|---|---|---|
+| 2026-05-22 | v0.1 (pre-anonymisation) | 6 | 3.92/1000w | claude-sonnet-4-6 |
+| 2026-06-26 | Current (no gender anon, improved prompt) | 15 | ~9.78/1000w | claude-sonnet-4-6 |
 
-### Trigger: topic-based detection
+Source: taz.de "Männlichkeitsbilder in Schulen" (1535 words)
 
-Topic keywords are checked on the raw text before anonymization — no extra LLM call needed.
+---
 
-```python
-_LLM_TOPICS: set[str] = {
-    "feminismus", "feministische", "gender", "männlichkeit",
-    "rassismus", "migration", "islamophobie",
-}
+## Symmetry results (summary)
 
-def _needs_llm(text: str) -> bool:
-    text_lower = text.lower()
-    return any(topic in text_lower for topic in _LLM_TOPICS)
-```
+Full results in bias-validation.md.
 
-### Why not use Bernays Score / Orwell-Index as trigger?
-
-These indicators are produced by Pass 1 — after anonymization has already run.
-They cannot influence the current article's strategy. Possible use: trigger a
-**second pass** with LLM strategy if the first result looks suspicious.
-
-### Architecture
-
-`AdaptiveStrategy` wraps `SpacyStrategy` and `LLMStrategy`. Only `replace_groups()`
-is escalated — `normalize()`, `ner()`, and `correct()` always use the spaCy path.
-
-```
-AdaptiveStrategy
-  ├── normalize()       → SpacyStrategy (always)
-  ├── ner()             → SpacyStrategy (always)
-  ├── replace_groups()  → SpacyStrategy / LLMStrategy (topic-dependent)
-  └── correct()         → SpacyStrategy (always)
-```
+| Bias type | Without anonymisation | With anonymisation | Verdict |
+|---|---|---|---|
+| Gender (Männer/Frauen) | Δ = 1 ✅ | — (removed) | Prompt rule sufficient |
+| Group/ethnicity (Muslime/Westeuropäer) | Δ = 4 ⚠ | Δ = 0 ✅ | Anonymisation needed |
 
 ---
 
 ## ToDo
 
-- [x] Port kinship terms from feature branch (`GENDERED_KINSHIP_TERMS`)
-- [x] Port article agreement correction (`_fix_article_agreement`)
-- [x] Port pronoun replacement (`_replace_pronouns`)
+- [x] Port kinship terms from feature branch
+- [x] Port article agreement correction
+- [x] Port pronoun replacement
 - [x] Port debug notebook (`notebooks/anonymizer_debug.ipynb`)
-- [ ] Restrict Pass 0 prompt to NER (PER/ORG/LOC) only — remove group detection
-- [ ] Curate group word lists (racial, gender_role, religious etc.)
-- [ ] Regression test: benchmark ≥ 6 technique instances on taz Männlichkeit article
+- [x] Restrict Pass 0 to group types only (no binary gender)
+- [x] Regression test: benchmark ≥ 6 technique instances — exceeded (15)
+- [ ] Curate group word lists as fallback for Pass 0 LLM failures
 - [ ] UI progress indicator (pipeline steps): detecting terms → anonymising → analysing
-- [ ] Implement `AdaptiveStrategy` with LLM-based `replace_groups()` (candidate: small Gemma 4, fits 8GB M1)
+- [ ] Implement `AdaptiveStrategy` with LLM-based `replace_groups()` for high-risk topics
