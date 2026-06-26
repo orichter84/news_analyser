@@ -40,7 +40,7 @@ Return ONLY a single, valid JSON object. No markdown, no additional text.
 - 1.0: Apocalyptic, existential threat, mobilisation
 
 **Anonymisation note:**
-Reconstruct the rhetorical intent behind the placeholders. Techniques that appear weakened by anonymisation must still be counted in full if the structure is recognisable.
+Reconstruct the rhetorical intent behind the placeholders. Count a technique only if the rhetorical structure — not merely the mention of a group — is recognisable: emotional loading, selective context, distortion, or implicit judgment. Neutral factual statements (e.g. reporting an age, nationality, or legal status) are not techniques even if they contain group identifiers.
 
 **Final instruction:**
 Be maximally objective and symmetric. Your assessment must yield a very similar result when roles are swapped.
