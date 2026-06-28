@@ -9,7 +9,7 @@ import { Technique } from '../models/technique.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private readonly base = 'http://localhost:8000';
+  private readonly base = `http://${window.location.hostname}:8000`;
   private readonly http = inject(HttpClient);
 
   getArticles(filter?: ArticleFilter): Observable<ArticleListItem[]> {

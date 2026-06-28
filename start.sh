@@ -7,7 +7,7 @@ VENV="$BASE/.venv/bin"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="/opt/homebrew/bin:$HOME/.local/bin:$PATH"
 
 # .env laden
 set -a; [ -f "$BASE/.env" ] && source "$BASE/.env"; set +a
@@ -36,7 +36,7 @@ echo "    Backend bereit (PID $BACKEND_PID)"
 
 echo "[3/3] Angular Frontend starten (Port 4200) ..."
 cd "$BASE/frontend"
-npx ng serve --port 4200 &
+npx ng serve --host 0.0.0.0 --port 4200 &
 FRONTEND_PID=$!
 sleep 2
 echo "    Frontend bereit (PID $FRONTEND_PID)"

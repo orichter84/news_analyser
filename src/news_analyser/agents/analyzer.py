@@ -153,7 +153,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
 
     # Rollen aus Pass 2 normalisieren
     for t in result2.get("manipulation_targets", []):
-        if isinstance(t.get("rolle"), str):
+        if isinstance(t, dict) and isinstance(t.get("rolle"), str):
             t["rolle"] = normalize_role(t["rolle"])
 
     # ------------------------------------------------------------------

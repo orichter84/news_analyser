@@ -42,6 +42,7 @@ class CLIAdapter(LLMAdapter):
         if not model:
             model = os.environ.get("LLM_MODEL") or os.environ.get("OPENAI_MODEL")
         self._model: str = model or self._DEFAULTS["model"]
+        self._cli_path: str = os.environ.get("CLAUDE_CLI_PATH", "claude")
 
         # Kein Schritt 2: Der CLI authentifiziert sich eigenständig.
 
@@ -53,7 +54,7 @@ class CLIAdapter(LLMAdapter):
         user_content = json.dumps(input_data, ensure_ascii=False, indent=2)
 
         cmd = [
-            "claude", "-p",
+            self._cli_path, "-p",
             "--no-session-persistence",  # keine History-Einträge
             "--system-prompt", system_prompt,
             "--model", self._model,
