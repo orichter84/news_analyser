@@ -1,29 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ApiService } from '../../core/services/api.service';
-import { Technique } from '../../core/models/technique.model';
+import { Component } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-knowledge',
   standalone: true,
-  imports: [CommonModule],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './knowledge.component.html',
 })
-export class KnowledgeComponent implements OnInit {
-  private api = inject(ApiService);
-
-  techniques = signal<Technique[]>([]);
-  categories = signal<string[]>([]);
-
-  techniquesByCategory(cat: string): Technique[] {
-    return this.techniques().filter(t => t.category === cat);
-  }
-
-  ngOnInit(): void {
-    this.api.getTechniques().subscribe(list => {
-      this.techniques.set(list);
-      const cats = [...new Set(list.map(t => t.category))].sort();
-      this.categories.set(cats);
-    });
-  }
-}
+export class KnowledgeComponent {}
