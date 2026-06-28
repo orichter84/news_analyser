@@ -18,6 +18,10 @@ export const STATS_ROUTES: Routes = [
         path: 'herausgeber',
         loadComponent: () => import('./stats-publisher.component').then(m => m.StatsPublisherComponent),
       },
+      {
+        path: 'trends',
+        loadComponent: () => import('./stats-trends.component').then(m => m.StatsTrendsComponent),
+      },
     ],
   },
 ];

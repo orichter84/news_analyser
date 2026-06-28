@@ -1,0 +1,89 @@
+@if (loading()) {
+  <p class="loading">Lade Trend-Daten…</p>
+} @else if (!data()) {
+  <p class="empty">Keine Daten vorhanden.</p>
+} @else {
+
+  <!-- 1. Trend-Dashboard -->
+  <section class="panel full">
+    <h2>Trend-Dashboard <span class="panel-hint">letzte 14 Tage vs. Vorperiode</span></h2>
+    @if (cards().length === 0) {
+      <p class="empty-hint">Noch zu wenig Daten für Trendvergleiche (mind. 2 Wochen Feed-Betrieb).</p>
+    } @else {
+      <div class="trend-cards">
+        @for (c of cards(); track c.domain) {
+          <div class="trend-card">
+            <div class="trend-domain">{{ c.domain }}</div>
+            <div class="trend-n">{{ c.artikel_recent }} Artikel</div>
+            <div class="trend-metrics">
+              <div class="trend-metric">
+                <span class="trend-metric-label">Orwell</span>
+                <span class="trend-metric-value">{{ c.orwell.current | number:'1.3-3' }}</span>
+                <span class="trend-badge" [ngClass]="trendClass(c.orwell.pct)">
+                  {{ trendArrow(c.orwell.pct) }}
+                  @if (c.orwell.pct !== null) {
+                    {{ c.orwell.pct > 0 ? '+' : '' }}{{ c.orwell.pct | number:'1.1-1' }}%
+                  }
+                </span>
+              </div>
+              <div class="trend-metric">
+                <span class="trend-metric-label">Bernays</span>
+                <span class="trend-metric-value">{{ c.bernays.current | number:'1.1-1' }}</span>
+                <span class="trend-badge" [ngClass]="trendClass(c.bernays.pct)">
+                  {{ trendArrow(c.bernays.pct) }}
+                  @if (c.bernays.pct !== null) {
+                    {{ c.bernays.pct > 0 ? '+' : '' }}{{ c.bernays.pct | number:'1.1-1' }}%
+                  }
+                </span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- 2. Multi-Domain Vergleich -->
+  @if (hasComparison()) {
+    <section class="panel full">
+      <h2>Orwell-Index im Wochenvergleich <span class="panel-hint">alle Portale</span></h2>
+      <div class="comp-chart-wrap">
+        <canvas #compCanvas></canvas>
+      </div>
+    </section>
+  }
+
+  <!-- 3. Themen-Heatmap -->
+  @if (heatRows().length > 0) {
+    <section class="panel full">
+      <h2>Manipulations-Heatmap nach Thema <span class="panel-hint">Orwell-Index, letzte 8 Wochen</span></h2>
+      <div class="heatmap-wrap">
+        <table class="heatmap">
+          <thead>
+            <tr>
+              <th class="heatmap-topic-col">Thema</th>
+              @for (w of heatWeeks(); track w) {
+                <th>{{ w }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of heatRows(); track row.topic) {
+              <tr>
+                <td class="heatmap-topic">{{ row.topic }}</td>
+                @for (val of row.cells; track $index) {
+                  <td class="heatmap-cell"
+                      [style.background]="heatColor(val)"
+                      [title]="val !== null ? (val | number:'1.3-3') : '–'">
+                    {{ val !== null ? (val | number:'1.2-2') : '' }}
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+}

@@ -18,9 +18,18 @@ from news_analyser.stats import (
     sentiment_distribution,
     daily_verlauf,
     publisher_profiles,
+    trend_analysis,
 )
 
 router = APIRouter(prefix="/stats", tags=["stats"])
+
+
+@router.get("/trends")
+def get_trends() -> dict:
+    df = _load_dataframe()
+    if df.empty:
+        return {"trend_cards": [], "topic_heatmap": {"weeks": [], "rows": []}, "domain_comparison": [], "weeks": []}
+    return trend_analysis(df)
 
 
 @router.get("/publisher")

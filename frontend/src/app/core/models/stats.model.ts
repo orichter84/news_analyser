@@ -1,3 +1,28 @@
+export interface TrendMetric {
+  current: number;
+  delta: number | null;
+  pct: number | null;
+}
+
+export interface TrendCard {
+  domain: string;
+  artikel_recent: number;
+  orwell: TrendMetric;
+  bernays: TrendMetric;
+}
+
+export interface HeatmapRow {
+  topic: string;
+  cells: (number | null)[];
+}
+
+export interface TrendResponse {
+  trend_cards: TrendCard[];
+  topic_heatmap: { weeks: string[]; rows: HeatmapRow[] };
+  domain_comparison: { domain: string; values: (number | null)[] }[];
+  weeks: string[];
+}
+
 export interface DependencyScore {
   label: string;
   score: number | null;

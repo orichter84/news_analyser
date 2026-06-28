@@ -818,6 +818,81 @@ a.technique-card {
   }
 }
 
+/* ---- Trend Analysis ---- */
+.panel-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
+
+.trend-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.trend-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+
+  .trend-domain { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.15rem; }
+  .trend-n { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem; }
+}
+
+.trend-metrics { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.trend-metric {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .trend-metric-label { font-size: 0.75rem; color: var(--muted); width: 52px; }
+  .trend-metric-value { font-weight: 600; font-size: 0.95rem; flex: 1; }
+}
+
+.trend-badge {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 99px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.trend-up      { background: rgba(224,82,82,0.15); color: #e05252; }
+  &.trend-down    { background: rgba(82,224,168,0.15); color: #52e0a8; }
+  &.trend-neutral { background: var(--border); color: var(--muted); }
+}
+
+.comp-chart-wrap {
+  height: 320px;
+  position: relative;
+}
+
+.heatmap-wrap {
+  overflow-x: auto;
+}
+
+.heatmap {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.78rem;
+
+  th, td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  th { color: var(--muted); font-weight: 600; background: var(--surface); }
+
+  .heatmap-topic-col { width: 130px; text-align: left; }
+  .heatmap-topic { text-align: left; font-weight: 500; background: var(--surface); }
+  .heatmap-cell { font-size: 0.72rem; color: var(--text); min-width: 70px; }
+}
+
 .positive .dep-bar-fill { background: #52e0a8; }
 .negative .dep-bar-fill { background: var(--danger); }
 

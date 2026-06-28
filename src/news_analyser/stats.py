@@ -268,6 +268,91 @@ _DEPENDENCY_LABELS: dict[str, str] = {
 }
 
 
+def trend_analysis(df: pd.DataFrame) -> dict:
+    """Trend-Analyse: Domain-Trend-Cards, Themen-Heatmap, Domain-Vergleich wochenweise."""
+    if df.empty:
+        return {"trend_cards": [], "topic_heatmap": [], "domain_comparison": []}
+
+    df = df.copy()
+    df["date"] = pd.to_datetime(
+        df["published_at"].where(df["published_at"].notna(), df.get("timestamp")),
+        errors="coerce",
+    ).dt.date
+    df = df.dropna(subset=["date"])
+    for col in ["orwell_index", "bernays_score"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    today = df["date"].max()
+    cutoff_recent = today - pd.Timedelta(days=14)
+    cutoff_prev   = today - pd.Timedelta(days=28)
+
+    recent = df[df["date"] > cutoff_recent]
+    prev   = df[(df["date"] > cutoff_prev) & (df["date"] <= cutoff_recent)]
+
+    # --- 1. Trend-Cards pro Domain ---
+    trend_cards = []
+    for domain in df["domain"].unique():
+        r = recent[recent["domain"] == domain]
+        p = prev[prev["domain"] == domain]
+        if len(r) < 2:
+            continue
+        card: dict = {"domain": domain, "artikel_recent": len(r)}
+        for metric, label in [("orwell_index", "orwell"), ("bernays_score", "bernays")]:
+            r_val = float(r[metric].median())
+            p_val = float(p[metric].median()) if len(p) >= 2 else None
+            delta = round(r_val - p_val, 3) if p_val is not None else None
+            pct   = round((delta / p_val) * 100, 1) if (delta is not None and p_val and p_val != 0) else None
+            card[label] = {"current": round(r_val, 3), "delta": delta, "pct": pct}
+        trend_cards.append(card)
+    trend_cards.sort(key=lambda x: -(x.get("orwell", {}).get("current") or 0))
+
+    # --- 2. Themen-Heatmap (letzte 8 Wochen) ---
+    cutoff_8w = today - pd.Timedelta(weeks=8)
+    hm_df = df[df["date"] >= cutoff_8w].copy()
+    hm_df["week"] = pd.to_datetime(hm_df["date"]).dt.strftime("%Y-W%W")
+    if not hm_df.empty and "themenbereich" in hm_df.columns:
+        hm = (
+            hm_df.groupby(["themenbereich", "week"])["orwell_index"]
+            .median()
+            .round(3)
+            .reset_index()
+            .rename(columns={"orwell_index": "orwell"})
+        )
+        weeks_sorted = sorted(hm["week"].unique())
+        topics = list(hm["themenbereich"].unique())
+        heatmap_rows = []
+        for topic in sorted(topics):
+            cells = []
+            for week in weeks_sorted:
+                val = hm[(hm["themenbereich"] == topic) & (hm["week"] == week)]["orwell"]
+                cells.append(float(val.iloc[0]) if len(val) else None)
+            heatmap_rows.append({"topic": topic, "cells": cells})
+        topic_heatmap = {"weeks": weeks_sorted, "rows": heatmap_rows}
+    else:
+        topic_heatmap = {"weeks": [], "rows": []}
+
+    # --- 3. Domain-Vergleich wochenweise (letzte 8 Wochen) ---
+    comp_df = df[df["date"] >= cutoff_8w].copy()
+    comp_df["week"] = pd.to_datetime(comp_df["date"]).dt.strftime("%Y-W%W")
+    domain_comparison = []
+    all_weeks = sorted(comp_df["week"].unique()) if not comp_df.empty else []
+    for domain in sorted(df["domain"].unique()):
+        ddf = comp_df[comp_df["domain"] == domain]
+        if ddf.empty:
+            continue
+        grouped = ddf.groupby("week")["orwell_index"].median().round(3)
+        points = [float(grouped.get(w, None)) if w in grouped.index else None for w in all_weeks]
+        if any(v is not None for v in points):
+            domain_comparison.append({"domain": domain, "values": points})
+
+    return {
+        "trend_cards":       trend_cards,
+        "topic_heatmap":     topic_heatmap,
+        "domain_comparison": domain_comparison,
+        "weeks":             all_weeks,
+    }
+
+
 def publisher_profiles(df: pd.DataFrame) -> list[dict]:
     """Publisher-Profil pro Domain: politische Strömungen + Abhängigkeits-Scores."""
     if df.empty:
