@@ -9,12 +9,31 @@ Verwendung:
 from __future__ import annotations
 
 import json
+import os
 from collections import Counter
 from typing import Any
 
+import numpy as np
 import pandas as pd
+from chromadb.utils import embedding_functions
 
 from .repositories.db_storage import _get_collection
+
+CANONICAL_EMOTIONS = [
+    "Angst",
+    "Wut",
+    "Empörung",
+    "Trauer",
+    "Hoffnung",
+    "Stolz",
+    "Ekel",
+    "Überraschung",
+    "Neutral",
+]
+
+_EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=os.environ.get("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+)
 
 
 def _parse_targets(raw: Any) -> list[dict]:
@@ -113,8 +132,33 @@ def top_domains(df: pd.DataFrame, n: int = 5) -> pd.Series:
 
 
 def sentiment_distribution(df: pd.DataFrame) -> pd.Series:
-    """Verteilung der intendierten Emotionen."""
-    return df["intended_sentiment"].value_counts()
+    """Aggregiert intendierte Emotionen via Embedding-Nearest-Neighbor zu kanonischen Labels."""
+    if "intended_sentiment" not in df.columns:
+        return pd.Series(dtype=int)
+
+    raw = [s for s in df["intended_sentiment"].dropna().tolist() if s]
+    if not raw:
+        return pd.Series(dtype=int)
+
+    canonical_embs: list[list[float]] = _EMBED_FN(CANONICAL_EMOTIONS)
+
+    unique_strings = list(set(raw))
+    unique_embs: list[list[float]] = _EMBED_FN(unique_strings)
+
+    def _nearest(emb: list[float]) -> str:
+        sims = [
+            float(np.dot(emb, c) / (np.linalg.norm(emb) * np.linalg.norm(c)))
+            for c in canonical_embs
+        ]
+        return CANONICAL_EMOTIONS[int(np.argmax(sims))]
+
+    string_to_label = {s: _nearest(e) for s, e in zip(unique_strings, unique_embs)}
+
+    counts: dict[str, int] = {label: 0 for label in CANONICAL_EMOTIONS}
+    for s in raw:
+        counts[string_to_label[s]] += 1
+
+    return pd.Series(counts).sort_values(ascending=False)
 
 
 def domain_averages(df: pd.DataFrame) -> pd.DataFrame:
