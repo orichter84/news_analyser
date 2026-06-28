@@ -1,3 +1,19 @@
+export interface DependencyScore {
+  label: string;
+  score: number | null;
+  positiv: number;
+  negativ: number;
+  neutral: number;
+  total: number;
+}
+
+export interface PublisherProfile {
+  domain: string;
+  artikel: number;
+  stroemung: Record<string, number>;
+  abhaengigkeit: Record<string, DependencyScore>;
+}
+
 export interface VerlaufEntry {
   date: string;
   count: number;

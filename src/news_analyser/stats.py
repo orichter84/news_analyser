@@ -251,6 +251,85 @@ def thema_bernays(df: pd.DataFrame) -> pd.DataFrame:
     return agg.sort_values("bernays_avg", ascending=False).round(3)
 
 
+_DEPENDENCY_ENTITIES: dict[str, list[str]] = {
+    "regierung":  ["bundesregierung", "olaf scholz", "scholz", "ampel", "koalition", "bundesminister", "bundesregier"],
+    "usa":        ["usa", "nato", "washington", "biden", "trump", "pentagon", "weißes haus", "white house"],
+    "eu":         ["eu", "europäische union", "brüssel", "von der leyen", "europäische kommission", "europarl"],
+    "russland":   ["russland", "putin", "kreml", "moskau", "russian"],
+    "china":      ["china", "xi jinping", "peking", "kpch", "volksrepublik"],
+}
+
+_DEPENDENCY_LABELS: dict[str, str] = {
+    "regierung": "Regierungsfreundlich",
+    "usa":       "US-freundlich",
+    "eu":        "EU-freundlich",
+    "russland":  "Russland-freundlich",
+    "china":     "China-freundlich",
+}
+
+
+def publisher_profiles(df: pd.DataFrame) -> list[dict]:
+    """Publisher-Profil pro Domain: politische Strömungen + Abhängigkeits-Scores."""
+    if df.empty:
+        return []
+
+    profiles: dict[str, dict] = {}
+
+    for _, row in df.iterrows():
+        domain = row.get("domain", "")
+        if not domain:
+            continue
+        if domain not in profiles:
+            profiles[domain] = {
+                "domain":    domain,
+                "artikel":   0,
+                "stroemung": {},
+                "abhaengigkeit": {k: {"positiv": 0, "negativ": 0, "neutral": 0} for k in _DEPENDENCY_ENTITIES},
+            }
+        p = profiles[domain]
+        p["artikel"] += 1
+
+        for label in row.get("politische_stroemung", []):
+            p["stroemung"][label] = p["stroemung"].get(label, 0) + 1
+
+        for t in row.get("manipulation_targets", []):
+            if not isinstance(t, dict):
+                continue
+            entity = t.get("entity", "").lower()
+            direction = t.get("direction", "neutral")
+            if direction not in ("positiv", "negativ", "neutral"):
+                direction = "neutral"
+            for dim, keywords in _DEPENDENCY_ENTITIES.items():
+                if any(kw in entity for kw in keywords):
+                    p["abhaengigkeit"][dim][direction] += 1
+
+    result = []
+    for p in profiles.values():
+        dep_scores = {}
+        for dim, counts in p["abhaengigkeit"].items():
+            total = counts["positiv"] + counts["negativ"] + counts["neutral"]
+            if total == 0:
+                score = None
+            else:
+                score = round((counts["positiv"] - counts["negativ"]) / total, 2)
+            dep_scores[dim] = {
+                "label":    _DEPENDENCY_LABELS[dim],
+                "score":    score,
+                "positiv":  counts["positiv"],
+                "negativ":  counts["negativ"],
+                "neutral":  counts["neutral"],
+                "total":    total,
+            }
+        result.append({
+            "domain":        p["domain"],
+            "artikel":       p["artikel"],
+            "stroemung":     dict(sorted(p["stroemung"].items(), key=lambda x: -x[1])),
+            "abhaengigkeit": dep_scores,
+        })
+
+    return sorted(result, key=lambda x: -x["artikel"])
+
+
 def daily_verlauf(df: pd.DataFrame, domain: str | None = None) -> list[dict]:
     """Tagesbasierter Median der numerischen Indikatoren, optional nach Domain gefiltert."""
     if domain:

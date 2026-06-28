@@ -17,9 +17,18 @@ from news_analyser.stats import (
     domain_averages,
     sentiment_distribution,
     daily_verlauf,
+    publisher_profiles,
 )
 
 router = APIRouter(prefix="/stats", tags=["stats"])
+
+
+@router.get("/publisher")
+def get_publisher_profiles() -> list[dict]:
+    df = _load_dataframe()
+    if df.empty:
+        return []
+    return publisher_profiles(df)
 
 
 @router.get("/verlauf")

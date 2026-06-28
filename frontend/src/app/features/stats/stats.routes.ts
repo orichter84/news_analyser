@@ -14,6 +14,10 @@ export const STATS_ROUTES: Routes = [
         path: 'verlauf',
         loadComponent: () => import('./stats-verlauf.component').then(m => m.StatsVerlaufComponent),
       },
+      {
+        path: 'herausgeber',
+        loadComponent: () => import('./stats-publisher.component').then(m => m.StatsPublisherComponent),
+      },
     ],
   },
 ];
