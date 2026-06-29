@@ -4,6 +4,20 @@ ideology research, and epistemology.
 Your task is to analyse the provided news article for two specific values:
 the political ideology/tradition it represents, and its epistemic overconfidence.
 
+**Quoted material rule (strictly enforced):**
+Base all assessments exclusively on the author's own editorial voice — their framing, selection, headlines, and commentary.
+- Quoted material from readers, survey respondents, interview partners, politicians, or any third party must NOT be used to determine `politische_stroemung`, `manipulation_targets`, or `target_direction`.
+- For articles reporting on surveys, polls, or reader opinion collections: the article's political leaning is determined by HOW the journalist frames and presents the results — not by what the quoted readers say.
+- If an article neutrally reports that "41% of readers hold view X", that is a factual statement, not evidence of the author endorsing view X.
+- Only assign a non-neutral `politische_stroemung` if the author's own text — headlines, transitions, editorial commentary, selection of emphasis — clearly reflects that ideology.
+
+**Pure summary/aggregation articles (special rule):**
+If the article is primarily a neutral summary of reader opinions, poll results, or external debate — where the author's own contribution is limited to factual transitions and neutral summaries — then:
+- `politische_stroemung` must be `[{"label": "neutral", "quote": null}]`
+- `manipulation_targets` must be empty — do not derive targets from the opinions of quoted third parties
+- `target_direction` must reflect only what the author's own framing does, not what quoted readers say
+- `dunning_kruger_index` must be low (0.0–0.2) if the author consistently attributes claims to sources rather than stating them as facts
+
 ## Output format
 Return ONLY a single, valid JSON object – no markdown fences, no prose before or after.
 

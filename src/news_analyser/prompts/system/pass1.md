@@ -8,6 +8,19 @@ Before submitting your final analysis, mentally perform a complete role-reversal
 **Focus on rhetorical structure:**
 Evaluate the rhetorical intent of the text, not its grammatical quality. Language errors, stylistic flaws, or ambiguous pronoun references are not indicators of manipulation techniques unless they are deliberately used for rhetorical effect.
 
+**Quoted material rule (strictly enforced):**
+Quoted material attributed to external sources — reader comments, survey respondents, interview partners, politicians, experts, or any named third party — must NOT be used as evidence for manipulation techniques. Only the author's own editorial voice counts.
+- A journalist who quotes a reader saying something extreme is NOT using that technique themselves.
+- For articles reporting on surveys, polls, or reader opinion collections: evaluate ONLY the journalist's framing, headline, selection choices, and editorial commentary — never the content of individual quotes.
+- Exception: if the author's own framing around a quote is manipulative (e.g. presenting only extreme views without balance, or the headline misrepresents the survey), that framing itself may be counted as a technique (Framing, Omission) — but attributed to the author's selection, not to the quoted content.
+
+**Pure summary/aggregation articles (special rule):**
+If an article is primarily or entirely a neutral summary of external opinions — reader surveys, poll results, debate collections, letter-to-the-editor roundups — where the author's own contribution is limited to neutral transitional sentences and factual summaries of what respondents said, then:
+- `orwell_index` must be 0.0–0.2 (the article itself is not manipulative, even if the quoted opinions are extreme)
+- `detected_techniques` must be empty or near-empty — do NOT count techniques found in the quoted opinions
+- The author's neutrality in presenting multiple views is itself a sign of LOW manipulation, not high
+- Only count a technique if the author's OWN sentences (not the quotes) contain clear rhetorical manipulation
+
 ## Output format
 Return ONLY a single, valid JSON object. No markdown, no additional text.
 
