@@ -252,11 +252,20 @@ def thema_bernays(df: pd.DataFrame) -> pd.DataFrame:
 
 
 _DEPENDENCY_ENTITIES: dict[str, list[str]] = {
+    # Geopolitisch
     "regierung":  ["bundesregierung", "olaf scholz", "scholz", "ampel", "koalition", "bundesminister", "bundesregier"],
     "usa":        ["usa", "nato", "washington", "biden", "trump", "pentagon", "weißes haus", "white house"],
     "eu":         ["eu", "europäische union", "brüssel", "von der leyen", "europäische kommission", "europarl"],
     "russland":   ["russland", "putin", "kreml", "moskau", "russian"],
     "china":      ["china", "xi jinping", "peking", "kpch", "volksrepublik"],
+    # Parteien
+    "spd":        ["spd", "sozialdemokraten", "sozialdemokrat", "pistorius", "heil", "esken", "klingbeil"],
+    "cdu_csu":    ["cdu", "csu", "union", "merz", "söder", "unionsfraktion", "schwarze null"],
+    "gruene":     ["grüne", "grünen", "bündnis 90", "habeck", "baerbock", "özdemir"],
+    "fdp":        ["fdp", "freie demokraten", "liberale", "lindner", "wissing", "dürr"],
+    "afd":        ["afd", "alternative für deutschland", "weidel", "chrupalla", "höcke"],
+    "bsw":        ["bsw", "bündnis sahra wagenknecht", "wagenknecht"],
+    "linke":      ["die linke", "linkspartei", "gysi", "bartsch", "pellmann"],
 }
 
 _DEPENDENCY_LABELS: dict[str, str] = {
@@ -265,6 +274,13 @@ _DEPENDENCY_LABELS: dict[str, str] = {
     "eu":        "EU-freundlich",
     "russland":  "Russland-freundlich",
     "china":     "China-freundlich",
+    "spd":       "SPD",
+    "cdu_csu":   "CDU/CSU",
+    "gruene":    "Grüne",
+    "fdp":       "FDP",
+    "afd":       "AfD",
+    "bsw":       "BSW",
+    "linke":     "Linke",
 }
 
 

@@ -29,9 +29,7 @@
             <div class="bar-row">
               <span class="bar-label">{{ entry[0] }}</span>
               <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width.%]="(entry[1] / maxStroemung(p)) * 100">
-                </div>
+                <div class="bar-fill" [style.width.%]="(entry[1] / maxStroemung(p)) * 100"></div>
               </div>
               <span class="bar-count">{{ entry[1] }}×</span>
             </div>
@@ -42,35 +40,21 @@
         </section>
 
         <section class="panel">
-          <h3>Abhängigkeitsprofil</h3>
+          <h3>Geopolitisches Profil</h3>
           <p class="hint">Score von −1 (sehr kritisch) bis +1 (sehr freundlich)</p>
           <div class="dep-grid">
-            @for (key of DEPENDENCY_KEYS; track key) {
-              @let d = dep(p, key);
-              <div class="dep-card" [class]="d ? scoreClass(d.score) : 'no-data'">
-                <div class="dep-label">{{ d?.label ?? key }}</div>
-                @if (d && d.total > 0) {
-                  <div class="dep-score">{{ d.score !== null ? (d.score | number:'1.2-2') : '–' }}</div>
-                  <div class="dep-bar-wrap">
-                    <div class="dep-bar-track">
-                      <div class="dep-bar-zero"></div>
-                      <div class="dep-bar-fill"
-                           [style.left.%]="d.score !== null && d.score < 0 ? scorePercent(d.score) : 50"
-                           [style.width.%]="d.score !== null ? Math.abs(d.score) * 50 : 0">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="dep-verdict">{{ scoreLabel(d.score) }}</div>
-                  <div class="dep-counts">
-                    <span class="pos">+{{ d.positiv }}</span>
-                    <span class="neu">○{{ d.neutral }}</span>
-                    <span class="neg">−{{ d.negativ }}</span>
-                  </div>
-                } @else {
-                  <div class="dep-score">–</div>
-                  <div class="dep-verdict no-data-text">keine Erwähnungen</div>
-                }
-              </div>
+            @for (key of GEO_KEYS; track key) {
+              <ng-container *ngTemplateOutlet="depCard; context: {p: p, key: key}"></ng-container>
+            }
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Parteiprofil</h3>
+          <p class="hint">Score von −1 (sehr kritisch) bis +1 (sehr freundlich)</p>
+          <div class="dep-grid">
+            @for (key of PARTY_KEYS; track key) {
+              <ng-container *ngTemplateOutlet="depCard; context: {p: p, key: key}"></ng-container>
             }
           </div>
         </section>
@@ -78,4 +62,32 @@
       </div>
     }
   </div>
+
+  <ng-template #depCard let-p="p" let-key="key">
+    @let d = dep(p, key);
+    <div class="dep-card" [class]="d ? scoreClass(d.score) : 'no-data'">
+      <div class="dep-label">{{ d?.label ?? key }}</div>
+      @if (d && d.total > 0) {
+        <div class="dep-score">{{ d.score !== null ? (d.score | number:'1.2-2') : '–' }}</div>
+        <div class="dep-bar-wrap">
+          <div class="dep-bar-track">
+            <div class="dep-bar-zero"></div>
+            <div class="dep-bar-fill"
+                 [style.left.%]="d.score !== null && d.score < 0 ? scorePercent(d.score) : 50"
+                 [style.width.%]="d.score !== null ? Math.abs(d.score) * 50 : 0">
+            </div>
+          </div>
+        </div>
+        <div class="dep-verdict">{{ scoreLabel(d.score) }}</div>
+        <div class="dep-counts">
+          <span class="pos">+{{ d.positiv }}</span>
+          <span class="neu">○{{ d.neutral }}</span>
+          <span class="neg">−{{ d.negativ }}</span>
+        </div>
+      } @else {
+        <div class="dep-score">–</div>
+        <div class="dep-verdict no-data-text">keine Erwähnungen</div>
+      }
+    </div>
+  </ng-template>
 }

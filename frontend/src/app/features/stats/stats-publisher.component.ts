@@ -1,12 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 import { PublisherProfile, DependencyScore } from '../../core/models/stats.model';
 
 @Component({
   selector: 'app-stats-publisher',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgTemplateOutlet],
   templateUrl: './stats-publisher.component.html',
 })
 export class StatsPublisherComponent implements OnInit {
@@ -16,8 +16,9 @@ export class StatsPublisherComponent implements OnInit {
   loading = signal(true);
   selected = signal<PublisherProfile | null>(null);
 
-  readonly DEPENDENCY_KEYS = ['regierung', 'usa', 'eu', 'russland', 'china'];
   readonly Math = Math;
+  readonly GEO_KEYS    = ['regierung', 'usa', 'eu', 'russland', 'china'];
+  readonly PARTY_KEYS  = ['spd', 'cdu_csu', 'gruene', 'fdp', 'afd', 'bsw', 'linke'];
 
   ngOnInit() {
     this.api.getPublisherProfiles().subscribe(p => {
