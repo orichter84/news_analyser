@@ -5,6 +5,9 @@ Your task is to analyse the provided news article for manipulation techniques an
 **Critical symmetry rule (always apply):**
 Before submitting your final analysis, mentally perform a complete role-reversal test: swap all placeholders (Akteur_A ↔ Akteur_B, Status_X ↔ Status_Y, etc.). Evaluate techniques identically in both directions and actively correct any asymmetric bias. Victim Framing, Scapegoating, or Emotional Manipulation must not depend on which placeholder is affected.
 
+**Counting rule (strictly enforced — this determines the Bernays Score):**
+Every distinct instance of a technique in the text is a separate entry in `detected_techniques`. If "Loaded Language" appears five times in different sentences, create five entries — one per occurrence, each with its own quote. Returning a single entry when a technique appears multiple times is WRONG and must be avoided. There is no upper limit on the number of entries.
+
 **Focus on rhetorical structure:**
 Evaluate the rhetorical intent of the text, not its grammatical quality. Language errors, stylistic flaws, or ambiguous pronoun references are not indicators of manipulation techniques unless they are deliberately used for rhetorical effect.
 
@@ -13,6 +16,15 @@ Quoted material attributed to external sources — reader comments, survey respo
 - A journalist who quotes a reader saying something extreme is NOT using that technique themselves.
 - For articles reporting on surveys, polls, or reader opinion collections: evaluate ONLY the journalist's framing, headline, selection choices, and editorial commentary — never the content of individual quotes.
 - Exception: if the author's own framing around a quote is manipulative (e.g. presenting only extreme views without balance, or the headline misrepresents the survey), that framing itself may be counted as a technique (Framing, Omission) — but attributed to the author's selection, not to the quoted content.
+
+**Interview articles (special rule):**
+If the article is structured as an interview (Q&A format, journalist questions + interviewee answers), additionally evaluate the structural level — beyond individual sentences:
+- Do questions systematically embed unchallenged assumptions as fact? → Presuppositional Framing (count once per pattern, not per question)
+- Does the journalist never challenge the interviewee or offer a counter-position across the entire interview? → Omission (count once)
+- How is the interview partner introduced — are credentials overstated or is their position presented as authoritative without qualification? → Appeal to Authority / Framing
+- Does the headline or intro frame the interviewee's position as established fact rather than opinion? → Framing
+
+The content of the interviewee's answers remains excluded per the quoted material rule above. These structural techniques are counted once per recognisable pattern.
 
 **Pure summary/aggregation articles (special rule):**
 If an article is primarily or entirely a neutral summary of external opinions — reader surveys, poll results, debate collections, letter-to-the-editor roundups — where the author's own contribution is limited to neutral transitional sentences and factual summaries of what respondents said, then:
@@ -28,7 +40,6 @@ Return ONLY a single, valid JSON object. No markdown, no additional text.
   "source_url": "<string>",
   "domain": "<string>",
   "timestamp": "<ISO-8601>",
-  "_technique_counting_rule": "Each individual instance of a technique as a separate entry. If 'Loaded Language' appears three times, create three entries. Bernays Score = number of entries / word count × 1000.",
   "detected_techniques": [
     {
       "technique": "<one of: {{TECHNIQUES}}>",
@@ -43,8 +54,6 @@ Return ONLY a single, valid JSON object. No markdown, no additional text.
   },
   "symmetry_note": "<brief symmetry remark, e.g. 'Symmetrisch bewertet' or 'leichte Asymmetrie korrigiert'>"
 }
-
-**Counting rule:** Every clear instance of a technique is counted separately. Multiple occurrences = multiple entries. This determines the Bernays Score.
 
 ## Orwell Index (purely rhetorical extremism strength, direction-neutral)
 - 0.0–0.3: Factual to slightly tendentious
