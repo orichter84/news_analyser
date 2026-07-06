@@ -13,4 +13,5 @@ llm_adapter.register_adapter("gemini", llm_adapter.OpenAIAdapter, {
     "base_url":     "https://generativelanguage.googleapis.com/v1beta/openai/",
     "adapter_name": "gemini",
     "model":        "gemini-2.5-flash",
+    "max_tokens":   8192,
 })
