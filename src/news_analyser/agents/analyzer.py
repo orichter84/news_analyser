@@ -35,7 +35,9 @@ from ..repositories.role_store import normalize_role, format_roles_for_prompt
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
-    cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.IGNORECASE)
+    # Strip Qwen-style thinking tokens before any other processing
+    cleaned = re.sub(r"<think>.*?</think>", "", raw.strip(), flags=re.DOTALL)
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned.strip(), flags=re.IGNORECASE)
     cleaned = re.sub(r"\s*```$", "", cleaned)
     try:
         parsed = json.loads(cleaned)

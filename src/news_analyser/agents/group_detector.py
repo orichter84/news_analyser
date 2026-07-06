@@ -29,7 +29,8 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
         print(f"[pass0] Fehler bei Gruppenidentifikation: {exc}")
         return []
 
-    cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.IGNORECASE)
+    cleaned = re.sub(r"<think>.*?</think>", "", raw.strip(), flags=re.DOTALL)
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned.strip(), flags=re.IGNORECASE)
     cleaned = re.sub(r"\s*```$", "", cleaned)
     try:
         result = json.loads(cleaned)
