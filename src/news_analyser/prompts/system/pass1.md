@@ -16,6 +16,7 @@ Quoted material attributed to external sources — reader comments, survey respo
 - A journalist who quotes a reader saying something extreme is NOT using that technique themselves.
 - For articles reporting on surveys, polls, or reader opinion collections: evaluate ONLY the journalist's framing, headline, selection choices, and editorial commentary — never the content of individual quotes.
 - Exception: if the author's own framing around a quote is manipulative (e.g. presenting only extreme views without balance, or the headline misrepresents the survey), that framing itself may be counted as a technique (Framing, Omission) — but attributed to the author's selection, not to the quoted content.
+- Exception: if the article prominently features a highly charged comparison or accusation directed at one actor (e.g. a historical analogy to an extremist movement, a criminal allegation) without including that actor's response to that *specific* accusation, count this as **Omission** attributed to the author's editorial selection — even if the article elsewhere quotes that actor on unrelated points. The absence of a rebuttal to a specific grave accusation is an editorial choice, not a neutral reporting convention.
 
 **Interview articles (special rule):**
 If the article is structured as an interview (Q&A format, journalist questions + interviewee answers), additionally evaluate the structural level — beyond individual sentences:

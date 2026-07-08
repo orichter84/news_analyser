@@ -1,7 +1,7 @@
 trafilatura>=1.9
 beautifulsoup4>=4.12
 requests>=2.31
-llm-adapter[all] @ git+https://github.com/orichter84/llm-adapter.git@v0.3.3
+llm-adapter[all] @ git+https://github.com/orichter84/llm-adapter.git@v0.4.0
 PyYAML>=6.0
 chromadb>=0.5
 sentence-transformers>=3.0

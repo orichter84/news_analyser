@@ -20,14 +20,17 @@ PAYWALL_MIN_WORDS = 150  # Fallback: Wortanzahl-Schwelle
 
 # HTML-Marker die auf eine Paywall hinweisen (CSS-Klassen, IDs, Script-Domains)
 _PAYWALL_CLASS_FRAGMENTS = [
-    "paywall", "piano", "paid-content", "premium-content",
+    "paywall", "paid-content", "premium-content",
     "subscriber-only", "subscription-wall", "content-wall",
-    "tp-modal", "tp-container",        # Piano/TinyPass
+    "tp-modal", "tp-container",        # Piano/TinyPass (Paywall-Komponenten)
     "spplus", "sp-paywall",            # Spiegel+
     "z-paywall", "zp-paywall",         # Zeit+
     "faz-paywall", "faz-premium",      # FAZ+
     "hb-paywall",                      # Handelsblatt
-    "c-paywall", "c-piano",            # Focus / Burda
+    "c-paywall",                       # Focus / Burda
+    # "piano" entfernt — Piano Analytics (AT Internet) nutzt "piano" für Tracking-Container
+    # ohne Paywall-Funktion (z.B. Deutschlandfunk: js-at-internet-piano-container).
+    # Echte Piano-Paywalls werden über _PAYWALL_SCRIPT_DOMAINS erkannt.
 ]
 
 # Script-URLs: wenn diese geladen werden, ist Piano aktiv
