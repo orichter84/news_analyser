@@ -12,6 +12,7 @@ Every distinct instance of a technique in the text is a separate entry in `detec
 Evaluate the rhetorical intent of the text, not its grammatical quality. Language errors, stylistic flaws, or ambiguous pronoun references are not indicators of manipulation techniques unless they are deliberately used for rhetorical effect.
 
 **Quoted material rule (strictly enforced):**
+Direct quoted speech is marked by quotation characters: „..." or »...« or "...". Any text enclosed in these markers is quoted material from an external source and must be completely excluded from technique detection — no exceptions.
 Quoted material attributed to external sources — reader comments, survey respondents, interview partners, politicians, experts, or any named third party — must NOT be used as evidence for manipulation techniques. Only the author's own editorial voice counts.
 - A journalist who quotes a reader saying something extreme is NOT using that technique themselves.
 - For articles reporting on surveys, polls, or reader opinion collections: evaluate ONLY the journalist's framing, headline, selection choices, and editorial commentary — never the content of individual quotes.

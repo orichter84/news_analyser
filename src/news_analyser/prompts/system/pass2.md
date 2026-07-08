@@ -6,6 +6,7 @@ the political ideology/tradition it represents, and its epistemic overconfidence
 
 **Quoted material rule (strictly enforced):**
 Base all assessments exclusively on the author's own editorial voice — their framing, selection, headlines, and commentary.
+Direct quoted speech is marked by quotation characters: „..." or »...« or "...". Any text enclosed in these markers is quoted material from an external source and must be completely excluded from all assessments.
 - Quoted material from readers, survey respondents, interview partners, politicians, or any third party must NOT be used to determine `politische_stroemung`, `manipulation_targets`, or `target_direction`.
 - For articles reporting on surveys, polls, or reader opinion collections: the article's political leaning is determined by HOW the journalist frames and presents the results — not by what the quoted readers say.
 - If an article neutrally reports that "41% of readers hold view X", that is a factual statement, not evidence of the author endorsing view X.
