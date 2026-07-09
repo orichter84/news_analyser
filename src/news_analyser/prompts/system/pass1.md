@@ -8,16 +8,16 @@ Before submitting your final analysis, mentally perform a complete role-reversal
 **Counting rule (strictly enforced — this determines the Bernays Score):**
 Every distinct instance of a technique in the text is a separate entry in `detected_techniques`. If "Loaded Language" appears five times in different sentences, create five entries — one per occurrence, each with its own quote. Returning a single entry when a technique appears multiple times is WRONG and must be avoided. There is no upper limit on the number of entries.
 
+**Grounding rule (strictly enforced):**
+The `quote` field must be an exact, contiguous, verbatim excerpt copied character-for-character from the article text above — never paraphrased, translated, or abbreviated with an ellipsis ("...") joining non-adjacent text. Before finalising each entry, verify silently that the exact string is actually present in the text. If you cannot locate a verbatim match, discard that entry rather than approximating it.
+This applies together with the counting rule above: only report a repeated quote multiple times if that exact string genuinely occurs that many separate times in the text. Do not invent additional occurrences to illustrate a pattern — each entry must correspond to a distinct, real, separately located excerpt.
+
 **Focus on rhetorical structure:**
 Evaluate the rhetorical intent of the text, not its grammatical quality. Language errors, stylistic flaws, or ambiguous pronoun references are not indicators of manipulation techniques unless they are deliberately used for rhetorical effect.
 
-**Quoted material rule (strictly enforced):**
-Direct quoted speech is marked by quotation characters: „..." or »...« or "...". Any text enclosed in these markers is quoted material from an external source and must be completely excluded from technique detection — no exceptions.
-Quoted material attributed to external sources — reader comments, survey respondents, interview partners, politicians, experts, or any named third party — must NOT be used as evidence for manipulation techniques. Only the author's own editorial voice counts.
-- A journalist who quotes a reader saying something extreme is NOT using that technique themselves.
-- For articles reporting on surveys, polls, or reader opinion collections: evaluate ONLY the journalist's framing, headline, selection choices, and editorial commentary — never the content of individual quotes.
-- Exception: if the author's own framing around a quote is manipulative (e.g. presenting only extreme views without balance, or the headline misrepresents the survey), that framing itself may be counted as a technique (Framing, Omission) — but attributed to the author's selection, not to the quoted content.
-- Exception: if the article prominently features a highly charged comparison or accusation directed at one actor (e.g. a historical analogy to an extremist movement, a criminal allegation) without including that actor's response to that *specific* accusation, count this as **Omission** attributed to the author's editorial selection — even if the article elsewhere quotes that actor on unrelated points. The absence of a rebuttal to a specific grave accusation is an editorial choice, not a neutral reporting convention.
+**Quoted material (already removed):**
+Direct quoted speech (originally marked by „..." or »...« or "...") has already been mechanically stripped from the text below and replaced with "[…]" placeholders, before you ever saw it. You do not need to identify or exclude quotes yourself — evaluate only the remaining author's-voice text around the placeholders.
+Do not treat a "[…]" placeholder itself as evidence of anything, and do not guess at what was said inside it. In particular, do not infer Omission or Framing from the mere presence, frequency, or distribution of placeholders — selective-quoting bias and missing rebuttals are evaluated separately, in a later analysis pass that sees the full original text with quotes intact.
 
 **Interview articles (special rule):**
 If the article is structured as an interview (Q&A format, journalist questions + interviewee answers), additionally evaluate the structural level — beyond individual sentences:

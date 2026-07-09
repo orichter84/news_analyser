@@ -13,6 +13,9 @@ build/
 # Datenbank & generierte Daten (nur Root-Verzeichnis, nicht src/*/data/)
 /data/
 
+# Lokale Chroma-Instanzen der Konzept-Validierungstests (eigene Ressourcen, nicht Teil des Repos)
+docs/concept/tests/**/chroma_nn_store/
+
 # Lokale Notizen
 *_local.md
 

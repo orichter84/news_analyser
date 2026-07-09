@@ -54,6 +54,59 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
     return parsed if isinstance(parsed, dict) else None
 
 
+def _validate_quote_grounding(
+    techniques: list[dict[str, Any]], source_text: str
+) -> list[dict[str, Any]]:
+    """Drops technique instances whose quote can't be verified against the source text.
+
+    Catches two hallucination patterns observed with local models: fabricated quotes that
+    never appear in the text, and inflated occurrence counts (the same quote reported as a
+    "2nd/3rd/4th instance" more often than it actually occurs in the text).
+    """
+    quote_counts: dict[str, int] = {}
+    validated = []
+    dropped = 0
+    for t in techniques:
+        quote = (t.get("quote") or "").strip()
+        if not quote:
+            dropped += 1
+            continue
+        occurrences = source_text.count(quote)
+        if occurrences == 0:
+            dropped += 1
+            continue
+        quote_counts[quote] = quote_counts.get(quote, 0) + 1
+        if quote_counts[quote] > occurrences:
+            dropped += 1
+            continue
+        validated.append(t)
+    if dropped:
+        print(f"[analyzer] Grounding-Check: {dropped} nicht belegte Technik-Instanz(en) entfernt.")
+    return validated
+
+
+_QUOTE_PATTERNS = [
+    re.compile(r"„.*?“", re.DOTALL),  # „..."
+    re.compile(r"».*?«", re.DOTALL),
+    re.compile(r'".*?"', re.DOTALL),
+]
+
+
+def _strip_quoted_material(text: str) -> str:
+    """Removes direct quoted speech („...", »...«, "...") before Pass 1.
+
+    Pass 1 must not use quoted third-party speech as evidence for detected_techniques
+    (every model tested so far violated that rule at least once when asked to self-exclude
+    it). Stripping it mechanically is more reliable than relying on the model's compliance.
+    Quote-selection bias (one-sided quoting, missing rebuttals) is judged in Pass 2 instead,
+    which operates on the full, unstripped original text.
+    """
+    stripped = text
+    for pattern in _QUOTE_PATTERNS:
+        stripped = pattern.sub("[…]", stripped)
+    return stripped
+
+
 def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str, Any] | None:
     provider = os.environ.get("LLM_PROVIDER", "openai")
     adapter  = llm_adapter.get_instance(provider)
@@ -85,6 +138,9 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     # ------------------------------------------------------------------
     # Pass 1 — anonymisierter Text → Orwell-Index (Extremismus), Techniken
     # ------------------------------------------------------------------
+    pass1_text = _strip_quoted_material(anon["text"])
+    _write_debug("02b_pass1_input_quotes_stripped.txt", pass1_text)
+
     pass1_input = {
         **base_meta,
         "keyword_signal": {
@@ -96,7 +152,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
             "right_hits":      kw["right_hits"],
             "general_hits":    kw["general_hits"],
         },
-        "text": anon["text"],
+        "text": pass1_text,
     }
 
     # Dynamische Anker in Prompt einbetten wenn vorhanden
@@ -118,6 +174,10 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     result1 = _extract_json(raw1)
     if result1 is None:
         return None
+
+    result1["detected_techniques"] = _validate_quote_grounding(
+        result1.get("detected_techniques", []), pass1_text
+    )
 
     # Techniken auf kanonische Namen normalisieren
     for t in result1.get("detected_techniques", []):
