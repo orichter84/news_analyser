@@ -7,12 +7,13 @@ import { Component } from '@angular/core';
 <section class="kb-section">
   <h2>2. Unser Ansatz</h2>
 
-  <h3>Anonymisierung als Strukturlösung</h3>
+  <h3>Pass 0 und Anonymisierung als Strukturlösung</h3>
   <p>
     Statt den LLM-Bias durch Prompt-Engineering zu kompensieren — was ein Katz-und-Maus-Spiel
-    ohne Ende wäre — entfernen wir die Ursache: Vor der Extremismus-Analyse werden
-    alle Personen- und Organisationsbezeichnungen durch neutrale Platzhalter ersetzt
-    (<em>Person-A</em>, <em>Org-B</em>, <em>Gruppe-C</em>).
+    ohne Ende wäre — entfernen wir die Ursache: Pass 0 identifiziert vor der
+    Extremismus-Analyse explizite menschliche Gruppenbezeichnungen. Anschließend ersetzt
+    die Anonymisierung diese zusammen mit Personen und Organisationen durch neutrale
+    Platzhalter (<em>Person-A</em>, <em>Org-B</em>, <em>Gruppe-C</em>).
   </p>
   <p>
     Das Modell bewertet damit nur noch die <strong>rhetorische Struktur</strong>
@@ -20,10 +21,11 @@ import { Component } from '@angular/core';
     unabhängig davon, welche Gruppe gemeint ist.
   </p>
 
-  <h3>Zwei-Pass-Architektur</h3>
+  <h3>Zwei Analyse-Pässe</h3>
   <p>
     Manche Informationen erfordern jedoch den Originaltext — z.&nbsp;B. welche
-    politische Strömung ein Artikel vertritt. Dafür nutzen wir zwei getrennte Analyse-Durchläufe:
+    politische Strömung ein Artikel vertritt. Nach Pass 0 und der Anonymisierung
+    nutzen wir dafür zwei getrennte Analyse-Durchläufe:
   </p>
   <div class="kb-two-pass">
     <div class="pass-card">

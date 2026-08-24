@@ -200,17 +200,22 @@ and delivers reliably group-blind results on real articles.
 
 ---
 
-## Solution: Two-Pass Architecture (implemented)
+## Solution: Pass 0 Preparation Plus Two Analysis Passes (implemented)
 
-All group identifiers are replaced by neutral placeholders before pass 1.
-The LLM evaluates exclusively the rhetorical structure.
+Before the two scoring passes, Pass 0 identifies explicit human-group identifiers
+in the original text. The spaCy anonymizer then replaces these terms together with
+persons and organisations with neutral placeholders. Pass 0 only identifies terms;
+replacement remains deterministic preprocessing.
 
 ```
 Original text
     │
-    ├── Anonymisation (spaCy NER)
+  ├── [Pass 0] LLM group detection
+  │       ↓
+  ├── Anonymisation (spaCy NER + detected group terms)
     │       ↓
-    ├── [Pass 1] Anonymised → Orwell Index, Bernays Score, techniques  (structural, bias-free)
+  ├── [Pass 1] Anonymised, direct quotes removed
+  │       → Orwell Index, Bernays Score, techniques  (structural, bias-reduced)
     │
     └── [Pass 2] Original   → Political leaning, DK Index, topic area, manipulation targets
 ```
@@ -246,7 +251,8 @@ inherently group-blind and is measured in pass 2 on the original text.
 |---|---|
 | Bernays Score | ✅ implemented |
 | Orwell Index (LLM + keyword prior + RAG anchors) | ✅ implemented |
-| Anonymisation via spaCy NER (two-pass) | ✅ implemented |
+| Pass 0: dynamic group identification | ✅ implemented |
+| Anonymisation via spaCy NER plus Pass-0 group terms | ✅ implemented |
 | Political leaning as labels | ✅ implemented |
 | DK Index | ✅ implemented |
 | Topic area classification | ✅ implemented |

@@ -25,33 +25,40 @@ import { Component } from '@angular/core';
     <div class="pipe-step">
       <span class="pipe-num">3</span>
       <div>
-        <strong>Anonymisierung</strong>
-        <p>spaCy (de_core_news_md) ersetzt Personen und Organisationen durch Platzhalter.</p>
+        <strong>Pass 0 — Gruppenerkennung</strong>
+        <p>Ein LLM identifiziert explizite menschliche Gruppenbezeichnungen im Originaltext.</p>
       </div>
     </div>
     <div class="pipe-step">
       <span class="pipe-num">4</span>
+      <div>
+        <strong>Anonymisierung</strong>
+        <p>spaCy ersetzt Personen, Organisationen und die in Pass 0 erkannten Gruppen durch Platzhalter.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <span class="pipe-num">5</span>
       <div>
         <strong>RAG-Anker-Abruf</strong>
         <p>Die 3 ähnlichsten bereits bewerteten Artikel werden aus ChromaDB abgerufen.</p>
       </div>
     </div>
     <div class="pipe-step">
-      <span class="pipe-num">5</span>
-      <div>
-        <strong>Pass 1 — LLM (anonymisiert)</strong>
-        <p>Orwell-Index, Bernays Score, Manipulationstechniken mit Zitaten.</p>
-      </div>
-    </div>
-    <div class="pipe-step">
       <span class="pipe-num">6</span>
       <div>
-        <strong>Pass 2 — LLM (Original)</strong>
-        <p>Politische Strömung als Labels, Dunning-Kruger-Index.</p>
+        <strong>Pass 1 — LLM (anonymisiert)</strong>
+        <p>Direktzitate werden zuvor entfernt. Pass 1 liefert Orwell-Index, Bernays Score und Manipulationstechniken.</p>
       </div>
     </div>
     <div class="pipe-step">
       <span class="pipe-num">7</span>
+      <div>
+        <strong>Pass 2 — LLM (Original)</strong>
+        <p>Politische Strömung als Labels, Dunning-Kruger-Index, Themenbereich und Manipulationsziele.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <span class="pipe-num">8</span>
       <div>
         <strong>Speicherung</strong>
         <p>Ergebnis und Einbettung in ChromaDB. Artikel wird automatisch als neuer Kalibrierungsanker gespeichert.</p>

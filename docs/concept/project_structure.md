@@ -1,4 +1,9 @@
-# Project Structure — Ziel-Architektur
+# Project Structure — geplante Ziel-Architektur (nicht implementiert)
+
+> Dieses Konzept beschreibt eine mögliche spätere Migration zu einer separaten
+> Python-Pipeline und einem Go-Server. Der aktuelle Produktionsstand verwendet
+> `src/news_analyser/` und ein FastAPI-Backend unter `backend/`; die Struktur in
+> diesem Dokument ist keine Beschreibung des aktuellen Repositories.
 
 ## Verzeichnisstruktur
 

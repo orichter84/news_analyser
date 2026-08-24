@@ -41,7 +41,7 @@ import { Component } from '@angular/core';
     <div class="kb-limit-card">
       <h4>Paywall-Artikel</h4>
       <p>Artikel hinter Paywalls liefern oft nur Teaser-Text.
-      Analysen auf Basis von &lt; 500 Zeichen sind wenig aussagekräftig.</p>
+      Texte mit weniger als 150 Wörtern werden deshalb als mögliche Paywall erkannt und nicht analysiert.</p>
     </div>
   </div>
 </section>

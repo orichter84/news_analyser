@@ -89,6 +89,17 @@ OPENAI_MODEL=<model-name-in-lm-studio>
 
 LM Studio must be running at `http://localhost:1234`.
 
+### Option E: Gemini via Google AI Studio
+
+```
+LLM_PROVIDER=gemini
+OPENAI_API_KEY=...  # Google AI Studio API key
+```
+
+Gemini is accessed through its OpenAI-compatible endpoint. When Gemini rejects a
+request because its quota is exhausted, the RSS watcher records a 24-hour
+cooldown in `data/` before trying further feed articles.
+
 ## 5. Start the application
 
 Start the full stack (ChromaDB + backend + frontend) with a single command:

@@ -95,10 +95,12 @@ GET  /articles/{url_encoded_id}
 ```
 POST /analyse
      Body: { "url": "https://..." }
-     Response: { "job_id": "...", "status": "queued" }
+     Response: { "job_id": "...", "status": "accepted" }
+     Existing URL: { "job_id": null, "status": "skipped" }
 
 GET  /analyse/job/{job_id}
-     Response: { "status": "done|running|error", "result_id": "..." }
+     Response: { "status": "pending|done|paywall|error", ... }
+     A completed job includes the full analysis as `result`.
 ```
 
 ### Statistics
@@ -159,7 +161,7 @@ GET  /techniques/{id}
 - URL form → POST /analyse → job status polling → link to result
 
 ### Techniques `/techniques`
-- Overview of all 19 documented techniques, grouped by category
+- Overview of all 28 documented techniques, grouped by category
 - Detail page `/techniques/:id` — individual URL per technique (linkable, for educational use)
 
 ### About `/knowledge`
@@ -171,8 +173,8 @@ GET  /techniques/{id}
 
 ```python
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+     CORSMiddleware,
+     allow_origin_regex=r"https?://(localhost|[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}|[a-z0-9_.-]+)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

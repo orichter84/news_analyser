@@ -121,7 +121,7 @@
 - [x] [SETUP.md](../SETUP.md) — setup guide, common errors
 - [x] [docs/reference.md](reference.md) — technical reference: JSON schema, indicators, paywall, techniques DB
 - [x] [docs/web_architecture.md](web_architecture.md) — stack, project structure, API endpoints
-- [x] [docs/analyse_architektur.md](analyse_architektur.md) — indicators, two-pass architecture (technically complex)
+- [x] [docs/analyse_architektur.md](analyse_architektur.md) — indicators, Pass 0 preparation and two analysis passes (technically complex)
 - [x] [docs/todo.md](todo.md) — roadmap
 
 **Python comments & docstrings:**

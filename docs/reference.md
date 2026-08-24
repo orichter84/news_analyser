@@ -64,7 +64,7 @@ For the design rationale behind these indicators see [analyse_architektur.md](an
 ## Paywall Detection
 
 Two-stage:
-1. **HTML markers** — Piano/TinyPass script URLs (`cdn.tinypass.com`), CSS classes (`paywall`, `piano`, `c-piano`, `spplus`, `z-paywall`, `faz-premium`, etc.)
+1. **HTML markers** — Piano/TinyPass script URLs (`cdn.tinypass.com`), CSS classes and IDs (`paywall`, `spplus`, `z-paywall`, `faz-premium`, etc.)
 2. **Word count fallback** — Articles with < 150 words are flagged as paywall teasers
 
 Paywalled articles are neither analysed nor stored.
@@ -73,7 +73,7 @@ Paywalled articles are neither analysed nor stored.
 
 ## Techniques Database
 
-19 documented manipulation techniques are defined in `src/news_analyser/data/techniques.json` and automatically seeded into ChromaDB (`techniques` collection) on first start. The collection lives in `data/` and is not pushed to the repository — the source data in `techniques.json` is versioned and enables automatic restoration.
+28 documented manipulation techniques are defined in `src/news_analyser/data/techniques.json` and automatically seeded into ChromaDB (`techniques` collection) on first start. The collection lives in `data/` and is not pushed to the repository — the source data in `techniques.json` is versioned and enables automatic restoration.
 
 During analysis, LLM free-text output is semantically mapped to canonical names (cosine similarity, threshold 0.35). New techniques can be added by extending `techniques.json`.
 

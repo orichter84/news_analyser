@@ -2,7 +2,7 @@
 
 Analyses news articles for manipulation techniques, rhetorical extremism and political framing. The analysis pipeline and database run locally — for the LLM backend you can choose between a local model (LM Studio) or a cloud service (OpenAI, Anthropic, GitHub Copilot).
 
-**Indicators:** Orwell Index (extremism), Bernays Score (manipulation intensity), Dunning-Kruger Index (unsubstantiated certainty), political leaning, manipulation targets, 23 documented techniques.
+**Indicators:** Orwell Index (extremism), Bernays Score (manipulation intensity), Dunning-Kruger Index (unsubstantiated certainty), political leaning, manipulation targets, 28 documented techniques.
 
 **License:** GNU Affero General Public License v3.0 — see [LICENSE](LICENSE)
 
@@ -147,6 +147,9 @@ python run.py --feed --auto
 python run.py --url https://www.spiegel.de/...
 ```
 
+With `LLM_PROVIDER=gemini`, an exhausted Gemini quota pauses feed processing for
+24 hours. The cooldown is retained across feed-process restarts in `data/`.
+
 ---
 
 ## LLM Backends
@@ -159,6 +162,7 @@ The backend is selected via `LLM_PROVIDER` in `.env`:
 | `anthropic` | `ANTHROPIC_API_KEY` | Anthropic API |
 | `cli` | — | Claude Code CLI (no API key required) |
 | `lm_studio` | — | LM Studio local server |
+| `gemini` | `OPENAI_API_KEY` | Google AI Studio via Gemini's OpenAI-compatible endpoint |
 | `copilot` | `GITHUB_TOKEN` | GitHub Copilot |
 | `m365_copilot` | `M365_COPILOT_ACCESS_TOKEN` | Microsoft 365 Copilot |
 
@@ -220,7 +224,7 @@ The active model is set within LM Studio itself — `OPENAI_MODEL` has no effect
 ```
 news_analyser/
 ├── src/news_analyser/       Analysis pipeline (Python package)
-│   ├── agents/              LLM analysis (two-pass architecture)
+│   ├── agents/              LLM analysis (Pass 0 preparation + two analysis passes)
 │   ├── repositories/        ChromaDB access (articles, anchors, techniques)
 │   ├── prompts/             Editable system prompts (Markdown)
 │   └── data/                Keyword lists, techniques JSON, feeds
@@ -249,7 +253,7 @@ news_analyser/
 | Document | Contents |
 |---|---|
 | [docs/reference.md](docs/reference.md) | Technical reference: JSON output schema, indicators, paywall detection, techniques database |
-| [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, two-pass architecture, bias mitigation |
+| [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, Pass 0 preparation, two-pass architecture, bias mitigation |
 | [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
 | [docs/todo.md](docs/todo.md) | Open features and extension ideas |
 | [docs/concept/bias-validation.md](docs/concept/bias-validation.md) | Bias validation: symmetry tests with group substitution |

@@ -7,7 +7,7 @@ Extract verifiable claims from an article as semantic triples
 
 This adds a factual dimension to the existing scoring:
 - **Bernays Score** — manipulation technique density
-- **Orwell-Index** — language opacity
+- **Orwell-Index** — rhetorical extremism
 - **DK-Index** — confidence/knowledge gap signals
 - **Fact Score** *(new)* — ratio of verifiable claims with external support
 
@@ -18,9 +18,9 @@ This adds a factual dimension to the existing scoring:
 Runs after Pass 1 (technique analysis) as an optional Pass 3:
 
 ```
-Pass 0 — Term detection (NER)
-Pass 1 — Anonymised technique analysis
-Pass 2 — Political leaning
+Pass 0 — LLM group detection, followed by spaCy anonymisation
+Pass 1 — Anonymised technique and extremism analysis
+Pass 2 — Political leaning, DK Index, topic and manipulation targets
 Pass 3 — Fact-check (new, optional)
 ```
 
