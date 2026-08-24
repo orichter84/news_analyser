@@ -29,6 +29,7 @@ import llm_adapter
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from .group_detector import detect_groups
+from .errors import raise_if_gemini_quota_error
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 from ..repositories.technique_store import normalize_technique, format_techniques_for_prompt
 from ..repositories.role_store import normalize_role, format_roles_for_prompt
@@ -167,6 +168,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
             input_data=pass1_input,
         )
     except Exception as exc:
+        raise_if_gemini_quota_error(exc)
         print(f"[analyzer] Pass 1 error: {exc}")
         return None
 
@@ -205,6 +207,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
             input_data=pass2_input,
         )
     except Exception as exc:
+        raise_if_gemini_quota_error(exc)
         print(f"[analyzer] Pass 2 error: {exc}")
         return None
 

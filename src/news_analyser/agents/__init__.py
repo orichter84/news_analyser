@@ -6,5 +6,6 @@ Currently:
 """
 
 from .analyzer import analyze_article
+from .errors import GeminiQuotaExceededError
 
-__all__ = ["analyze_article"]
+__all__ = ["analyze_article", "GeminiQuotaExceededError"]

@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .scraper import Article, fetch_article
 from .agents import analyze_article
+from .agents.errors import GeminiQuotaExceededError
 from .repositories.db_storage import store_result
 from .stats import print_report
 
@@ -111,13 +112,24 @@ def main() -> None:
         run_text_file(args.text_file, domain=args.domain, source_url=source_url)
 
     elif args.url:
-        run(args.url)
+        try:
+            run(args.url)
+        except GeminiQuotaExceededError as exc:
+            from .feed import start_quota_cooldown
+            start_quota_cooldown()
+            print(f"[!] Gemini-Quota erschöpft: {exc}")
 
     elif args.file:
         with open(args.file, encoding="utf-8") as fh:
             urls = [line.strip() for line in fh if line.strip()]
         for url in urls:
-            run(url)
+            try:
+                run(url)
+            except GeminiQuotaExceededError as exc:
+                from .feed import start_quota_cooldown
+                start_quota_cooldown()
+                print(f"[!] Gemini-Quota erschöpft: {exc}")
+                break
 
     elif args.feed:
         from .config import FeedConfig

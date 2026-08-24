@@ -13,6 +13,7 @@ from typing import Any
 
 import llm_adapter
 from ..prompts import load_prompt
+from .errors import raise_if_gemini_quota_error
 
 
 def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
@@ -26,6 +27,7 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
     try:
         raw = adapter.generate(system_prompt=prompt, input_data={"text": text})
     except Exception as exc:
+        raise_if_gemini_quota_error(exc)
         print(f"[pass0] Fehler bei Gruppenidentifikation: {exc}")
         return []
 
