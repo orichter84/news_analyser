@@ -94,7 +94,7 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--acc
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
-  &.full { grid-column: 1 / -1; }
+  &.full { grid-column: 1 / -1; margin-bottom: 1rem; }
   &.recent { grid-column: 1 / -1; margin-top: 1rem; }
 }
 
