@@ -8,12 +8,15 @@ erfolgt deterministisch durch den Anonymizer-Code, nicht durch das LLM.
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any
 
 import llm_adapter
 from ..prompts import load_prompt
 from .errors import raise_if_gemini_quota_error
+
+logger = logging.getLogger(__name__)
 
 
 def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
@@ -28,7 +31,7 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
         raw = adapter.generate(system_prompt=prompt, input_data={"text": text})
     except Exception as exc:
         raise_if_gemini_quota_error(exc)
-        print(f"[pass0] Fehler bei Gruppenidentifikation: {exc}")
+        logger.error("Fehler bei Gruppenidentifikation: %s", exc)
         return []
 
     cleaned = re.sub(r"<think>.*?</think>", "", raw.strip(), flags=re.DOTALL)
@@ -41,7 +44,7 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
             from json_repair import repair_json
             result = json.loads(repair_json(cleaned))
         except Exception as exc:
-            print(f"[pass0] JSON-Fehler: {exc}")
+            logger.error("JSON-Fehler: %s", exc)
             return []
 
     if not isinstance(result, list):

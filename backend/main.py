@@ -3,6 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import articles, analyse, stats, search, techniques
+from news_analyser.logging_config import setup_logging
+
+setup_logging()
 
 app = FastAPI(
     title="News Analyser API",

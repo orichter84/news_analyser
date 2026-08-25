@@ -96,7 +96,7 @@
 - [ ] **Keyword lists** — adversarial framing filter (mark keywords in quotation marks as "cited")
 - [ ] **Keyword lazy update** — SQLite DB stores keyword hits with context sentence; periodic job classifies affirmative vs. citing and writes corrections back to keyword lists
 - [ ] **Manually curated anchor corpus** — initial curation with verified reference articles for better cold-start calibration
-- [ ] **Unit tests** — populate tests/: scraper mocks, JSON parser, adapter interface
+- [x] **Unit tests** — populate tests/: scraper mocks, JSON parser, adapter interface, Gemini quota-error classification, feed cooldown persistence (`pytest`, see `requirements-dev.txt`)
 - [ ] **Analysis validation** — verify that returned quote fields are actually present in the article text
 
 ### Language Models & Local Models
@@ -141,4 +141,4 @@
 ### Export & Integration
 - [ ] **CSV/JSON export** — export all stored analyses
 - [ ] **Authentication** — optional API key protection for the analysis endpoint
-- [ ] **Logging** — structured logging to logs/ instead of print() statements
+- [x] **Logging** — structured logging to logs/ instead of print() statements (console + rotating file via `logging_config.py`, `LOG_LEVEL` env var; `stats.py`'s report output stays on `print()` since it's the actual CLI deliverable, not a log)

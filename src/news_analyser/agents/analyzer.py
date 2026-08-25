@@ -8,12 +8,15 @@ Pass 2 (original text):   Politische Strömung (labels), DK-Index
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from pathlib import Path
 from typing import Any
 
 from ..scraper import Article
+
+logger = logging.getLogger(__name__)
 
 _DEBUG_DIR = Path(__file__).resolve().parents[3] / "data" / "debug_last_run"
 
@@ -47,7 +50,7 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
             from json_repair import repair_json
             parsed = json.loads(repair_json(cleaned))
         except Exception as exc:
-            print(f"[analyzer] JSON parse error (auch nach Reparatur): {exc}")
+            logger.error("JSON parse error (auch nach Reparatur): %s", exc)
             return None
     # Manche Modelle wrappen das Ergebnis in ein Array — erstes Element nehmen
     if isinstance(parsed, list):
@@ -82,7 +85,7 @@ def _validate_quote_grounding(
             continue
         validated.append(t)
     if dropped:
-        print(f"[analyzer] Grounding-Check: {dropped} nicht belegte Technik-Instanz(en) entfernt.")
+        logger.info("Grounding-Check: %d nicht belegte Technik-Instanz(en) entfernt.", dropped)
     return validated
 
 
@@ -169,7 +172,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         )
     except Exception as exc:
         raise_if_gemini_quota_error(exc)
-        print(f"[analyzer] Pass 1 error: {exc}")
+        logger.error("Pass 1 error: %s", exc)
         return None
 
     _write_debug("04_pass1_raw_response.txt", raw1)
@@ -208,7 +211,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         )
     except Exception as exc:
         raise_if_gemini_quota_error(exc)
-        print(f"[analyzer] Pass 2 error: {exc}")
+        logger.error("Pass 2 error: %s", exc)
         return None
 
     _write_debug("05_pass2_raw_response.txt", raw2)

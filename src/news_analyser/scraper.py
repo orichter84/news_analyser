@@ -7,6 +7,7 @@ Fallback:       BeautifulSoup paragraph extraction.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 import datetime
@@ -15,6 +16,7 @@ import trafilatura
 import requests
 from bs4 import BeautifulSoup
 
+logger = logging.getLogger(__name__)
 
 PAYWALL_MIN_WORDS = 150  # Fallback: Wortanzahl-Schwelle
 
@@ -117,7 +119,7 @@ def fetch_article(url: str, timeout: int = 15) -> Article | None:
         })
         response.raise_for_status()
     except requests.RequestException as exc:
-        print(f"[scraper] HTTP error: {exc}")
+        logger.warning("HTTP-Fehler beim Abruf von %s: %s", url, exc)
         return None
 
     html = response.text

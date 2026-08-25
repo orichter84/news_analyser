@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import time
 import datetime
+import logging
 import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -24,6 +25,7 @@ from .main import run
 from .topic_filter import is_relevant
 from .agents.errors import GeminiQuotaExceededError
 
+logger = logging.getLogger(__name__)
 
 _GEMINI_QUOTA_COOLDOWN_SECONDS = 24 * 60 * 60
 _QUOTA_COOLDOWN_FILE = Path(__file__).resolve().parents[2] / "data" / "gemini_quota_cooldown.json"
@@ -36,7 +38,7 @@ def _quota_cooldown_remaining() -> float:
     except FileNotFoundError:
         return 0.0
     except (KeyError, TypeError, ValueError):
-        print("[feed] Beschädigte Gemini-Cooldown-Datei; starte vorsorglich neue 24-Stunden-Pause.")
+        logger.warning("Beschädigte Gemini-Cooldown-Datei; starte vorsorglich neue 24-Stunden-Pause.")
         start_quota_cooldown()
         return float(_GEMINI_QUOTA_COOLDOWN_SECONDS)
 
@@ -85,7 +87,7 @@ def _fetch_new_urls(
     for feed_url in feed_urls:
         parsed = feedparser.parse(feed_url)
         if parsed.bozo:
-            print(f"[feed] Warnung: Feed nicht lesbar: {feed_url}")
+            logger.warning("Feed nicht lesbar: %s", feed_url)
             candidates.append([])
             continue
         feed_candidates: list[str] = []
@@ -97,7 +99,7 @@ def _fetch_new_urls(
             summary = entry.get("summary", "")
             relevant, topic = is_relevant(title, summary, allowed_topics)
             if not relevant:
-                print(f"[feed] Thema '{topic or 'unbekannt'}' gefiltert: {title[:60]}")
+                logger.debug("Thema '%s' gefiltert: %s", topic or "unbekannt", title[:60])
                 continue
             feed_candidates.append(url)
         candidates.append(feed_candidates)
@@ -124,53 +126,53 @@ def run_once(cfg: FeedConfig) -> bool:
     cooldown_remaining = _quota_cooldown_remaining()
     if cooldown_remaining:
         resume_at = datetime.datetime.now() + datetime.timedelta(seconds=cooldown_remaining)
-        print(
-            "[feed] Feed pausiert wegen erschöpfter Gemini-Quota bis "
-            f"{resume_at:%Y-%m-%d %H:%M:%S}."
+        logger.warning(
+            "Feed pausiert wegen erschöpfter Gemini-Quota bis %s.",
+            resume_at.strftime("%Y-%m-%d %H:%M:%S"),
         )
         return True
 
     feed_urls = _load_feed_urls(cfg.feeds_file)
-    print(f"[feed] {len(feed_urls)} Feed(s) geladen, max. {cfg.max_articles} neue Artikel.")
+    logger.info("%d Feed(s) geladen, max. %d neue Artikel.", len(feed_urls), cfg.max_articles)
 
     if cfg.allowed_topics:
-        print(f"[feed] Themenfilter aktiv: {', '.join(sorted(cfg.allowed_topics))}")
+        logger.info("Themenfilter aktiv: %s", ", ".join(sorted(cfg.allowed_topics)))
     else:
-        print("[feed] Themenfilter deaktiviert (FEED_TOPICS=all) — alle Artikel werden analysiert.")
+        logger.info("Themenfilter deaktiviert (FEED_TOPICS=all) — alle Artikel werden analysiert.")
     new_urls = list(_fetch_new_urls(feed_urls, cfg.max_articles, cfg.allowed_topics))
     if not new_urls:
-        print("[feed] Keine neuen Artikel gefunden.")
+        logger.info("Keine neuen Artikel gefunden.")
         return False
 
-    print(f"[feed] {len(new_urls)} neue Artikel werden analysiert …")
+    logger.info("%d neue Artikel werden analysiert …", len(new_urls))
     for url in new_urls:
         try:
             run(url)
         except GeminiQuotaExceededError as exc:
-            print(f"[feed] Gemini-Quota erschöpft: {exc}")
+            logger.error("Gemini-Quota erschöpft: %s", exc)
             start_quota_cooldown()
             return True
     return False
 
 
 def run_auto(cfg: FeedConfig) -> None:
-    print(
-        f"[feed] Auto-Modus gestartet – Intervall: {cfg.interval}s "
-        f"({cfg.interval // 60} min). Abbrechen mit Ctrl+C."
+    logger.info(
+        "Auto-Modus gestartet – Intervall: %ds (%d min). Abbrechen mit Ctrl+C.",
+        cfg.interval, cfg.interval // 60,
     )
     while True:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"\n[feed] Lauf um {now}")
+        logger.info("Lauf um %s", now)
         try:
             quota_exhausted = run_once(cfg)
         except Exception as exc:
-            print(f"[feed] Fehler im Lauf: {exc}")
+            logger.error("Fehler im Lauf: %s", exc)
             quota_exhausted = False
         if quota_exhausted:
             cooldown_remaining = _quota_cooldown_remaining()
             time.sleep(cooldown_remaining)
             continue
-        print(f"[feed] Nächster Lauf in {cfg.interval}s …")
+        logger.info("Nächster Lauf in %ds …", cfg.interval)
         time.sleep(cfg.interval)
 
 

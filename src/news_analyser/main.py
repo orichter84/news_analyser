@@ -13,30 +13,34 @@ Usage:
 
 import argparse
 import datetime
+import logging
 from pathlib import Path
 
+from .logging_config import setup_logging
 from .scraper import Article, fetch_article
 from .agents import analyze_article
 from .agents.errors import GeminiQuotaExceededError
 from .repositories.db_storage import store_result
 from .stats import print_report
 
+logger = logging.getLogger(__name__)
+
 
 def run(url: str) -> None:
-    print(f"[*] Fetching: {url}")
+    logger.info("Fetching: %s", url)
     article = fetch_article(url)
     if not article:
-        print(f"[!] Could not extract text from {url}")
+        logger.warning("Could not extract text from %s", url)
         return
 
     if article.is_paywall:
-        print(f"[~] Paywall erkannt ({article.word_count} Wörter) – übersprungen: {url}")
+        logger.info("Paywall erkannt (%d Wörter) – übersprungen: %s", article.word_count, url)
         return
 
-    print(f"[*] Analyzing ({len(article.text)} chars) …")
+    logger.info("Analyzing (%d chars) …", len(article.text))
     result = analyze_article(article)
     if not result:
-        print("[!] Analysis failed – no JSON returned.")
+        logger.warning("Analysis failed – no JSON returned.")
         return
 
     store_result(article.text, result, url=article.url)
@@ -46,15 +50,18 @@ def run(url: str) -> None:
     bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
     dk = ft.get("dunning_kruger_index", 0.0)
     stroemung = result.get("politische_stroemung", ["neutral"])
-    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
-    print(f"    Stroemung: {stroemung}")
-    print(f"    Techniken: {[t['technique'] for t in techniques]}")
+    logger.info(
+        "Stored. Orwell-Index: %.2f  |  Bernays Score: %.2f/1000w  |  DK-Index: %.2f",
+        ft["orwell_index"], bernays, dk,
+    )
+    logger.info("Stroemung: %s", stroemung)
+    logger.info("Techniken: %s", [t["technique"] for t in techniques])
 
 
 def run_text_file(path: str, domain: str, source_url: str) -> None:
     text = Path(path).read_text(encoding="utf-8").strip()
     if len(text) < 100:
-        print(f"[!] Text zu kurz für eine Analyse ({len(text)} Zeichen).")
+        logger.warning("Text zu kurz für eine Analyse (%d Zeichen).", len(text))
         return
 
     fetched_at = datetime.datetime.utcnow().isoformat() + "Z"
@@ -66,10 +73,13 @@ def run_text_file(path: str, domain: str, source_url: str) -> None:
         word_count=len(text.split()),
     )
 
-    print(f"[*] Analyzing text file '{path}' ({len(text)} chars, {article.word_count} Wörter) …")
+    logger.info(
+        "Analyzing text file '%s' (%d chars, %d Wörter) …",
+        path, len(text), article.word_count,
+    )
     result = analyze_article(article)
     if not result:
-        print("[!] Analysis failed – no JSON returned.")
+        logger.warning("Analysis failed – no JSON returned.")
         return
 
     store_result(article.text, result, url=article.url)
@@ -79,12 +89,16 @@ def run_text_file(path: str, domain: str, source_url: str) -> None:
     bernays = round(len(techniques) / word_count * 1000, 2) if word_count > 0 else 0.0
     dk = ft.get("dunning_kruger_index", 0.0)
     stroemung = result.get("politische_stroemung", ["neutral"])
-    print(f"[+] Stored. Orwell-Index: {ft['orwell_index']:.2f}  |  Bernays Score: {bernays:.2f}/1000w  |  DK-Index: {dk:.2f}")
-    print(f"    Stroemung: {stroemung}")
-    print(f"    Techniken: {[t['technique'] for t in techniques]}")
+    logger.info(
+        "Stored. Orwell-Index: %.2f  |  Bernays Score: %.2f/1000w  |  DK-Index: %.2f",
+        ft["orwell_index"], bernays, dk,
+    )
+    logger.info("Stroemung: %s", stroemung)
+    logger.info("Techniken: %s", [t["technique"] for t in techniques])
 
 
 def main() -> None:
+    setup_logging()
     parser = argparse.ArgumentParser(description="Media manipulation analyser")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--url", help="Einzelne Artikel-URL analysieren")
@@ -117,7 +131,7 @@ def main() -> None:
         except GeminiQuotaExceededError as exc:
             from .feed import start_quota_cooldown
             start_quota_cooldown()
-            print(f"[!] Gemini-Quota erschöpft: {exc}")
+            logger.error("Gemini-Quota erschöpft: %s", exc)
 
     elif args.file:
         with open(args.file, encoding="utf-8") as fh:
@@ -128,7 +142,7 @@ def main() -> None:
             except GeminiQuotaExceededError as exc:
                 from .feed import start_quota_cooldown
                 start_quota_cooldown()
-                print(f"[!] Gemini-Quota erschöpft: {exc}")
+                logger.error("Gemini-Quota erschöpft: %s", exc)
                 break
 
     elif args.feed:

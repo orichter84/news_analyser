@@ -11,6 +11,7 @@ Technique definitions are loaded from src/news_analyser/data/techniques.json.
 from __future__ import annotations
 
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,8 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 from .chroma_client import get_client
+
+logger = logging.getLogger(__name__)
 
 _DATA_DIR = Path(__file__).parent.parent / "data"
 _COLLECTION = "techniques"
@@ -65,7 +68,7 @@ def _ensure_seeded(col: chromadb.Collection) -> None:
             for t in _TECHNIQUES
         ],
     )
-    print(f"[techniques] {len(_TECHNIQUES)} Techniken in DB gespeichert.")
+    logger.info("%d Techniken in DB gespeichert.", len(_TECHNIQUES))
 
 
 def format_techniques_for_prompt() -> str:
