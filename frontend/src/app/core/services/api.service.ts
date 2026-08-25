@@ -6,6 +6,7 @@ import { ArticleListItem, ArticleDetail, ArticleFilter } from '../models/article
 import { StatsResponse, VerlaufEntry, PublisherProfile, TrendResponse } from '../models/stats.model';
 import { AnalyseRequest, AnalyseResponse, JobStatus } from '../models/analyse.model';
 import { Technique } from '../models/technique.model';
+import { SystemStatus } from '../models/status.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -66,5 +67,9 @@ export class ApiService {
 
   getConfig(): Observable<{ submit_enabled: boolean }> {
     return this.http.get<{ submit_enabled: boolean }>(`${this.base}/config`);
+  }
+
+  getSystemStatus(): Observable<SystemStatus> {
+    return this.http.get<SystemStatus>(`${this.base}/status`);
   }
 }

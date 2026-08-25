@@ -1,0 +1,69 @@
+<div class="system-status">
+  <h1>Systemstatus</h1>
+
+  @if (loading()) {
+    <p class="loading">Lade Systemstatus…</p>
+  } @else if (!status()) {
+    <p class="empty">Status konnte nicht geladen werden.</p>
+  } @else {
+    @let s = status()!;
+
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="status-head">
+          <span class="status-dot" [class.is-ok]="s.backend.status === 'ok'" [class.is-error]="s.backend.status !== 'ok'"></span>
+          <h2>Backend</h2>
+        </div>
+        <p class="status-line">{{ s.backend.status === 'ok' ? 'Läuft' : 'Fehler' }}</p>
+      </div>
+
+      <div class="status-card">
+        <div class="status-head">
+          <span class="status-dot" [class.is-ok]="s.chroma.status === 'ok'" [class.is-error]="s.chroma.status !== 'ok'"></span>
+          <h2>ChromaDB</h2>
+        </div>
+        <p class="status-line">
+          {{ s.chroma.status === 'ok' ? 'Läuft' : 'Nicht erreichbar' }}
+        </p>
+      </div>
+
+      <div class="status-card">
+        <div class="status-head">
+          <span class="status-dot" [class.is-ok]="s.feed.running" [class.is-error]="!s.feed.running"></span>
+          <h2>Feed-Grabber</h2>
+        </div>
+        <p class="status-line">
+          {{ s.feed.running ? 'Läuft' : 'Nicht aktiv' }}
+          @if (s.feed.mode) { &ndash; {{ s.feed.mode === 'auto' ? 'Dauerbetrieb' : 'manuell' }} }
+        </p>
+        <dl class="status-details">
+          @if (s.feed.pid) {
+            <dt>PID</dt><dd>{{ s.feed.pid }}</dd>
+          }
+          @if (s.feed.started_at) {
+            <dt>Prozess gestartet</dt><dd>{{ s.feed.started_at | date:'dd.MM. HH:mm:ss' }}</dd>
+          }
+          @if (s.feed.last_run_at) {
+            <dt>Letzter Lauf</dt><dd>{{ s.feed.last_run_at | date:'dd.MM. HH:mm:ss' }}</dd>
+          }
+          @if (s.feed.last_run_at) {
+            <dt>Ergebnis</dt><dd>{{ lastRunLabel() }}</dd>
+          }
+          @if (s.feed.last_run_articles != null) {
+            <dt>Verarbeitete Artikel</dt><dd>{{ s.feed.last_run_articles }}</dd>
+          }
+          @if (s.feed.next_run_at) {
+            <dt>Nächster Lauf</dt><dd>{{ s.feed.next_run_at | date:'dd.MM. HH:mm:ss' }}</dd>
+          }
+        </dl>
+        @if (!s.feed.last_run_at && !s.feed.pid) {
+          <p class="status-hint">Noch kein Feed-Lauf erfasst.</p>
+        }
+      </div>
+    </div>
+
+    @if (lastChecked()) {
+      <p class="status-footer">Zuletzt geprüft: {{ lastChecked() | date:'HH:mm:ss' }} (Auto-Aktualisierung alle 10s)</p>
+    }
+  }
+</div>

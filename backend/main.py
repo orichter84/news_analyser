@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import articles, analyse, stats, search, techniques
+from routers import articles, analyse, stats, search, techniques, status
 from news_analyser.logging_config import setup_logging
 
 setup_logging()
@@ -26,6 +26,7 @@ app.include_router(analyse.router)
 app.include_router(stats.router)
 app.include_router(search.router)
 app.include_router(techniques.router)
+app.include_router(status.router)
 
 
 @app.get("/health")

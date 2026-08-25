@@ -16,6 +16,8 @@ from news_analyser.config import FeedConfig
 def isolated_cooldown_file(tmp_path, monkeypatch):
     cooldown_file = tmp_path / "gemini_quota_cooldown.json"
     monkeypatch.setattr(feed, "_QUOTA_COOLDOWN_FILE", cooldown_file)
+    # run_once() also writes a status file — isolate it too, or tests pollute the real data/ dir.
+    monkeypatch.setattr(feed, "_STATUS_FILE", tmp_path / "feed_status.json")
     return cooldown_file
 
 

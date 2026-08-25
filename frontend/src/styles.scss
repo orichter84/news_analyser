@@ -11,6 +11,7 @@
   --muted:     #7a7d96;
   --radius:    8px;
   --high:      #e07a52;
+  --ok:        #52e0a8;
 }
 
 body {
@@ -97,6 +98,45 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--acc
   &.full { grid-column: 1 / -1; margin-bottom: 1rem; }
   &.recent { grid-column: 1 / -1; margin-top: 1rem; }
 }
+
+/* ---- System status ---- */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.status-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.status-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+.status-head h2 { margin-bottom: 0; }
+.status-dot {
+  width: 10px;
+  height: 10px;
+  min-height: 0;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+  &.is-ok { background: var(--ok); }
+  &.is-error { background: var(--danger); }
+}
+.status-line { color: var(--muted); font-size: 0.85rem; }
+.status-hint { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; }
+.status-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.75rem;
+  row-gap: 0.3rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+
+  dt { color: var(--muted); }
+  dd { text-align: right; }
+}
+.status-footer { color: var(--muted); font-size: 0.75rem; margin-top: 1rem; }
 
 /* ---- Bar chart ---- */
 .bar-row {

@@ -29,6 +29,20 @@ logger = logging.getLogger(__name__)
 
 _GEMINI_QUOTA_COOLDOWN_SECONDS = 24 * 60 * 60
 _QUOTA_COOLDOWN_FILE = Path(__file__).resolve().parents[2] / "data" / "gemini_quota_cooldown.json"
+_STATUS_FILE = Path(__file__).resolve().parents[2] / "data" / "feed_status.json"
+_PROCESS_STARTED_AT = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _now_iso() -> str:
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _atomic_write_json(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as temp_file:
+        json.dump(data, temp_file)
+        temp_path = temp_file.name
+    os.replace(temp_path, path)
 
 
 def _quota_cooldown_remaining() -> float:
@@ -51,16 +65,22 @@ def _quota_cooldown_remaining() -> float:
 
 def start_quota_cooldown() -> None:
     """Persist a 24-hour Gemini cooldown atomically."""
-    _QUOTA_COOLDOWN_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        dir=_QUOTA_COOLDOWN_FILE.parent,
-        delete=False,
-    ) as temp_file:
-        json.dump({"until": time.time() + _GEMINI_QUOTA_COOLDOWN_SECONDS}, temp_file)
-        temp_path = temp_file.name
-    os.replace(temp_path, _QUOTA_COOLDOWN_FILE)
+    _atomic_write_json(_QUOTA_COOLDOWN_FILE, {"until": time.time() + _GEMINI_QUOTA_COOLDOWN_SECONDS})
+
+
+def _write_status(**fields) -> None:
+    """Merge fields into data/feed_status.json — read by the backend's /status endpoint."""
+    current = {}
+    if _STATUS_FILE.exists():
+        try:
+            current = json.loads(_STATUS_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            current = {}
+    current.update(pid=os.getpid(), started_at=_PROCESS_STARTED_AT, **fields)
+    try:
+        _atomic_write_json(_STATUS_FILE, current)
+    except OSError as exc:
+        logger.warning("Konnte Feed-Status nicht schreiben: %s", exc)
 
 
 def _load_feed_urls(feeds_file: Path) -> list[str]:
@@ -123,6 +143,11 @@ def _fetch_new_urls(
 
 def run_once(cfg: FeedConfig) -> bool:
     """Run one feed cycle and return whether Gemini quota was exhausted."""
+    # Mark the cycle as in-progress and clear the previous cycle's terminal fields —
+    # otherwise a stale last_run_status/next_run_at from the last run stays visible
+    # in /status for the whole duration of this (possibly long-running) cycle.
+    _write_status(mode=cfg.mode, last_run_status="running", last_run_articles=None, next_run_at=None)
+
     cooldown_remaining = _quota_cooldown_remaining()
     if cooldown_remaining:
         resume_at = datetime.datetime.now() + datetime.timedelta(seconds=cooldown_remaining)
@@ -130,6 +155,7 @@ def run_once(cfg: FeedConfig) -> bool:
             "Feed pausiert wegen erschöpfter Gemini-Quota bis %s.",
             resume_at.strftime("%Y-%m-%d %H:%M:%S"),
         )
+        _write_status(last_run_status="quota_cooldown")
         return True
 
     feed_urls = _load_feed_urls(cfg.feeds_file)
@@ -142,16 +168,21 @@ def run_once(cfg: FeedConfig) -> bool:
     new_urls = list(_fetch_new_urls(feed_urls, cfg.max_articles, cfg.allowed_topics))
     if not new_urls:
         logger.info("Keine neuen Artikel gefunden.")
+        _write_status(last_run_at=_now_iso(), last_run_status="no_new_articles", last_run_articles=0)
         return False
 
     logger.info("%d neue Artikel werden analysiert …", len(new_urls))
+    processed = 0
     for url in new_urls:
         try:
             run(url)
+            processed += 1
         except GeminiQuotaExceededError as exc:
             logger.error("Gemini-Quota erschöpft: %s", exc)
             start_quota_cooldown()
+            _write_status(last_run_at=_now_iso(), last_run_status="quota_exceeded", last_run_articles=processed)
             return True
+    _write_status(last_run_at=_now_iso(), last_run_status="ok", last_run_articles=processed)
     return False
 
 
@@ -168,10 +199,15 @@ def run_auto(cfg: FeedConfig) -> None:
         except Exception as exc:
             logger.error("Fehler im Lauf: %s", exc)
             quota_exhausted = False
+            _write_status(last_run_at=_now_iso(), last_run_status="error")
         if quota_exhausted:
             cooldown_remaining = _quota_cooldown_remaining()
+            next_run = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=cooldown_remaining)
+            _write_status(next_run_at=next_run.isoformat())
             time.sleep(cooldown_remaining)
             continue
+        next_run = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=cfg.interval)
+        _write_status(next_run_at=next_run.isoformat())
         logger.info("Nächster Lauf in %ds …", cfg.interval)
         time.sleep(cfg.interval)
 
