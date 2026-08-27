@@ -66,4 +66,27 @@
       <p class="status-footer">Zuletzt geprüft: {{ lastChecked() | date:'HH:mm:ss' }} (Auto-Aktualisierung alle 10s)</p>
     }
   }
+
+  <section class="log-viewer">
+    <h2>Logs</h2>
+    <nav class="log-tabs">
+      <ul>
+        @for (tab of logTabs; track tab.name) {
+          <li>
+            <button type="button" [class.active]="activeLog() === tab.name" (click)="selectLog(tab.name)">
+              {{ tab.label }}
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    @if (logLoading()) {
+      <p class="loading">Lade Log…</p>
+    } @else if (logLines().length === 0) {
+      <p class="empty">Kein Log vorhanden.</p>
+    } @else {
+      <pre class="log-box" #logBox>{{ logLines().join('\n') }}</pre>
+    }
+  </section>
 </div>

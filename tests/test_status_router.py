@@ -129,3 +129,57 @@ class TestStatusEndpoint:
         assert body["backend"] == {"status": "ok"}
         assert body["chroma"]["status"] == "error"
         assert "running" in body["feed"]
+
+
+class TestTailLines:
+    def test_missing_file_returns_empty_list(self, tmp_path):
+        assert status_router._tail_lines(tmp_path / "missing.log", 10) == []
+
+    def test_returns_all_lines_when_under_the_limit(self, tmp_path):
+        log_file = tmp_path / "small.log"
+        log_file.write_text("a\nb\nc\n", encoding="utf-8")
+        assert status_router._tail_lines(log_file, 10) == ["a", "b", "c"]
+
+    def test_truncates_to_max_lines(self, tmp_path):
+        log_file = tmp_path / "many.log"
+        log_file.write_text("\n".join(f"line{i}" for i in range(10)), encoding="utf-8")
+        assert status_router._tail_lines(log_file, 3) == ["line7", "line8", "line9"]
+
+    def test_strips_ansi_color_codes(self, tmp_path):
+        # ChromaDB's startup banner (and uvicorn's colored log levels) contain
+        # ANSI escape sequences that must not leak into the plain-text UI.
+        log_file = tmp_path / "colored.log"
+        log_file.write_text("\x1b[38;5;069mhello\x1b[0m\nplain\n", encoding="utf-8")
+        assert status_router._tail_lines(log_file, 10) == ["hello", "plain"]
+
+    def test_bounded_byte_window_still_yields_correct_tail(self, tmp_path, monkeypatch):
+        # Each "entry-NNN" line is 10 bytes incl. newline; a 80-byte window covers
+        # the last ~8 lines but not the full 550-byte file, exercising the
+        # seek-from-end path while still comfortably holding the 5 requested lines.
+        monkeypatch.setattr(status_router, "_LOG_TAIL_BYTES", 80)
+        log_file = tmp_path / "big.log"
+        log_file.write_text("\n".join(f"entry-{i:03d}" for i in range(50)), encoding="utf-8")
+
+        result = status_router._tail_lines(log_file, 5)
+
+        assert result == ["entry-045", "entry-046", "entry-047", "entry-048", "entry-049"]
+
+
+class TestLogEndpoint:
+    def test_returns_lines_for_known_log(self, tmp_path, monkeypatch):
+        log_file = tmp_path / "app.log"
+        log_file.write_text("hello\nworld\n", encoding="utf-8")
+        monkeypatch.setitem(status_router._LOG_FILES, "app", log_file)
+
+        app = FastAPI()
+        app.include_router(status_router.router)
+        response = TestClient(app).get("/status/logs/app")
+
+        assert response.status_code == 200
+        assert response.json() == {"lines": ["hello", "world"]}
+
+    def test_unknown_log_name_returns_404(self):
+        app = FastAPI()
+        app.include_router(status_router.router)
+        response = TestClient(app).get("/status/logs/does-not-exist")
+        assert response.status_code == 404

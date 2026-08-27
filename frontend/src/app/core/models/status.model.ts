@@ -19,3 +19,9 @@ export interface SystemStatus {
   chroma: ServiceStatus;
   feed: FeedStatus;
 }
+
+export type LogName = 'app' | 'chroma' | 'backend' | 'frontend';
+
+export interface LogResponse {
+  lines: string[];
+}

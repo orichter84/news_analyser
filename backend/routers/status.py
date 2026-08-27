@@ -1,10 +1,11 @@
 import datetime
 import json
+import re
 import sys
 from pathlib import Path
 
 import psutil
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from news_analyser.repositories.chroma_client import get_client
@@ -14,6 +15,17 @@ _PID_IDENTITY_TOLERANCE_SECONDS = 5
 router = APIRouter(prefix="/status", tags=["status"])
 
 _FEED_STATUS_FILE = Path(__file__).parent.parent.parent / "data" / "feed_status.json"
+
+_LOG_DIR = Path(__file__).parent.parent.parent / "logs"
+_LOG_FILES = {
+    "app": _LOG_DIR / "news_analyser.log",
+    "chroma": _LOG_DIR / "chroma.log",
+    "backend": _LOG_DIR / "backend.log",
+    "frontend": _LOG_DIR / "frontend.log",
+}
+_LOG_MAX_LINES = 300
+_LOG_TAIL_BYTES = 200_000  # cap how much of a (potentially unbounded) log file we read
+_ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
 
 _FEED_STATUS_DEFAULTS = {
     "pid": None,
@@ -68,6 +80,23 @@ def _feed_status() -> dict:
     return feed
 
 
+def _tail_lines(path: Path, max_lines: int) -> list[str]:
+    """Read up to max_lines from the end of path without loading the whole file."""
+    if not path.exists():
+        return []
+    with path.open("rb") as f:
+        size = f.seek(0, 2)
+        if size > _LOG_TAIL_BYTES:
+            f.seek(size - _LOG_TAIL_BYTES)
+            f.readline()  # drop the (likely partial) first line of the window
+        else:
+            f.seek(0)
+        content = f.read().decode("utf-8", errors="replace")
+    content = _ANSI_ESCAPE_RE.sub("", content)
+    lines = content.splitlines()
+    return lines[-max_lines:]
+
+
 @router.get("")
 def get_status() -> dict:
     return {
@@ -75,3 +104,11 @@ def get_status() -> dict:
         "chroma": _chroma_status(),
         "feed": _feed_status(),
     }
+
+
+@router.get("/logs/{name}")
+def get_log(name: str) -> dict:
+    path = _LOG_FILES.get(name)
+    if path is None:
+        raise HTTPException(status_code=404, detail=f"Unbekanntes Log: {name}")
+    return {"lines": _tail_lines(path, _LOG_MAX_LINES)}

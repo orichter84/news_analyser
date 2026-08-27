@@ -15,8 +15,11 @@ set -a; [ -f "$BASE/.env" ] && source "$BASE/.env"; set +a
 CHROMA_HOST="${CHROMA_HOST:-localhost}"
 CHROMA_PORT="${CHROMA_PORT:-8001}"
 
+LOGS="$BASE/logs"
+mkdir -p "$LOGS"
+
 echo "[1/3] ChromaDB starten (${CHROMA_HOST}:${CHROMA_PORT}) ..."
-"$VENV/chroma" run --host "$CHROMA_HOST" --port "$CHROMA_PORT" --path "$BASE/data/chroma_db" &
+"$VENV/chroma" run --host "$CHROMA_HOST" --port "$CHROMA_PORT" --path "$BASE/data/chroma_db" >> "$LOGS/chroma.log" 2>&1 &
 CHROMA_PID=$!
 
 # Warten bis ChromaDB antwortet (bis zu 60s — erster Start lädt sentence-transformers)
@@ -29,14 +32,14 @@ echo "    ChromaDB bereit (PID $CHROMA_PID)"
 
 echo "[2/3] FastAPI Backend starten (Port 8000) ..."
 cd "$BASE/backend"
-"$VENV/uvicorn" main:app --host 0.0.0.0 --port 8000 &
+"$VENV/uvicorn" main:app --host 0.0.0.0 --port 8000 >> "$LOGS/backend.log" 2>&1 &
 BACKEND_PID=$!
 sleep 2
 echo "    Backend bereit (PID $BACKEND_PID)"
 
 echo "[3/3] Angular Frontend starten (Port 4200) ..."
 cd "$BASE/frontend"
-npx ng serve --host 0.0.0.0 --port 4200 &
+npx ng serve --host 0.0.0.0 --port 4200 >> "$LOGS/frontend.log" 2>&1 &
 FRONTEND_PID=$!
 sleep 2
 echo "    Frontend bereit (PID $FRONTEND_PID)"
@@ -46,6 +49,7 @@ echo "News Analyser läuft:"
 echo "  ChromaDB  → http://${CHROMA_HOST}:${CHROMA_PORT}"
 echo "  Backend   → http://localhost:8000"
 echo "  Frontend  → http://localhost:4200"
+echo "  Logs      → $LOGS/{chroma,backend,frontend}.log (auch einsehbar unter /system im Frontend)"
 echo ""
 echo "Alle Services mit Ctrl+C beenden."
 

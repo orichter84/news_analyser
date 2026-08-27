@@ -6,7 +6,7 @@ import { ArticleListItem, ArticleDetail, ArticleFilter } from '../models/article
 import { StatsResponse, VerlaufEntry, PublisherProfile, TrendResponse } from '../models/stats.model';
 import { AnalyseRequest, AnalyseResponse, JobStatus } from '../models/analyse.model';
 import { Technique } from '../models/technique.model';
-import { SystemStatus } from '../models/status.model';
+import { SystemStatus, LogName, LogResponse } from '../models/status.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -71,5 +71,9 @@ export class ApiService {
 
   getSystemStatus(): Observable<SystemStatus> {
     return this.http.get<SystemStatus>(`${this.base}/status`);
+  }
+
+  getLog(name: LogName): Observable<LogResponse> {
+    return this.http.get<LogResponse>(`${this.base}/status/logs/${name}`);
   }
 }
