@@ -77,6 +77,9 @@
 ### Frontend
 - [ ] **Pagination** — switch article list and backend endpoint to cursor- or offset-based pagination (relevant from ~500 articles)
 
+### Database & RAG
+- [ ] **ChromaDB replacement** — evaluated PostgreSQL/pgvector vs. embedded lightweight alternatives (SQLite+`sqlite-vec`, DuckDB+VSS) after an unexplained ChromaDB crash on the server (2026-08-27). Not decided — waiting to see whether the now-added `logs/chroma.log` reveals a real reliability issue (→ Postgres) or the pain point is really `stats.py`'s pandas-based aggregation (→ embedded alternative, no extra service to run). See [docs/concept/postgres_migration.md](concept/postgres_migration.md) for the full write-up.
+
 ### Data Collection
 - [ ] **Feed health check** — check on startup whether all feed URLs are reachable, report dead feeds
 - [ ] **MSN feed** — test MSN Germany as a central aggregator
