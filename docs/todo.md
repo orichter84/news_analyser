@@ -78,6 +78,7 @@
 - [ ] **Pagination** — switch article list and backend endpoint to cursor- or offset-based pagination (relevant from ~500 articles)
 
 ### Database & RAG
+- [ ] **[Priorität] Stats-Cache im Feed-Grabber** — `stats.py`'s Pandas-Aggregation läuft aktuell bei jedem `/stats`-Request neu über die komplette Chroma-Collection. Grabber läuft jetzt im Dauerbetrieb (`--auto`) — soll nach jedem Zyklus die Aggregation einmal berechnen und als `data/stats_cache.json` atomar schreiben (gleiches Muster wie `feed_status.json`/`gemini_quota_cooldown.json` via `_atomic_write_json`); Backend liest nur noch die fertige Datei statt live zu aggregieren. Unabhängig von der Programmiersprache sinnvoll, wurde im Rahmen einer Diskussion über einen möglichen Go/Rust-Rewrite des App-Backends identifiziert (nicht im Konzept-Dokument, nur hier vermerkt — kein Rewrite entschieden).
 - [ ] **ChromaDB replacement** — evaluated PostgreSQL/pgvector vs. embedded lightweight alternatives (SQLite+`sqlite-vec`, DuckDB+VSS) after an unexplained ChromaDB crash on the server (2026-08-27). Not decided — waiting to see whether the now-added `logs/chroma.log` reveals a real reliability issue (→ Postgres) or the pain point is really `stats.py`'s pandas-based aggregation (→ embedded alternative, no extra service to run). See [docs/concept/postgres_migration.md](concept/postgres_migration.md) for the full write-up.
 
 ### Data Collection
