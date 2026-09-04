@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 _GEMINI_QUOTA_COOLDOWN_SECONDS = 24 * 60 * 60
 _QUOTA_COOLDOWN_FILE = Path(__file__).resolve().parents[2] / "data" / "gemini_quota_cooldown.json"
 _STATUS_FILE = Path(__file__).resolve().parents[2] / "data" / "feed_status.json"
+_ROTATION_FILE = Path(__file__).resolve().parents[2] / "data" / "feed_rotation.json"
 _PROCESS_STARTED_AT = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
@@ -81,6 +82,35 @@ def _write_status(**fields) -> None:
         _atomic_write_json(_STATUS_FILE, current)
     except OSError as exc:
         logger.warning("Konnte Feed-Status nicht schreiben: %s", exc)
+
+
+def _rotate_feed_urls(feed_urls: list[str]) -> list[str]:
+    """Rotate feed_urls so a different feed leads the round-robin each cycle.
+
+    _fetch_new_urls() round-robins starting from feed_urls[0]. Combined with a
+    tight LLM quota (often only a handful of articles get through before
+    GeminiQuotaExceededError aborts the whole cycle), a fixed order meant the
+    same early feeds always won the race and feeds further down feeds.txt
+    never got a turn. Persisting a rotating start offset spreads that fairly
+    across cycles instead.
+    """
+    if not feed_urls:
+        return feed_urls
+
+    offset = 0
+    if _ROTATION_FILE.exists():
+        try:
+            offset = int(json.loads(_ROTATION_FILE.read_text(encoding="utf-8"))["offset"])
+        except (OSError, ValueError, KeyError, TypeError):
+            offset = 0
+    offset %= len(feed_urls)
+
+    try:
+        _atomic_write_json(_ROTATION_FILE, {"offset": (offset + 1) % len(feed_urls)})
+    except OSError as exc:
+        logger.warning("Konnte Feed-Rotation nicht speichern: %s", exc)
+
+    return feed_urls[offset:] + feed_urls[:offset]
 
 
 def _load_feed_urls(feeds_file: Path) -> list[str]:
@@ -158,8 +188,11 @@ def run_once(cfg: FeedConfig) -> bool:
         _write_status(last_run_status="quota_cooldown")
         return True
 
-    feed_urls = _load_feed_urls(cfg.feeds_file)
-    logger.info("%d Feed(s) geladen, max. %d neue Artikel.", len(feed_urls), cfg.max_articles)
+    feed_urls = _rotate_feed_urls(_load_feed_urls(cfg.feeds_file))
+    logger.info(
+        "%d Feed(s) geladen, max. %d neue Artikel. Start bei: %s",
+        len(feed_urls), cfg.max_articles, feed_urls[0] if feed_urls else "–",
+    )
 
     if cfg.allowed_topics:
         logger.info("Themenfilter aktiv: %s", ", ".join(sorted(cfg.allowed_topics)))

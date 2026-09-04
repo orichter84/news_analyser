@@ -11,12 +11,11 @@ from news_analyser.agents.errors import GeminiQuotaExceededError
 from news_analyser.config import FeedConfig
 
 
-@pytest.fixture(autouse=True)
-def isolated_files(tmp_path, monkeypatch):
-    monkeypatch.setattr(feed, "_QUOTA_COOLDOWN_FILE", tmp_path / "gemini_quota_cooldown.json")
-    status_file = tmp_path / "feed_status.json"
-    monkeypatch.setattr(feed, "_STATUS_FILE", status_file)
-    return status_file
+@pytest.fixture
+def isolated_files(_isolate_feed_state_files):
+    # All of feed.py's state files are already redirected into tmp_path by the
+    # autouse fixture in conftest.py; this just hands back the specific path.
+    return feed._STATUS_FILE
 
 
 def _cfg(**overrides) -> FeedConfig:
