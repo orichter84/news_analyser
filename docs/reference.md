@@ -9,6 +9,8 @@ For API endpoints and frontend structure see [web_architecture.md](web_architect
 
 ## Analysis Output (JSON)
 
+This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyzer.py`) — what gets stored in ChromaDB. The list/detail HTTP API (`backend/routers/articles.py`, `search.py`) reshapes some fields for the frontend; see the note after the example.
+
 ```json
 {
   "source_url": "https://...",
@@ -28,9 +30,13 @@ For API endpoints and frontend structure see [web_architecture.md](web_architect
     "main_narrative": "Central thesis of the article",
     "intended_sentiment": "Fear | Outrage | Approval | …",
     "orwell_index": 0.42,
-    "dunning_kruger_index": 0.35
+    "dunning_kruger_index": 0.35,
+    "target_direction": "who or what is elevated (+) or denigrated (-) and how, in German"
   },
-  "politische_stroemung": ["konservativ", "nationalpopulistisch"],
+  "politische_stroemung": [
+    {"label": "konservativ", "quote": "exact quote supporting this label, or null"},
+    {"label": "nationalpopulistisch", "quote": "exact quote supporting this label, or null"}
+  ],
   "themenbereich": "Politik",
   "manipulation_targets": [
     {
@@ -40,9 +46,15 @@ For API endpoints and frontend structure see [web_architecture.md](web_architect
       "rolle": "Täter",
       "rolle_quote": "exact quote supporting the narrative function, or null"
     }
-  ]
+  ],
+  "llm_provider": "anthropic",
+  "llm_model": "claude-..."
 }
 ```
+
+**Differences in the HTTP API:**
+- `politische_stroemung` is flattened to a plain list of label strings (`["konservativ", "nationalpopulistisch"]`) for `GET /articles`, `GET /articles/{id}` and `GET /search` — the per-label `quote` evidence shown above is only present in the stored/pipeline record, not in the API response.
+- `bernays_score` is **not** part of this pipeline output at all. It is computed afterwards, when the result is stored (`len(detected_techniques) / word_count * 1000`, see `src/news_analyser/repositories/db_storage.py:70-72`), and only then appears as a top-level field on the stored record and in the API responses.
 
 ---
 
@@ -51,9 +63,10 @@ For API endpoints and frontend structure see [web_architecture.md](web_architect
 | Indicator | Range | Description |
 |---|---|---|
 | `orwell_index` | 0.0 – 1.0 | Rhetorical extremism. 0 = factual, 1 = highly manipulative |
-| `bernays_score` | 0.0 – ∞ | Manipulation techniques per 1000 words |
+| `bernays_score` | 0.0 – ∞ | Manipulation techniques per 1000 words — computed downstream at storage time, not part of the LLM output itself (see below) |
 | `dunning_kruger_index` | 0.0 – 1.0 | How confidently a text is written without being backed by sources, subjunctive mood or qualifications |
-| `politische_stroemung` | Labels | Ideological classification (multiple possible): `liberal`, `konservativ`, `sozialdemokratisch`, `sozialistisch`, `nationalistisch`, `grün`, etc. |
+| `politische_stroemung` | Labels + quote | Ideological classification (multiple possible): `liberal`, `konservativ`, `sozialdemokratisch`, `sozialistisch`, `nationalistisch`, `grün`, etc. Each label carries a supporting verbatim quote in the pipeline output (flattened to plain labels in the HTTP API) |
+| `target_direction` | Free text (German) | Nested inside `framing_target`. One-sentence summary of who/what the article elevates or denigrates and how |
 | `themenbereich` | Category | Thematic classification: Politik, Wirtschaft, Technologie, … |
 | `manipulation_targets` | List | Entities with direction (positiv/negativ/neutral), role (Sündenbock, Opfer, Held, Feind, Bedrohung, Autorität, Nutznießer, Versager, Täter, Sonstiges) and optional quote evidence |
 
@@ -73,8 +86,12 @@ Paywalled articles are neither analysed nor stored.
 
 ## Techniques Database
 
-28 documented manipulation techniques are defined in `src/news_analyser/data/techniques.json` and automatically seeded into ChromaDB (`techniques` collection) on first start. The collection lives in `data/` and is not pushed to the repository — the source data in `techniques.json` is versioned and enables automatic restoration.
+28 documented manipulation techniques are defined in `src/news_analyser/data/techniques.json`. They are **not** seeded at application startup — `_ensure_seeded()` (`src/news_analyser/repositories/technique_store.py:52`) runs lazily on the first call to `normalize_technique()` or `get_all_techniques()`, populating the ChromaDB `techniques` collection at that point. The collection lives in `data/` and is not pushed to the repository — the source data in `techniques.json` is versioned and enables automatic restoration.
 
-During analysis, LLM free-text output is semantically mapped to canonical names (cosine similarity, threshold 0.35). New techniques can be added by extending `techniques.json`.
+During analysis, LLM free-text output is semantically mapped to canonical names (cosine similarity, threshold 0.35). Only 18 of the 28 techniques are offered to the LLM as explicit options in the Pass 1 prompt (those flagged `"prompt": true` in `techniques.json`); the remaining 10 — including "Appeal to Fear", the example used above — are reachable only via semantic normalization of the LLM's free-text output. New techniques can be added by extending `techniques.json`.
 
-Categories: **Emotional** (Appeal to Fear, Bandwagon, Appeal to Emotion), **Logical** (Ad Hominem, Straw Man, False Dichotomy, Slippery Slope, Cherry Picking), **Rhetorical** (Loaded Language, Whataboutism, Euphemismus, Dysphemismus, Appeal to Authority, Presuppositional Framing), **Structural** (Framing, Agenda Setting, False Balance, Scapegoating, Repetition).
+Categories:
+- **Emotional** (5): Appeal to Fear, Emotional Manipulation, Bandwagon, Appeal to Emotion, Halo Effect
+- **Structural** (9): Selective Empathy, Omission, Scapegoating, Victim Framing, Agenda Setting, Framing, False Balance, Repetition, Anchoring
+- **Rhetorical** (7): Whataboutism, Loaded Language, Euphemismus, Dysphemismus, Appeal to Authority, Presuppositional Framing, Exaggeration
+- **Logical** (7): Cherry Picking, False Dichotomy, Ad Hominem, Straw Man, Slippery Slope, False Cause, Overgeneralization
