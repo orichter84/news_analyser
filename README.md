@@ -10,61 +10,11 @@ Analyses news articles for manipulation techniques, rhetorical extremism and pol
 
 ## Requirements
 
-- Python 3.10–3.12 (recommended: 3.12) — 3.13+ may have compatibility issues with ChromaDB and PyTorch
-- [uv](https://github.com/astral-sh/uv) (recommended package manager — `pip install uv`)
+- Python 3.10–3.12 (recommended: 3.12)
 - Node.js 18+ (frontend only)
 - Access to an LLM backend (OpenAI, Anthropic, LM Studio, Claude CLI etc.)
 
----
-
-## Installation
-
-### 1. Clone the repository
-
-```bash
-git clone <repo-url>
-cd news_analyser
-```
-
-### 2. Virtual environment & dependencies
-
-**Option A — with uv (recommended):**
-
-```bash
-uv venv
-source .venv/bin/activate      # Linux/macOS
-.venv\Scripts\activate         # Windows
-uv pip install -r requirements.txt -r requirements-api.txt
-python -m spacy download de_core_news_md
-```
-
-**Option B — without uv (classic):**
-
-```bash
-python -m venv .venv
-source .venv/bin/activate      # Linux/macOS
-.venv\Scripts\activate         # Windows
-pip install -r requirements.txt -r requirements-api.txt
-python -m spacy download de_core_news_md
-```
-
-> Both options create a `.venv/` environment — use one, not both.
-
-### 3. Configure environment variables
-
-```bash
-cp .env.example .env
-# Open .env in an editor and fill in your values
-```
-
-At minimum set `LLM_PROVIDER`. Depending on the provider an API key may be required — `cli` and `lm_studio` work without one. All options are documented in `.env.example`.
-
-### 4. Frontend (optional)
-
-```bash
-cd frontend
-npm install
-```
+For installation and first-time setup, see **[SETUP.md](SETUP.md)**.
 
 ---
 
@@ -90,46 +40,7 @@ Starts ChromaDB, backend and frontend in the correct order. Stop all services wi
 | Backend  | http://localhost:8000 |
 | ChromaDB | http://localhost:8001 |
 
-### Manual startup (three terminals)
-
-ChromaDB must be started first — the backend connects to it on startup.
-
-**Terminal 1 — ChromaDB (Port 8001)**
-
-```bash
-# Linux/macOS
-chroma run --host localhost --port 8001 --path data/chroma_db
-```
-```powershell
-# Windows
-.venv\Scripts\chroma.exe run --host localhost --port 8001 --path data\chroma_db
-```
-
-**Terminal 2 — Backend (Port 8000)**
-
-```bash
-# Linux/macOS
-cd backend
-uvicorn main:app --reload
-```
-```powershell
-# Windows
-cd backend
-.venv\Scripts\uvicorn.exe main:app --reload
-```
-
-**Terminal 3 — Frontend (Port 4200)**
-
-```bash
-# Linux/macOS
-cd frontend
-ng serve
-```
-```powershell
-# Windows
-cd frontend
-npx ng serve --port 4200
-```
+For manual startup (separate terminals) and troubleshooting, see **[SETUP.md](SETUP.md)**.
 
 The web UI is available at [http://localhost:4200](http://localhost:4200).  
 The API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
@@ -166,56 +77,7 @@ The backend is selected via `LLM_PROVIDER` in `.env`:
 | `copilot` | `GITHUB_TOKEN` | GitHub Copilot |
 | `m365_copilot` | `M365_COPILOT_ACCESS_TOKEN` | Microsoft 365 Copilot |
 
-### Claude Code CLI (`cli`)
-
-The `cli` provider uses the locally installed [Claude Code CLI](https://claude.ai/code) as a subprocess — no separate API key needed, authentication is handled via CLI login.
-
-**Installation (Node.js 18+ required):**
-
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-**Login:**
-
-```bash
-claude login
-```
-
-A browser window opens for authentication with your Anthropic account. After login the CLI can be used directly.
-
-**Configure `.env`:**
-
-```env
-LLM_PROVIDER=cli
-```
-
-### LM Studio (`lm_studio`)
-
-[LM Studio](https://lmstudio.ai) enables running local language models without cloud connectivity — no API key required.
-
-**Installation:**
-
-1. Download and install LM Studio from [lmstudio.ai](https://lmstudio.ai)
-2. In the **Discover** tab, download a model (recommended: Mistral 7B Q8 or Llama 3 8B Q8)
-3. In the **Local Server** tab, load the model and start the server — runs on port 1234 by default
-
-**Configure `.env`:**
-
-```env
-LLM_PROVIDER=lm_studio
-```
-
-The active model is set within LM Studio itself — `OPENAI_MODEL` has no effect. `OPENAI_BASE_URL` does not need to be set either; the connector automatically uses `http://localhost:1234/v1`.
-
-> **Alternative: Ollama** — also works locally via the `openai` provider, as Ollama offers an OpenAI-compatible API:
-> ```env
-> LLM_PROVIDER=openai
-> OPENAI_API_KEY=ollama
-> OPENAI_BASE_URL=http://localhost:11434/v1
-> OPENAI_MODEL=llama3.2
-> ```
-> Download the model first: `ollama pull llama3.2`
+Setup instructions for each provider (API keys, CLI login, LM Studio, Ollama) are in **[SETUP.md](SETUP.md)**.
 
 ---
 
@@ -230,9 +92,9 @@ news_analyser/
 │   └── data/                Keyword lists, techniques JSON, feeds
 ├── src/llm_adapter/         LLM backend abstraction layer
 ├── backend/                 FastAPI REST API
-│   ├── routers/             Endpoints: articles, analyse, stats, search, techniques
+│   ├── routers/             Endpoints: articles, analyse, stats, search, techniques, status
 │   └── schemas/             Pydantic request/response models
-├── frontend/                Angular 17+ SPA
+├── frontend/                Angular SPA
 ├── docs/                    Architecture documentation and concept tests
 ├── data/                    ChromaDB (local, persistent, not in repo)
 ├── config/                  User configuration (committed, no secrets)

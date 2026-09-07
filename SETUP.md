@@ -89,6 +89,15 @@ OPENAI_MODEL=<model-name-in-lm-studio>
 
 LM Studio must be running at `http://localhost:1234`.
 
+> **Alternative: Ollama** — also works locally via the `openai` provider, as Ollama offers an OpenAI-compatible API:
+> ```env
+> LLM_PROVIDER=openai
+> OPENAI_API_KEY=ollama
+> OPENAI_BASE_URL=http://localhost:11434/v1
+> OPENAI_MODEL=llama3.2
+> ```
+> Download the model first: `ollama pull llama3.2`
+
 ### Option E: Gemini via Google AI Studio
 
 ```
@@ -120,6 +129,50 @@ Services are then available at:
 - ChromaDB → http://localhost:8001
 
 Stop all services with `Ctrl+C`.
+
+### Manual startup (three terminals)
+
+ChromaDB must be started first — the backend connects to it on startup.
+
+**Terminal 1 — ChromaDB (Port 8001)**
+
+```bash
+# Linux/macOS
+chroma run --host localhost --port 8001 --path data/chroma_db
+```
+```powershell
+# Windows
+.venv\Scripts\chroma.exe run --host localhost --port 8001 --path data\chroma_db
+```
+
+**Terminal 2 — Backend (Port 8000)**
+
+```bash
+# Linux/macOS
+cd backend
+uvicorn main:app --reload
+```
+```powershell
+# Windows
+cd backend
+.venv\Scripts\uvicorn.exe main:app --reload
+```
+
+**Terminal 3 — Frontend (Port 4200)**
+
+```bash
+# Linux/macOS
+cd frontend
+ng serve
+```
+```powershell
+# Windows
+cd frontend
+npx ng serve --port 4200
+```
+
+The web UI is available at [http://localhost:4200](http://localhost:4200).
+The API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
 
 ## 6. First test
 
