@@ -40,14 +40,14 @@ import { Component } from '@angular/core';
       <span class="pipe-num">5</span>
       <div>
         <strong>RAG-Anker-Abruf</strong>
-        <p>Die 3 ähnlichsten bereits bewerteten Artikel werden aus ChromaDB abgerufen.</p>
+        <p>Die 3 ähnlichsten bereits bewerteten Artikel werden aus ChromaDB abgerufen — sofern mindestens 5 Anker vorhanden sind, sonst läuft Pass 1 ohne Kalibrierung.</p>
       </div>
     </div>
     <div class="pipe-step">
       <span class="pipe-num">6</span>
       <div>
         <strong>Pass 1 — LLM (anonymisiert)</strong>
-        <p>Direktzitate werden zuvor entfernt. Pass 1 liefert Orwell-Index, Bernays Score und Manipulationstechniken.</p>
+        <p>Direktzitate werden zuvor entfernt. Pass 1 liefert Orwell-Index und die erkannten Manipulationstechniken — aus deren Anzahl wird anschließend der Bernays Score berechnet.</p>
       </div>
     </div>
     <div class="pipe-step">

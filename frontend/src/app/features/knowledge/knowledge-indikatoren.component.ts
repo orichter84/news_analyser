@@ -55,10 +55,10 @@ import { Component } from '@angular/core';
       kurzer Artikel mit vielen erhalten so einen fairen Vergleichswert.
     </p>
     <p>
-      Erkannte Techniken umfassen u.&nbsp;a.: FUD (Fear, Uncertainty, Doubt),
-      Framing, Loaded Language, Logischer Fehlschluss, False Balance,
-      Scapegoating, Appeal to Authority, Emotionale Manipulation, Omission,
-      Whataboutism.
+      Erkannte Techniken umfassen u.&nbsp;a.: Framing, Loaded Language, Straw
+      Man, False Balance, Scapegoating, Appeal to Authority, Emotionale
+      Manipulation, Omission, Whataboutism — insgesamt 28 dokumentierte
+      Techniken (siehe „6. Manipulationstechniken").
     </p>
     <div class="kb-callout name">
       <strong>Warum „Bernays"?</strong>
@@ -134,6 +134,48 @@ import { Component } from '@angular/core';
       Labels ermöglichen Überschneidungen und historische Präzision,
       ohne eine falsche Eindimensionalität zu suggerieren.
     </div>
+  </div>
+
+  <!-- Themenbereich -->
+  <div class="kb-indicator">
+    <div class="indicator-header">
+      <span class="indicator-score">Kategorie</span>
+      <div>
+        <h3>Themenbereich</h3>
+        <span class="indicator-sub">Thematische Einordnung</span>
+      </div>
+    </div>
+    <p>
+      Ordnet jeden Artikel einer thematischen Kategorie zu (z.&nbsp;B.
+      <em>Politik</em>, <em>Wirtschaft</em>, <em>Technologie</em>). Wird in
+      Pass 2 zusammen mit der politischen Strömung ermittelt und ist u.&nbsp;a.
+      Grundlage der Themen-Heatmap in den Statistiken.
+    </p>
+  </div>
+
+  <!-- Manipulationsziele -->
+  <div class="kb-indicator">
+    <div class="indicator-header">
+      <span class="indicator-score">Entität + Rolle</span>
+      <div>
+        <h3>Manipulationsziele</h3>
+        <span class="indicator-sub">Wer wird wie dargestellt?</span>
+      </div>
+    </div>
+    <p>
+      Erfasst für jede im Artikel genannte Entität (Person, Organisation,
+      Land …), ob sie <strong>positiv</strong>, <strong>negativ</strong> oder
+      <strong>neutral</strong> dargestellt wird, sowie ihre narrative Rolle —
+      z.&nbsp;B. <em>Held</em>, <em>Feind</em>, <em>Sündenbock</em>,
+      <em>Opfer</em> oder <em>Autorität</em>. Beide Einordnungen werden
+      jeweils durch ein wörtliches Zitat aus dem Artikel belegt.
+    </p>
+    <p>
+      Über viele Artikel hinweg aggregiert bilden diese Profile die
+      Datengrundlage der Herausgeber-Analyse (Statistiken → Herausgeber),
+      die z.&nbsp;B. misst, wie regierungs- oder US-freundlich ein Medium
+      über die Zeit berichtet.
+    </p>
   </div>
 </section>
 `,

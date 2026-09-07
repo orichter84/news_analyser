@@ -33,8 +33,7 @@ import { Component } from '@angular/core';
       <strong>Anonymisierter Text</strong>
       <ul>
         <li>Orwell-Index (Extremismus)</li>
-        <li>Bernays Score (Techniken)</li>
-        <li>Erkannte Manipulationstechniken</li>
+        <li>Erkannte Manipulationstechniken (Basis für den Bernays Score)</li>
       </ul>
       <span class="pass-note">Gruppenblind — strukturell unbiased</span>
     </div>
@@ -58,7 +57,9 @@ import { Component } from '@angular/core';
     bereits bewertete Artikel aus einer Vektordatenbank abgerufen und als
     dynamische Kalibrierungsbeispiele in den Prompt eingebettet.
     Ähnliche Texte sollten ähnliche Scores erhalten — dieses Prinzip heißt
-    <em>Retrieval-Augmented Generation (RAG)</em>.
+    <em>Retrieval-Augmented Generation (RAG)</em>. Diese Kalibrierung greift
+    erst, sobald mindestens 5 bewertete Artikel als Anker vorliegen — davor
+    läuft Pass 1 ohne Referenzbeispiele.
   </p>
 </section>
 `,
