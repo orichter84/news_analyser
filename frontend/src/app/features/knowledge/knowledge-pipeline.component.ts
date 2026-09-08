@@ -47,18 +47,25 @@ import { Component } from '@angular/core';
       <span class="pipe-num">6</span>
       <div>
         <strong>Pass 1 — LLM (anonymisiert)</strong>
-        <p>Direktzitate werden zuvor entfernt. Pass 1 liefert Orwell-Index und die erkannten Manipulationstechniken — aus deren Anzahl wird anschließend der Bernays Score berechnet.</p>
+        <p>Direktzitate werden zuvor entfernt. Pass 1 liefert den strukturellen Orwell-Index und die erkannten Manipulationstechniken — aus deren Anzahl wird anschließend der Bernays Score berechnet.</p>
       </div>
     </div>
     <div class="pipe-step">
       <span class="pipe-num">7</span>
       <div>
         <strong>Pass 2 — LLM (Original)</strong>
-        <p>Politische Strömung als Labels, Dunning-Kruger-Index, Themenbereich und Manipulationsziele.</p>
+        <p>Politische Strömung als Labels, Dunning-Kruger-Index, Themenbereich, Manipulationsziele und der Zitat-Verstärkungs-Index (wie stark die Zitatauswahl extreme Rhetorik verstärkt).</p>
       </div>
     </div>
     <div class="pipe-step">
       <span class="pipe-num">8</span>
+      <div>
+        <strong>Zusammenführung</strong>
+        <p>Der finale Orwell-Index ist das Maximum aus dem strukturellen Wert (Pass 1) und dem Zitat-Verstärkungs-Index (Pass 2).</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <span class="pipe-num">9</span>
       <div>
         <strong>Speicherung</strong>
         <p>Ergebnis und Einbettung in ChromaDB. Artikel wird automatisch als neuer Kalibrierungsanker gespeichert.</p>

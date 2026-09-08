@@ -228,9 +228,17 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     # Ergebnisse zusammenführen
     # ------------------------------------------------------------------
     stroemung            = result2.get("politische_stroemung", ["neutral"])
-    orwell               = result1.get("framing_target", {}).get("orwell_index", 0.0)
     themenbereich        = result2.get("themenbereich", "Sonstiges")
     manipulation_targets = result2.get("manipulation_targets", [])
+
+    # orwell_index ist das Maximum aus zwei unabhängigen Signalen:
+    # - orwell_index_structural: Pass 1, eigene Stimme des Autors (zitat-bereinigt)
+    # - quote_amplification_index: Pass 2, Verstärkung extremer Rhetorik durch Zitatauswahl
+    # Ein Artikel kann also allein durch seine Zitatauswahl als extrem gelten,
+    # selbst wenn der Autor selbst sachlich und neutral formuliert.
+    orwell_structural   = float(result1.get("framing_target", {}).get("orwell_index", 0.0))
+    quote_amplification = float(result2.get("quote_amplification_index", 0.0))
+    orwell              = max(orwell_structural, quote_amplification)
 
     result = {
         **base_meta,
@@ -239,8 +247,11 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         "detected_techniques": result1.get("detected_techniques", []),
         "framing_target": {
             **result1.get("framing_target", {}),
-            "dunning_kruger_index": result2.get("dunning_kruger_index", 0.0),
-            "target_direction":     result2.get("target_direction", ""),
+            "orwell_index":              orwell,
+            "orwell_index_structural":   orwell_structural,
+            "quote_amplification_index": quote_amplification,
+            "dunning_kruger_index":      result2.get("dunning_kruger_index", 0.0),
+            "target_direction":          result2.get("target_direction", ""),
         },
         "politische_stroemung":  stroemung,
         "themenbereich":         themenbereich,

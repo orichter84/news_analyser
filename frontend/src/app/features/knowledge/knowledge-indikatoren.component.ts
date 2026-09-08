@@ -27,6 +27,16 @@ import { Component } from '@angular/core';
       keine Feindbilder). <strong>1.0</strong> für totalen Anspruch: existenzielle
       Bedrohungsnarrative, Scapegoating, kein Raum für Differenzierung.
     </p>
+    <p>
+      Der Wert setzt sich aus zwei unabhängigen Quellen zusammen: der
+      <strong>strukturellen</strong> Bewertung der eigenen Autor:innen-Stimme
+      (Pass 1, ohne Zitate) und dem <strong>Zitat-Verstärkungs-Index</strong>
+      (Pass 2), der misst, wie stark die <em>Auswahl</em> zitierter Aussagen
+      extreme Rhetorik verstärkt, ohne Einordnung oder Gegenrede. Es zählt
+      jeweils der höhere der beiden Werte — ein Artikel kann also allein durch
+      seine Zitatauswahl als extrem gelten, auch wenn die Autor:innen selbst
+      sachlich formulieren.
+    </p>
     <div class="kb-callout name">
       <strong>Warum „Orwell"?</strong>
       George Orwell (1903–1950) beschrieb in <em>1984</em> und <em>Politics and the

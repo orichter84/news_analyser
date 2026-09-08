@@ -215,14 +215,28 @@ Original text
   ├── Anonymisation (spaCy NER + detected group terms)
     │       ↓
   ├── [Pass 1] Anonymised, direct quotes removed
-  │       → Orwell Index, Bernays Score, techniques  (structural, bias-reduced)
+  │       → Orwell Index (structural), Bernays Score, techniques
     │
-    └── [Pass 2] Original   → Political leaning, DK Index, topic area, manipulation targets
+    └── [Pass 2] Original   → Political leaning, DK Index, topic area,
+            manipulation targets, Quote Amplification Index
+                    │
+                    ▼
+        orwell_index = max(structural, quote amplification)
 ```
 
 **Key advantage:** The solution is model-independent. The anonymisation
 preprocessing runs before the LLM call and works identically with any model,
 because the bias is structurally excluded rather than suppressed by instruction.
+
+**Quote Amplification Index (implemented):** Pass 1 deliberately excludes direct
+quotes so that an outlet is not penalised merely for accurately quoting an extreme
+voice. But *which* quotes an article chooses to prominently feature — and whether
+it gives them a rebuttal or context — is itself an editorial/rhetorical choice.
+Pass 2 sees the full original text (quotes included) and scores this selection
+separately as `quote_amplification_index`. The final `orwell_index` is the
+maximum of Pass 1's structural score and this quote-selection score, so an
+article can score as extreme purely through its choice of what to quote and
+amplify, even when the author's own sentences are measured and neutral.
 
 **DK Index as special case:** Symmetry tests have shown that the DK Index remains
 stable across all test cases — epistemic overconfidence manifests in
@@ -239,8 +253,11 @@ inherently group-blind and is measured in pass 2 on the original text.
 - **Keyword lists:** The current lists cover the political extremes. For
   centrist vocabulary (e.g. *freedom, personal responsibility*) a context-dependent
   evaluation is missing — these words appear on both left and right.
-- **Adversarial framing filter:** Long-term a heuristic filter would be useful
-  (e.g. marking keywords in quotation marks as "cited"). Currently the LLM corrects in stage 3.
+- **Adversarial framing filter:** Partially addressed by the Quote Amplification
+  Index (Pass 2 now scores whether an article amplifies extreme quoted rhetoric
+  without context or rebuttal). Still open: no automated check for whether the
+  LLM applies this consistently across similar cases — needs symmetry-style
+  validation like the existing bias tests.
 - **Extend symmetry tests:** Additional substitution pairs and model-switch tests.
 
 ---
@@ -251,6 +268,7 @@ inherently group-blind and is measured in pass 2 on the original text.
 |---|---|
 | Bernays Score | ✅ implemented |
 | Orwell Index (LLM + keyword prior + RAG anchors) | ✅ implemented |
+| Quote Amplification Index (Pass 2, merged into Orwell Index via max) | ✅ implemented |
 | Pass 0: dynamic group identification | ✅ implemented |
 | Anonymisation via spaCy NER plus Pass-0 group terms | ✅ implemented |
 | Political leaning as labels | ✅ implemented |

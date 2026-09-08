@@ -13,6 +13,7 @@ Direct quoted speech is marked by quotation characters: „..." or »...« or ".
 - Only assign a non-neutral `politische_stroemung` if the author's own text — headlines, transitions, editorial commentary, selection of emphasis — clearly reflects that ideology.
 - Exception — selective quoting: the author's SELECTION of which voices to quote is itself an editorial choice, even though the content of what they say is excluded. If the article exclusively or overwhelmingly quotes voices supporting one side of a conflict, without including an opposing view or a targeted party's own response, reflect this imbalance in `target_direction` and in the `direction`/`rolle` of the affected entities — attributed to the author's selection, not to the quoted content.
 - Exception — missing rebuttal: if the article prominently features a quoted, highly charged accusation against a specific entity without including that entity's response to that *specific* accusation anywhere in the text, treat the missing rebuttal as part of the author's editorial framing when assessing that entity's `direction`/`rolle` — even if the article elsewhere quotes that entity on unrelated points.
+- Exception — `quote_amplification_index`: this one field is deliberately the odd one out. Unlike every other assessment above, it DOES look at the content of quoted material — not to judge the speaker, but to judge the author's choice of which rhetoric to platform and how prominently. See the "Quote Amplification Index" section below.
 
 **Pure summary/aggregation articles (special rule):**
 If the article is primarily a neutral summary of reader opinions, poll results, or external debate — where the author's own contribution is limited to factual transitions and neutral summaries — then:
@@ -30,6 +31,7 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
     {"label": "<label2>", "quote": "<verbatim sentence from the article that best supports this label, or null>"}
   ],
   "dunning_kruger_index": <float 0.0 to 1.0>,
+  "quote_amplification_index": <float 0.0 to 1.0>,
   "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
   "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>",
   "manipulation_targets": [
@@ -82,6 +84,45 @@ hedges, or acknowledgement of complexity.
 Score LOW (→0.0) when claims are properly qualified ("laut Experten",
 "möglicherweise", "Studien zeigen"), sources are cited, and uncertainty is
 acknowledged.
+
+## Quote Amplification Index
+
+Measures how much the article's SELECTION of quoted material — not the words
+themselves — amplifies extreme, one-sided, or enemy-image rhetoric. This is
+independent of `politische_stroemung` and `dunning_kruger_index`, and
+complements (does not replace) the `orwell_index` from the separate rhetorical
+analysis pass, which only ever sees the author's own voice with quotes
+removed. The final orwell_index used downstream is the higher of that pass's
+score and this one — so this index is what allows an article to score as
+extreme via its quoting choices alone, even when the author's own sentences
+are measured and neutral.
+
+Base this exclusively on editorial *choices*, using the same exceptions
+defined in the quoted-material rule above (selective quoting, missing
+rebuttal):
+- Does the article prominently feature quotes containing enemy imagery,
+  apocalyptic framing, dehumanising language, or existential-threat rhetoric?
+- Are these quotes given prominence (headline, lead paragraph, standalone
+  block, or repeated across the article) without contextualisation,
+  counter-quote, or rebuttal?
+- Is the quoted rhetoric one-sided — amplifying only one side's most extreme
+  voices while other sides only get measured, factual quotes?
+
+Score using the same bands as the Orwell Index:
+- 0.0–0.3: quotes are measured, balanced, or contextualised; no amplification
+  of extremity
+- 0.4–0.6: some prominent quotes carry emotionally loaded or one-sided
+  framing, without balancing context
+- 0.7–0.9: multiple prominent quotes carry enemy-image, dehumanising, or
+  apocalyptic rhetoric, amplified without pushback
+- 1.0: the article's structure exists primarily to platform extreme,
+  unchallenged rhetoric via quotation
+
+If the article contains no notable quoted material, or quotes are balanced
+and neutral, score 0.0–0.2. Do not conflate this with `dunning_kruger_index`
+(which measures the author's own certainty) or with `politische_stroemung`
+(which measures the author's own ideological alignment) — a neutral,
+balanced author can still amplify extreme rhetoric by choosing to platform it.
 
 ## Themenbereich
 
@@ -146,3 +187,6 @@ If no techniques are detected, return an empty array.
 2. Write target_direction in German.
 3. Apply labels consistently regardless of which group is the target —
    the same rhetorical pattern against any group receives the same label.
+4. Score `quote_amplification_index` the same way regardless of which side is
+   quoted — an extreme quote amplified without pushback scores the same
+   whether it targets the left or the right of the political spectrum.

@@ -30,6 +30,8 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
     "main_narrative": "Central thesis of the article",
     "intended_sentiment": "Fear | Outrage | Approval | …",
     "orwell_index": 0.42,
+    "orwell_index_structural": 0.2,
+    "quote_amplification_index": 0.42,
     "dunning_kruger_index": 0.35,
     "target_direction": "who or what is elevated (+) or denigrated (-) and how, in German"
   },
@@ -52,6 +54,11 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 }
 ```
 
+**`orwell_index` is a merge of two independent signals**, computed in `analyzer.py` after both passes finish:
+- `orwell_index_structural` — Pass 1's own assessment, on the anonymised, quote-stripped text (the author's own voice only)
+- `quote_amplification_index` — Pass 2's assessment of how much the article's *selection* of quoted material amplifies extreme or one-sided rhetoric, on the full original text
+- `orwell_index = max(orwell_index_structural, quote_amplification_index)` — an article can score as extreme through its quoting choices alone, even if the author's own sentences are neutral
+
 **Differences in the HTTP API:**
 - `politische_stroemung` is flattened to a plain list of label strings (`["konservativ", "nationalpopulistisch"]`) for `GET /articles`, `GET /articles/{id}` and `GET /search` — the per-label `quote` evidence shown above is only present in the stored/pipeline record, not in the API response.
 - `bernays_score` is **not** part of this pipeline output at all. It is computed afterwards, when the result is stored (`len(detected_techniques) / word_count * 1000`, see `src/news_analyser/repositories/db_storage.py:70-72`), and only then appears as a top-level field on the stored record and in the API responses.
@@ -62,7 +69,9 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 
 | Indicator | Range | Description |
 |---|---|---|
-| `orwell_index` | 0.0 – 1.0 | Rhetorical extremism. 0 = factual, 1 = highly manipulative |
+| `orwell_index` | 0.0 – 1.0 | Rhetorical extremism. 0 = factual, 1 = highly manipulative. `max(orwell_index_structural, quote_amplification_index)` — see below |
+| `orwell_index_structural` | 0.0 – 1.0 | Pass 1 sub-score: the author's own rhetorical voice, on anonymised/quote-stripped text |
+| `quote_amplification_index` | 0.0 – 1.0 | Pass 2 sub-score: how much the article's quote *selection* amplifies extreme or one-sided rhetoric, on the full original text |
 | `bernays_score` | 0.0 – ∞ | Manipulation techniques per 1000 words — computed downstream at storage time, not part of the LLM output itself (see below) |
 | `dunning_kruger_index` | 0.0 – 1.0 | How confidently a text is written without being backed by sources, subjunctive mood or qualifications |
 | `politische_stroemung` | Labels + quote | Ideological classification (multiple possible): `liberal`, `konservativ`, `sozialdemokratisch`, `sozialistisch`, `nationalistisch`, `grün`, etc. Each label carries a supporting verbatim quote in the pipeline output (flattened to plain labels in the HTTP API) |

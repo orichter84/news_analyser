@@ -21,6 +21,12 @@
       <div class="score-card" [class.high]="a.orwell_index > 0.6">
         <span class="score-value">{{ a.orwell_index | number:'1.2-2' }}</span>
         <span class="score-label">Orwell-Index</span>
+        @if (a.framing_target.quote_amplification_index != null && a.framing_target.orwell_index_structural != null) {
+          <span class="score-sub">
+            Struktur {{ a.framing_target.orwell_index_structural | number:'1.2-2' }}
+            · Zitate {{ a.framing_target.quote_amplification_index | number:'1.2-2' }}
+          </span>
+        }
       </div>
       <div class="score-card">
         <span class="score-value">{{ a.bernays_score | number:'1.2-2' }}</span>

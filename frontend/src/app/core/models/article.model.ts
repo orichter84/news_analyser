@@ -8,6 +8,8 @@ export interface FramingTarget {
   main_narrative: string;
   intended_sentiment: string;
   orwell_index: number;
+  orwell_index_structural?: number;
+  quote_amplification_index?: number;
   dunning_kruger_index?: number;
   target_direction?: string;
 }
