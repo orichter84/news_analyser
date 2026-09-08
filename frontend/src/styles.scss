@@ -470,6 +470,7 @@ td.date { white-space: nowrap; color: var(--muted); }
   &.warning {
     background: rgba(224, 82, 82, 0.08);
     border-left: 3px solid var(--danger);
+    margin-bottom: 1.25rem;
     strong { color: var(--danger); }
   }
   &.name {

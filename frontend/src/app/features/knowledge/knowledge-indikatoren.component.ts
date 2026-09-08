@@ -7,6 +7,39 @@ import { Component } from '@angular/core';
 <section class="kb-section">
   <h2>4. Die Indikatoren</h2>
 
+  <h3>Warum überhaupt Indikatoren?</h3>
+  <p>
+    Die Pipeline erzeugt pro Artikel eine Fülle an Detailinformationen — einzelne
+    Zitate, erkannte Techniken, die Zielrichtung einzelner Entitäten. Das ist für
+    die Detailansicht eines einzelnen Artikels wertvoll, aber nicht
+    vergleichbar: Man kann daraus nicht auf einen Blick ablesen, ob Artikel A
+    manipulativer ist als Artikel B, oder ob sich ein Herausgeber über Monate
+    hinweg verändert hat. Die Indikatoren verdichten diese Details zu wenigen,
+    konsistent berechneten Kennzahlen — erst dadurch werden einzelne Artikel,
+    Verläufe über Zeit und ganze Herausgeber überhaupt vergleichbar (siehe
+    Statistiken → Herausgeber &amp; Trends).
+  </p>
+
+  <h3>Woher kommen diese Indikatoren?</h3>
+  <div class="kb-callout warning">
+    <strong>Keine etablierten Standardmaße</strong>
+    Orwell-Index, Bernays Score, Dunning-Kruger-Index und Zitat-Verstärkungs-Index
+    sind <strong>keine</strong> wissenschaftlich anerkannten oder journalistisch
+    etablierten Kennzahlen — anders als z.&nbsp;B. der Flesch-Lesbarkeitsindex.
+    Es sind projekteigene Metriken, die im Rahmen dieses Projekts entwickelt,
+    iterativ verfeinert und gegen selbst erstellte Testfälle kalibriert wurden
+    (siehe „2. Unser Ansatz" für die Pipeline und „7. Quellen &amp; Inspiration"
+    für die Namensgeber). Die konkreten Skalen, Schwellenwerte und die
+    Zusammenführung mehrerer Signale (z.&nbsp;B. das Maximum aus struktureller
+    und zitatbasierter Bewertung beim Orwell-Index) sind Design-Entscheidungen
+    dieses Projekts, kein Ergebnis externer, peer-geprüfter Forschung. Die Namen
+    (Orwell, Bernays, Dunning-Kruger) sind bewusst gewählte Anspielungen auf die
+    Konzepte, die die jeweilige Kennzahl inspiriert haben — keine Übernahme
+    fremder Metriken oder Zitate aus deren Werken. Ein Score sagt daher nichts
+    Absolutes aus, sondern ist nur innerhalb dieses Tools und relativ zum
+    eigenen Analyse-Korpus zu interpretieren (siehe auch „5. Limitierungen").
+  </div>
+
   <!-- Orwell-Index -->
   <div class="kb-indicator">
     <div class="indicator-header">
