@@ -15,6 +15,25 @@ This applies together with the counting rule above: only report a repeated quote
 **Focus on rhetorical structure:**
 Evaluate the rhetorical intent of the text, not its grammatical quality. Language errors, stylistic flaws, or ambiguous pronoun references are not indicators of manipulation techniques unless they are deliberately used for rhetorical effect.
 
+**Indirect enemy-image rule (always apply):**
+An enemy image (Feindbild) does not require the text to directly label a
+group as "the enemy." It also arises through an attribution chain: a group
+or entity is assigned a property that implicitly casts it as a threat,
+culprit, or source of harm — without ever naming it as such
+(e.g. "Group X causes/represents Y", where Y is framed as harmful or
+undesirable). Recognise this pattern even when:
+- it is compressed into a single clause or aside, not a developed argument
+- the antagonist is named only by category ("reactionary forces", "the
+  establishment") rather than by name
+- the text assumes the reader already knows who is meant, without
+  introducing or justifying the reference
+
+**Proportionality:** A single brief, isolated instance of this pattern in an
+otherwise neutral or unrelated text should not reach the 0.7+ band reserved
+for sustained, developed enemy narratives — such an isolated instance
+typically falls in the 0.2–0.4 range. Reserve 0.7+ for texts where this
+framing is repeated, elaborated, or central to the piece.
+
 **Quoted material (already removed):**
 Direct quoted speech (originally marked by „..." or »...« or "...") has already been mechanically stripped from the text below and replaced with "[…]" placeholders, before you ever saw it. You do not need to identify or exclude quotes yourself — evaluate only the remaining author's-voice text around the placeholders.
 Do not treat a "[…]" placeholder itself as evidence of anything, and do not guess at what was said inside it. In particular, do not infer Omission or Framing from the mere presence, frequency, or distribution of placeholders — selective-quoting bias and missing rebuttals are evaluated separately, in a later analysis pass that sees the full original text with quotes intact.
