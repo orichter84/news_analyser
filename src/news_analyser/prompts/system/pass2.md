@@ -173,6 +173,19 @@ manipulation techniques — either as beneficiary or victim.
       (called victims but defamed — reader meant to feel contempt, not sympathy)
     - Balanced investigative report on a corrupt official: `rolle: Täter`, `direction: neutral`
       (documented without emotional colouring)
+  - **General grounding requirement (applies to every role, not just one):**
+    Whichever `rolle`/`direction` you assign, the corresponding quote must
+    demonstrate the actual authorial framing or judgment — not merely
+    describe a neutral fact or shared circumstance that happens to be
+    favourable or unfavourable. A quote that only states something happened
+    or will happen does not by itself justify `negativ` or `positiv`; look
+    for evaluative language, blame, praise, or mockery in the text itself.
+    - ❌ "Wir müssen auch höhere Preise zahlen" → `rolle: Opfer`, `direction: negativ`
+      (wrong — this states a shared fact, not an evaluative framing; on its
+      own this supports `positiv`/`neutral`, i.e. solidarity with a shared burden)
+    - ✓ "Wieder spielt er die Opferkarte, um sich der Verantwortung zu entziehen"
+      → `rolle: Opfer`, `direction: negativ`
+      (correct — the quote itself frames the victimhood claim as manipulative)
 - **rolle**: The entity's narrative function — independent of how favourably it is presented:
 {{ROLES}}
 

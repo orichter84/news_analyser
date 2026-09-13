@@ -71,11 +71,15 @@
           <div class="target-card">
             <div class="target-header">
               <span class="target-entity">{{ t.entity }}</span>
-              <span class="target-direction" [class]="'dir-' + t.direction">
-                {{ t.direction === 'positiv' ? '▲' : t.direction === 'negativ' ? '▼' : '●' }}
-                {{ t.direction }}
-              </span>
-              <span class="target-rolle">{{ t.rolle }}</span>
+              @if (t.direction) {
+                <span class="target-direction" [class]="'dir-' + t.direction">
+                  {{ t.direction === 'positiv' ? '▲' : t.direction === 'negativ' ? '▼' : '●' }}
+                  {{ t.direction }}
+                </span>
+              }
+              @if (t.rolle) {
+                <span class="target-rolle">{{ t.rolle }}</span>
+              }
             </div>
             @if (t.direction_quote) {
               <div class="target-evidence">

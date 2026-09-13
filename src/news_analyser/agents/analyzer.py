@@ -89,6 +89,52 @@ def _validate_quote_grounding(
     return validated
 
 
+def _validate_manipulation_target_grounding(
+    targets: list[dict[str, Any]], source_text: str
+) -> list[dict[str, Any]]:
+    """Strips `rolle`/`direction` that lack a verifiable supporting quote.
+
+    An unevidenced classification is not a valid data point (see the "General
+    grounding requirement" in pass2.md) — it would otherwise silently skew
+    downstream aggregations (publisher profiles, Cato-pattern) that read
+    `rolle`/`direction` directly. Drops the whole entity if neither survives,
+    since at that point nothing about it is a verified claim — consistent
+    with "only list entities where manipulation techniques are clearly
+    directed at them".
+    """
+    validated = []
+    dropped_fields = 0
+    dropped_entities = 0
+    for t in targets:
+        if not isinstance(t, dict):
+            continue
+        rolle_quote = (t.get("rolle_quote") or "").strip()
+        direction_quote = (t.get("direction_quote") or "").strip()
+        rolle_grounded = bool(rolle_quote) and rolle_quote in source_text
+        direction_grounded = bool(direction_quote) and direction_quote in source_text
+
+        if t.get("rolle") is not None and not rolle_grounded:
+            t["rolle"] = None
+            t["rolle_quote"] = None
+            dropped_fields += 1
+        if t.get("direction") is not None and not direction_grounded:
+            t["direction"] = None
+            t["direction_quote"] = None
+            dropped_fields += 1
+
+        if t.get("rolle") is None and t.get("direction") is None:
+            dropped_entities += 1
+            continue
+        validated.append(t)
+
+    if dropped_fields or dropped_entities:
+        logger.info(
+            "Grounding-Check (manipulation_targets): %d Feld(er) entfernt, %d Entität(en) komplett entfernt.",
+            dropped_fields, dropped_entities,
+        )
+    return validated
+
+
 _QUOTE_PATTERNS = [
     re.compile(r"„.*?“", re.DOTALL),  # „..."
     re.compile(r"».*?«", re.DOTALL),
@@ -223,6 +269,10 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     for t in result2.get("manipulation_targets", []):
         if isinstance(t, dict) and isinstance(t.get("rolle"), str):
             t["rolle"] = normalize_role(t["rolle"])
+
+    result2["manipulation_targets"] = _validate_manipulation_target_grounding(
+        result2.get("manipulation_targets", []), article.text
+    )
 
     # ------------------------------------------------------------------
     # Ergebnisse zusammenführen
