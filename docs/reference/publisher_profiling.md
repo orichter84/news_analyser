@@ -1,7 +1,7 @@
 # Publisher Profiling — Konzept & Umsetzung
 
 Drei aufeinander aufbauende Analysen zur automatischen Charakterisierung von Medien-Herausgebern.  
-Datenbasis und Schema: [reference.md](reference.md) | Auswertungsübersicht: [auswertungen.md](auswertungen.md)
+Datenbasis und Schema: [reference.md](reference.md) | Auswertungsübersicht: [auswertungen.md](../planning/auswertungen.md)
 
 **Status:** Feature 1 und 2 sind implementiert (seit `536e16f`, 2026-06-28) — beide teilen sich einen gemeinsamen Endpoint statt der ursprünglich getrennt geplanten Routen. Feature 3 ist weiterhin offen.
 

@@ -79,7 +79,7 @@
 
 ### Database & RAG
 - [ ] **[Priorität] Stats-Cache im Feed-Grabber** — `stats.py`'s Pandas-Aggregation läuft aktuell bei jedem `/stats`-Request neu über die komplette Chroma-Collection. Grabber läuft jetzt im Dauerbetrieb (`--auto`) — soll nach jedem Zyklus die Aggregation einmal berechnen und als `data/stats_cache.json` atomar schreiben (gleiches Muster wie `feed_status.json`/`gemini_quota_cooldown.json` via `_atomic_write_json`); Backend liest nur noch die fertige Datei statt live zu aggregieren. Unabhängig von der Programmiersprache sinnvoll, wurde im Rahmen einer Diskussion über einen möglichen Go/Rust-Rewrite des App-Backends identifiziert (nicht im Konzept-Dokument, nur hier vermerkt — kein Rewrite entschieden).
-- [ ] **ChromaDB replacement** — evaluated PostgreSQL/pgvector vs. embedded lightweight alternatives (SQLite+`sqlite-vec`, DuckDB+VSS) after an unexplained ChromaDB crash on the server (2026-08-27). Not decided — waiting to see whether the now-added `logs/chroma.log` reveals a real reliability issue (→ Postgres) or the pain point is really `stats.py`'s pandas-based aggregation (→ embedded alternative, no extra service to run). See [docs/concept/postgres_migration.md](concept/postgres_migration.md) for the full write-up.
+- [ ] **ChromaDB replacement** — evaluated PostgreSQL/pgvector vs. embedded lightweight alternatives (SQLite+`sqlite-vec`, DuckDB+VSS) after an unexplained ChromaDB crash on the server (2026-08-27). Not decided — waiting to see whether the now-added `logs/chroma.log` reveals a real reliability issue (→ Postgres) or the pain point is really `stats.py`'s pandas-based aggregation (→ embedded alternative, no extra service to run). See [docs/concepts/proposals/postgres_migration.md](../concepts/proposals/postgres_migration.md) for the full write-up.
 
 ### Data Collection
 - [ ] **Feed health check** — check on startup whether all feed URLs are reachable, report dead feeds
@@ -121,26 +121,25 @@
 ### Documentation & Code Translation
 
 **Markdown documentation:**
-- [x] [README.md](../README.md) — project overview, architecture, installation, configuration
-- [x] [SETUP.md](../SETUP.md) — setup guide, common errors
-- [x] [docs/reference.md](reference.md) — technical reference: JSON schema, indicators, paywall, techniques DB
-- [x] [docs/web_architecture.md](web_architecture.md) — stack, project structure, API endpoints
-- [x] [docs/analyse_architektur.md](analyse_architektur.md) — indicators, Pass 0 preparation and two analysis passes (technically complex)
-- [x] [docs/todo.md](todo.md) — roadmap
+- [x] [README.md](../../README.md) — project overview, architecture, installation, configuration
+- [x] [docs/environments/local.md](../environments/local.md) — setup guide, common errors
+- [x] [docs/reference/reference.md](../reference/reference.md) — technical reference: JSON schema, indicators, paywall, techniques DB
+- [x] [docs/reference/web_architecture.md](../reference/web_architecture.md) — stack, project structure, API endpoints
+- [x] [docs/reference/analyse_architektur.md](../reference/analyse_architektur.md) — indicators, Pass 0 preparation and two analysis passes (technically complex)
+- [x] [docs/planning/todo.md](todo.md) — roadmap
 
 **Python comments & docstrings:**
-- [ ] [src/news_analyser/anonymizer.py](../src/news_analyser/anonymizer.py)
-- [ ] [src/news_analyser/feed.py](../src/news_analyser/feed.py)
-- [ ] [src/news_analyser/main.py](../src/news_analyser/main.py)
-- [ ] [src/llm_adapter/cli_adapter.py](../src/llm_adapter/cli_adapter.py)
-- [ ] [src/news_analyser/agents/analyzer.py](../src/news_analyser/agents/analyzer.py)
-- [ ] [src/news_analyser/repositories/anchor_store.py](../src/news_analyser/repositories/anchor_store.py)
-- [ ] [src/news_analyser/repositories/role_store.py](../src/news_analyser/repositories/role_store.py)
-- [ ] [backend/main.py](../backend/main.py)
-- [ ] [backend/routers/analyse.py](../backend/routers/analyse.py)
+- [ ] [src/news_analyser/anonymizer/](../../src/news_analyser/anonymizer/) (refactored from the former single `anonymizer.py` into a package)
+- [ ] [src/news_analyser/feed.py](../../src/news_analyser/feed.py)
+- [ ] [src/news_analyser/main.py](../../src/news_analyser/main.py)
+- [ ] [src/news_analyser/agents/analyzer.py](../../src/news_analyser/agents/analyzer.py)
+- [ ] [src/news_analyser/repositories/anchor_store.py](../../src/news_analyser/repositories/anchor_store.py)
+- [ ] [src/news_analyser/repositories/role_store.py](../../src/news_analyser/repositories/role_store.py)
+- [ ] [backend/main.py](../../backend/main.py)
+- [ ] [backend/routers/analyse.py](../../backend/routers/analyse.py)
 
 **TypeScript comments:**
-- [ ] [frontend/src/app/features/stats/stats-verlauf.component.ts](../frontend/src/app/features/stats/stats-verlauf.component.ts)
+- [ ] [frontend/src/app/features/stats/stats-verlauf.component.ts](../../frontend/src/app/features/stats/stats-verlauf.component.ts)
 
 ### Export & Integration
 - [ ] **CSV/JSON export** — export all stored analyses

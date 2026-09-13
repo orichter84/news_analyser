@@ -14,7 +14,7 @@ Analyses news articles for manipulation techniques, rhetorical extremism and pol
 - Node.js 18+ (frontend only)
 - Access to an LLM backend (OpenAI, Anthropic, LM Studio, Claude CLI etc.)
 
-For installation and first-time setup, see **[SETUP.md](SETUP.md)**.
+For installation and first-time setup, see **[docs/environments/local.md](docs/environments/local.md)**.
 
 ---
 
@@ -40,7 +40,7 @@ Starts ChromaDB, backend and frontend in the correct order. Stop all services wi
 | Backend  | http://localhost:8000 |
 | ChromaDB | http://localhost:8001 |
 
-For manual startup (separate terminals) and troubleshooting, see **[SETUP.md](SETUP.md)**.
+For manual startup (separate terminals) and troubleshooting, see **[docs/environments/local.md](docs/environments/local.md)**.
 
 The web UI is available at [http://localhost:4200](http://localhost:4200).  
 The API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
@@ -77,7 +77,7 @@ The backend is selected via `LLM_PROVIDER` in `.env`:
 | `copilot` | `GITHUB_TOKEN` | GitHub Copilot |
 | `m365_copilot` | `M365_COPILOT_ACCESS_TOKEN` | Microsoft 365 Copilot |
 
-Setup instructions for each provider (API keys, CLI login, LM Studio, Ollama) are in **[SETUP.md](SETUP.md)**.
+Setup instructions for each provider (API keys, CLI login, LM Studio, Ollama) are in **[docs/environments/local.md](docs/environments/local.md)**.
 
 ---
 
@@ -95,7 +95,7 @@ news_analyser/
 │   ├── routers/             Endpoints: articles, analyse, stats, search, techniques, status
 │   └── schemas/             Pydantic request/response models
 ├── frontend/                Angular SPA
-├── docs/                    Architecture documentation and concept tests
+├── docs/                    Full documentation (see docs/index.md)
 ├── data/                    ChromaDB (local, persistent, not in repo)
 ├── config/                  User configuration (committed, no secrets)
 │   ├── feeds.txt            RSS feed URLs (one per line, # for comments)
@@ -112,12 +112,6 @@ news_analyser/
 
 ## Documentation
 
-| Document | Contents |
-|---|---|
-| [docs/reference.md](docs/reference.md) | Technical reference: JSON output schema, indicators, paywall detection, techniques database |
-| [docs/analyse_architektur.md](docs/analyse_architektur.md) | Indicators, Pass 0 preparation, two-pass architecture, bias mitigation |
-| [docs/web_architecture.md](docs/web_architecture.md) | API endpoints, frontend structure |
-| [docs/todo.md](docs/todo.md) | Open features and extension ideas |
-| [docs/concept/bias-validation.md](docs/concept/bias-validation.md) | Bias validation: symmetry tests with group substitution |
-| [docs/concept/base-tests.md](docs/concept/base-tests.md) | Calibration tests and initial results |
-| [docs/concept/bias-test-cases/](docs/concept/bias-test-cases/) | Test data: original and substituted article texts, symmetry test results |
+Full documentation lives in [`docs/`](docs/index.md), organised by category
+(reference, environments, concepts & decisions, planning, archive) — see
+**[docs/index.md](docs/index.md)** for the complete index.

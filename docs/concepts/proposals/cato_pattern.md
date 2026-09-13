@@ -13,7 +13,7 @@ a single article's `orwell_index` or `bernays_score`, both of which are
 deliberately scoped to one article at a time. A single brief aside is, by
 design, not supposed to move a single article's score much (see the
 "Indirect enemy-image rule" and its proportionality clause in
-[`pass1.md`](../../src/news_analyser/prompts/system/pass1.md)) — but the same
+[`pass1.md`](../../../src/news_analyser/prompts/system/pass1.md)) — but the same
 aside, repeated across many otherwise unrelated articles, is itself a
 distinct manipulation pattern that the per-article indicators are not meant
 to catch.
@@ -55,7 +55,7 @@ No new extraction is needed. Every stored article already carries:
 - `themenbereich` — one of `Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges`
 - `domain`
 
-See [`reference.md`](../reference.md) for the full schema.
+See [`reference.md`](../../reference/reference.md) for the full schema.
 
 ---
 
@@ -75,7 +75,7 @@ See [`reference.md`](../reference.md) for the full schema.
    unrelated topics is the same phenomenon as a persistent enemy narrative,
    just the other valence. This mirrors the direction-neutral design already
    used for the Orwell-Index and DK-Index (see
-   [`analyse_architektur.md`](../analyse_architektur.md)).
+   [`analyse_architektur.md`](../../reference/analyse_architektur.md)).
 
 ### Entity Normalisation Problem
 
@@ -90,7 +90,7 @@ strong.
 
 This is the same normalisation problem `_DEPENDENCY_ENTITIES` already solves
 in `stats.py` for geopolitical/party entities (multiple keyword phrasings →
-one canonical bucket, see [`publisher_profiling.md`](../publisher_profiling.md)
+one canonical bucket, see [`publisher_profiling.md`](../../reference/publisher_profiling.md)
 Feature 2). The proposed fix follows the same pattern:
 
 - A curated, hand-maintained keyword-bucket dict (e.g.
@@ -155,7 +155,7 @@ the existing per-publisher profiling view rather than a standalone page.
 - [ ] Implement `cato_pattern()` in `stats.py`
 - [ ] Add `GET /stats/cato` route
 - [ ] Add frontend section to `stats-publisher.component` + model/service updates
-- [ ] Document the new endpoint in [`reference.md`](../reference.md) and
-      [`web_architecture.md`](../web_architecture.md) once implemented
+- [ ] Document the new endpoint in [`reference.md`](../../reference/reference.md) and
+      [`web_architecture.md`](../../reference/web_architecture.md) once implemented
 - [ ] Evaluate whether semantic normalisation (vs. keyword buckets) becomes
       necessary once real data shows how much phrasing variance exists

@@ -14,7 +14,7 @@ build/
 /data/
 
 # Lokale Chroma-Instanzen der Konzept-Validierungstests (eigene Ressourcen, nicht Teil des Repos)
-docs/concept/tests/**/chroma_nn_store/
+**/chroma_nn_store/
 
 # Lokale Notizen
 *_local.md

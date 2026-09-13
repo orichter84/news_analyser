@@ -20,4 +20,4 @@ Produktionspipeline (`src/news_analyser/`) übernommen werden.
 
 | # | Ordner | Frage | Status |
 |---|---|---|---|
-| 1 | [01_klasse1_semantic_nn](01_klasse1_semantic_nn/) | Trennt Nearest-Neighbor-Suche auf Satzebene Techniken sauber, oder streut das Embedding zu breit (Klasse 1 aus [konzept_hybrid_technik_erkennung.md](../konzept_hybrid_technik_erkennung.md))? | offen |
+| 1 | [01_klasse1_semantic_nn](01_klasse1_semantic_nn/) | Trennt Nearest-Neighbor-Suche auf Satzebene Techniken sauber, oder streut das Embedding zu breit (Klasse 1 aus [konzept_hybrid_technik_erkennung.md](../../proposals/konzept_hybrid_technik_erkennung.md))? | offen |

@@ -26,7 +26,7 @@ Each value measures an independent dimension. A text can score high on Bernays S
 
 ### Why the Dunning-Kruger Index is orthogonal
 
-The DK Index captures how confidently a text makes claims without backing them with sources, subjunctive mood, or qualifications — regardless of which group or ideology is the subject. A text that states *"vaccines cause autism"* and one that states *"immigration destroys our culture"* can both score equally high on the DK Index even though they are politically opposite. This group-blindness is by design and confirmed by symmetry tests: DK values show zero difference between mirrored texts on real articles (see [bias-validation](concept/bias-validation.md)).
+The DK Index captures how confidently a text makes claims without backing them with sources, subjunctive mood, or qualifications — regardless of which group or ideology is the subject. A text that states *"vaccines cause autism"* and one that states *"immigration destroys our culture"* can both score equally high on the DK Index even though they are politically opposite. This group-blindness is by design and confirmed by symmetry tests: DK values show zero difference between mirrored texts on real articles (see [bias-validation](../concepts/validation/bias-validation.md)).
 
 ### Why labels instead of a numerical axis for direction?
 
@@ -139,7 +139,7 @@ output final Orwell Index and Bernays Score.
 
 ## Core Limitation: LLM Training Bias
 
-Full test results and methodology: [concept/bias-validation.md](concept/bias-validation.md) · [concept/base-tests.md](concept/base-tests.md)
+Full test results and methodology: [bias-validation.md](../concepts/validation/bias-validation.md) · [base-tests.md](../concepts/validation/base-tests.md)
 
 
 This primarily affects **political leaning** and **technique labels**, not the
@@ -175,7 +175,7 @@ techniques and labels must be identical or explainably different.
 | Migrants / Foreigners | Natives / Germans |
 | Left-wing / Communists | Right-wing / Nationalists |
 
-Results from `docs/concept/bias-validation.md` (2026-05-26):
+Results from `docs/concepts/validation/bias-validation.md` (2026-05-26):
 
 | Metric | Text A (Muslims) | Text B (Western Europeans) | Difference |
 |---|---|---|---|

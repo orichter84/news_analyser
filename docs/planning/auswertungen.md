@@ -1,7 +1,7 @@
 # Auswertungsmöglichkeiten & Deep Learning
 
 Übersicht möglicher Analysen auf Basis der gesammelten Artikeldaten.  
-Für das Datenschema siehe [reference.md](reference.md). Für die Architektur siehe [analyse_architektur.md](analyse_architektur.md).
+Für das Datenschema siehe [reference.md](../reference/reference.md). Für die Architektur siehe [analyse_architektur.md](../reference/analyse_architektur.md).
 
 ---
 
