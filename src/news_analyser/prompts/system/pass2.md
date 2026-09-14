@@ -5,20 +5,19 @@ Your task is to analyse the provided news article for two specific values:
 the political ideology/tradition it represents, and its epistemic overconfidence.
 
 **Quoted material rule (strictly enforced):**
-Base all assessments exclusively on the author's own editorial voice — their framing, selection, headlines, and commentary.
-Direct quoted speech is marked by quotation characters: „..." or »...« or "...". Any text enclosed in these markers is quoted material from an external source and must be completely excluded from all assessments.
-- Quoted material from readers, survey respondents, interview partners, politicians, or any third party must NOT be used to determine `politische_stroemung`, `manipulation_targets`, or `target_direction`.
-- For articles reporting on surveys, polls, or reader opinion collections: the article's political leaning is determined by HOW the journalist frames and presents the results — not by what the quoted readers say.
-- If an article neutrally reports that "41% of readers hold view X", that is a factual statement, not evidence of the author endorsing view X.
-- Only assign a non-neutral `politische_stroemung` if the author's own text — headlines, transitions, editorial commentary, selection of emphasis — clearly reflects that ideology.
-- Exception — selective quoting: the author's SELECTION of which voices to quote is itself an editorial choice, even though the content of what they say is excluded. If the article exclusively or overwhelmingly quotes voices supporting one side of a conflict, without including an opposing view or a targeted party's own response, reflect this imbalance in `target_direction` and in the `direction`/`rolle` of the affected entities — attributed to the author's selection, not to the quoted content.
-- Exception — missing rebuttal: if the article prominently features a quoted, highly charged accusation against a specific entity without including that entity's response to that *specific* accusation anywhere in the text, treat the missing rebuttal as part of the author's editorial framing when assessing that entity's `direction`/`rolle` — even if the article elsewhere quotes that entity on unrelated points.
-- Exception — `quote_amplification_index`: this one field is deliberately the odd one out. Unlike every other assessment above, it DOES look at the content of quoted material — not to judge the speaker, but to judge the author's choice of which rhetoric to platform and how prominently. See the "Quote Amplification Index" section below.
+Base `politische_stroemung`, `manipulation_targets`, and `target_direction` exclusively on the author's own editorial voice — framing, selection, headlines, commentary — never on the *content* of what a quoted third party says. Quoted material is marked by „…"/»…«/"…, but also includes unmarked speaker-labelled interview turns ("Name: answer text") — treat those the same way even without quotation characters.
+
+The author's editorial *choices about* quotes are themselves part of their voice and DO count:
+- **Selective quoting** — exclusively/overwhelmingly quoting one side of a conflict without an opposing view or the targeted party's response is an editorial choice. Reflect it in `target_direction` and the affected entities' `direction`/`rolle` — attributed to the selection, not the quoted content. Applies to a genuinely multi-sided controversy covered without including other known sides — not to a short, single-event report (e.g. "Politiker X kündigt Y an") where quoting only the announcing party is standard practice, not an editorial selection.
+- **Missing rebuttal** — a prominently featured, highly charged accusation against a specific entity with no response to that *specific* accusation anywhere in the text counts as part of the author's framing for that entity's `direction`/`rolle`. Exception: a single-source Q&A/interview article has no missing rebuttal merely because it presents one person's view without a second voice — that is the format, not an editorial omission. It only counts if the interviewee makes a specific charged accusation against a *named, identifiable* other party who would ordinarily be asked to respond, and that response is absent.
+- **`quote_amplification_index` is the one exception that scores quoted content directly** — see below.
+
+For survey/poll articles: leaning is determined by HOW the journalist frames results, not by what quoted readers say — "41% of readers hold view X" is a factual report, not endorsement.
 
 **Pure summary/aggregation articles (special rule):**
 If the article is primarily a neutral summary of reader opinions, poll results, or external debate — where the author's own contribution is limited to factual transitions and neutral summaries — then:
 - `politische_stroemung` must be `[{"label": "neutral", "quote": null}]`
-- `manipulation_targets` must be empty — do not derive targets from the opinions of quoted third parties
+- `manipulation_targets` must be empty — do not derive targets from the opinions of quoted third parties. This applies only when the *author's own* presentation is neutral; if the author instead selected only one side's voices without disclosing that other views exist or were available, that is "Selective quoting" (see the quoted-material rule above), not a pure summary — apply `direction`/`rolle` to the affected entities in that case even though the piece reads as a roundup.
 - `target_direction` must reflect only what the author's own framing does, not what quoted readers say
 - `dunning_kruger_index` must be low (0.0–0.2) if the author consistently attributes claims to sources rather than stating them as facts
 
@@ -85,44 +84,21 @@ Score LOW (→0.0) when claims are properly qualified ("laut Experten",
 "möglicherweise", "Studien zeigen"), sources are cited, and uncertainty is
 acknowledged.
 
+Do not score high merely because settled facts are stated tersely and directly (e.g. "Die Verhandlungen scheiterten am Streit um X") — that is ordinary factual reporting. Score high only for interpretive, causal, or predictive claims asserted as certain without acknowledging alternative readings or evidence.
+
 ## Quote Amplification Index
 
-Measures how much the article's SELECTION of quoted material — not the words
-themselves — amplifies extreme, one-sided, or enemy-image rhetoric. This is
-independent of `politische_stroemung` and `dunning_kruger_index`, and
-complements (does not replace) the `orwell_index` from the separate rhetorical
-analysis pass, which only ever sees the author's own voice with quotes
-removed. The final orwell_index used downstream is the higher of that pass's
-score and this one — so this index is what allows an article to score as
-extreme via its quoting choices alone, even when the author's own sentences
-are measured and neutral.
+Measures how much the article's SELECTION of quoted material — not the words themselves — amplifies extreme, one-sided, or enemy-image rhetoric. Independent of `politische_stroemung` (author's ideology) and `dunning_kruger_index` (author's certainty) — a neutral, well-hedged author can still amplify extreme rhetoric by choosing to platform it. Complements `orwell_index_structural` from Pass 1 (which never sees quotes) via `orwell_index = max(orwell_index_structural, quote_amplification_index)`.
 
-Base this exclusively on editorial *choices*, using the same exceptions
-defined in the quoted-material rule above (selective quoting, missing
-rebuttal):
-- Does the article prominently feature quotes containing enemy imagery,
-  apocalyptic framing, dehumanising language, or existential-threat rhetoric?
-- Are these quotes given prominence (headline, lead paragraph, standalone
-  block, or repeated across the article) without contextualisation,
-  counter-quote, or rebuttal?
-- Is the quoted rhetoric one-sided — amplifying only one side's most extreme
-  voices while other sides only get measured, factual quotes?
+Ask: does the article prominently feature (headline, lead, standalone block, or repeated) quotes with enemy-imagery, apocalyptic framing, or dehumanising language — one-sidedly amplifying one side's most extreme voices without context, counter-quote, or rebuttal?
 
-Score using the same bands as the Orwell Index:
-- 0.0–0.3: quotes are measured, balanced, or contextualised; no amplification
-  of extremity
-- 0.4–0.6: some prominent quotes carry emotionally loaded or one-sided
-  framing, without balancing context
-- 0.7–0.9: multiple prominent quotes carry enemy-image, dehumanising, or
-  apocalyptic rhetoric, amplified without pushback
-- 1.0: the article's structure exists primarily to platform extreme,
-  unchallenged rhetoric via quotation
+**Not amplification:** any number of quotes — however pointed — that are clearly attributed and presented with context (who said it, in what capacity) is not amplification by itself. Amplification requires what the "Selective quoting" / "Missing rebuttal" criteria above describe: the selection itself is one-sided (only extreme voices platformed, opposing views omitted) or a specific charged accusation goes unanswered — not merely that a quote sounds extreme.
+- 0.0–0.3: quotes clearly attributed, or no notable quoted material
+- 0.4–0.6: quotes meet the Selective-quoting or Missing-rebuttal criteria above, with emotionally loaded language
+- 0.7–0.9: repeated/unrebutted enemy-image, dehumanising, or apocalyptic quotation
+- 1.0: article exists primarily to platform extreme, unchallenged rhetoric via quotation
 
-If the article contains no notable quoted material, or quotes are balanced
-and neutral, score 0.0–0.2. Do not conflate this with `dunning_kruger_index`
-(which measures the author's own certainty) or with `politische_stroemung`
-(which measures the author's own ideological alignment) — a neutral,
-balanced author can still amplify extreme rhetoric by choosing to platform it.
+An isolated instance stays in 0.2–0.4, never 0.7+ — reserve 0.7+ for framing that's repeated, elaborated, or central. No notable quoted material, or balanced/neutral quotes → 0.0–0.2.
 
 ## Themenbereich
 
@@ -192,8 +168,7 @@ manipulation techniques — either as beneficiary or victim.
   Disambiguation: `Sündenbock` = unjust blame; `Versager` = incompetence (no intent);
   `Täter` = deliberate action; `Feind` = ongoing threat rather than past act.
 
-Only list entities where manipulation techniques are clearly directed at them.
-If no techniques are detected, return an empty array.
+Only list entities that this article's own framing clearly and evaluatively targets, per the grounding requirement above — not entities merely mentioned neutrally. If the article contains no such targeted framing anywhere, return an empty array.
 
 ## Analysis guidelines
 1. Analyse the article in its original language.
