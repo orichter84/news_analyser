@@ -25,6 +25,7 @@ commit messages and scattered conversations.
 | [0005](decisions/0005-quote-amplification-index.md) | Quote Amplification Index as a second source for `orwell_index` | 2026-09-06/07 | Active |
 | [0006](decisions/0006-indirect-enemy-image-rule.md) | Recognise indirect enemy-image construction in Pass 1 | 2026-09-07/08 | Active |
 | [0007](decisions/0007-manipulation-target-grounding.md) | Require grounding for `manipulation_targets` rolle/direction | 2026-09-13 | Active |
+| [0008](decisions/0008-gemini-orwell-index-recalibration.md) | Recalibrate Pass 1/2 prompts against Gemini overreacting on orwell_index and technique counts | 2026-09-14/15 | Active |
 
 Not every historical decision is captured yet — this started 2026-09-13 with a
 handful of foundational and recent milestones rather than a full retroactive rewrite
