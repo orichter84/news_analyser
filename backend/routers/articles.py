@@ -13,18 +13,27 @@ from news_analyser.repositories.db_storage import _get_collection
 router = APIRouter(prefix="/articles", tags=["articles"])
 
 
-def _parse_meta(meta: dict[str, Any]) -> dict[str, Any]:
+def _parse_meta(meta: dict[str, Any], flatten_stroemung: bool = True) -> dict[str, Any]:
     for field in ("technique_names", "politische_stroemung"):
         if isinstance(meta.get(field), str):
             try:
                 meta[field] = json.loads(meta[field])
             except Exception:
                 meta[field] = []
-    # Flatten politische_stroemung — always return list of strings for list view
-    ps = meta.get("politische_stroemung", [])
-    if ps and isinstance(ps[0], dict):
-        meta["politische_stroemung"] = [item.get("label", "") for item in ps if isinstance(item, dict)]
+    # Flatten politische_stroemung to plain label strings — only for the list
+    # view. The detail view keeps {label, quote} objects so the frontend can
+    # render the supporting quote.
+    if flatten_stroemung:
+        ps = meta.get("politische_stroemung", [])
+        if ps and isinstance(ps[0], dict):
+            meta["politische_stroemung"] = [item.get("label", "") for item in ps if isinstance(item, dict)]
     return meta
+
+
+def _dk_index(m: dict[str, Any]) -> float | None:
+    """Reads dunning_kruger_index, preserving a real 0.0 instead of collapsing it to None."""
+    val = m.get("dunning_kruger_index")
+    return float(val) if val is not None else None
 
 
 @router.get("")
@@ -53,7 +62,7 @@ def list_articles(
             "published_at":        m.get("published_at", ""),
             "orwell_index":        oi,
             "bernays_score":       float(m.get("bernays_score", 0.0)),
-            "dunning_kruger_index": float(m.get("dunning_kruger_index", 0.0)) or None,
+            "dunning_kruger_index": _dk_index(m),
             "politische_stroemung": m.get("politische_stroemung", []),
             "technique_names":     m.get("technique_names", []),
             "intended_sentiment":  m.get("intended_sentiment", ""),
@@ -76,12 +85,12 @@ def get_article(article_id: str) -> dict:
         full = json.loads(raw)
     except Exception:
         full = m
-    full = _parse_meta(full)
+    full = _parse_meta(full, flatten_stroemung=False)
 
     # Felder aus den Metadaten auf die oberste Ebene heben (für das Frontend)
     full.setdefault("orwell_index",         float(m.get("orwell_index", 0.0)))
     full.setdefault("bernays_score",        float(m.get("bernays_score", 0.0)))
-    full.setdefault("dunning_kruger_index", float(m.get("dunning_kruger_index", 0.0)) or None)
+    full.setdefault("dunning_kruger_index", _dk_index(m))
     full.setdefault("technique_names",      m.get("technique_names", []))
     full.setdefault("intended_sentiment",   m.get("intended_sentiment", ""))
     full.setdefault("themenbereich",        m.get("themenbereich", ""))
