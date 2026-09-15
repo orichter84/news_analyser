@@ -1,6 +1,11 @@
 """Unit tests for the JSON extraction and quote-grounding helpers in analyzer.py."""
 
-from news_analyser.agents.analyzer import _extract_json, _validate_quote_grounding
+from news_analyser.agents.analyzer import (
+    _dedupe_techniques,
+    _extract_json,
+    _validate_quote_grounding,
+    _validate_stroemung_grounding,
+)
 
 
 class TestExtractJson:
@@ -65,3 +70,54 @@ class TestValidateQuoteGrounding:
         ]
         result = _validate_quote_grounding(techniques, "hi there, hi again")
         assert len(result) == 2
+
+
+class TestDedupeTechniques:
+    def test_removes_exact_duplicate_after_normalization(self):
+        # two different raw labels that both normalized to the same canonical
+        # technique, over the same quote
+        techniques = [
+            {"technique": "Emotional Manipulation", "quote": "katastrophale Folgen"},
+            {"technique": "Emotional Manipulation", "quote": "katastrophale Folgen"},
+        ]
+        result = _dedupe_techniques(techniques)
+        assert len(result) == 1
+
+    def test_keeps_same_technique_different_quotes(self):
+        techniques = [
+            {"technique": "Emotional Manipulation", "quote": "erste Stelle"},
+            {"technique": "Emotional Manipulation", "quote": "zweite Stelle"},
+        ]
+        result = _dedupe_techniques(techniques)
+        assert result == techniques
+
+    def test_keeps_different_technique_same_quote(self):
+        # same passage, genuinely reported once per distinct technique — not a duplicate
+        techniques = [
+            {"technique": "Scapegoating", "quote": "gemeinsame Stelle"},
+            {"technique": "Loaded Language", "quote": "gemeinsame Stelle"},
+        ]
+        result = _dedupe_techniques(techniques)
+        assert result == techniques
+
+
+class TestValidateStroemungGrounding:
+    def test_keeps_quote_present_in_source(self):
+        stroemung = [{"label": "konservativ", "quote": "Wir müssen jetzt handeln."}]
+        result = _validate_stroemung_grounding(stroemung, "Der Autor schreibt: Wir müssen jetzt handeln.")
+        assert result == stroemung
+        assert result[0]["label"] == "konservativ"
+
+    def test_nulls_unverifiable_quote_but_keeps_label(self):
+        stroemung = [{"label": "grün", "quote": "Dieser Satz steht nirgends im Text."}]
+        result = _validate_stroemung_grounding(stroemung, "Ein völlig anderer Artikeltext.")
+        assert result == [{"label": "grün", "quote": None}]
+
+    def test_passes_through_plain_string_entries(self):
+        result = _validate_stroemung_grounding(["neutral"], "irgendein Text")
+        assert result == ["neutral"]
+
+    def test_passes_through_neutral_with_null_quote(self):
+        stroemung = [{"label": "neutral", "quote": None}]
+        result = _validate_stroemung_grounding(stroemung, "irgendein Text")
+        assert result == stroemung
