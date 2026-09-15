@@ -30,6 +30,7 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
     {"label": "<label2>", "quote": "<verbatim sentence from the article that best supports this label, or null>"}
   ],
   "dunning_kruger_index": <float 0.0 to 1.0>,
+  "dunning_kruger_explanation": "<1-2 sentences justifying the score, in German>",
   "quote_amplification_index": <float 0.0 to 1.0>,
   "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
   "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>",
@@ -83,6 +84,12 @@ hedges, or acknowledgement of complexity.
 Score LOW (→0.0) when claims are properly qualified ("laut Experten",
 "möglicherweise", "Studien zeigen"), sources are cited, and uncertainty is
 acknowledged.
+
+`dunning_kruger_explanation` must name the specific pattern the score is based
+on — e.g. which claims are asserted without qualification, or which hedges/
+sources make the article epistemically modest. This is a qualitative
+justification, not a verbatim quote requirement: overconfidence is often a
+property of the article's overall tone rather than one isolated sentence.
 
 Do not score high merely because settled facts are stated tersely and directly (e.g. "Die Verhandlungen scheiterten am Streit um X") — that is ordinary factual reporting. Score high only for interpretive, causal, or predictive claims asserted as certain without acknowledging alternative readings or evidence.
 

@@ -36,6 +36,9 @@
         <div class="score-card">
           <span class="score-value">{{ a.dunning_kruger_index | number:'1.2-2' }}</span>
           <span class="score-label">DK-Index</span>
+          @if (a.framing_target.dunning_kruger_explanation) {
+            <span class="score-sub">{{ a.framing_target.dunning_kruger_explanation }}</span>
+          }
         </div>
       }
     </div>

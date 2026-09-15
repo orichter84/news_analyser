@@ -11,6 +11,7 @@ export interface FramingTarget {
   orwell_index_structural?: number;
   quote_amplification_index?: number;
   dunning_kruger_index?: number;
+  dunning_kruger_explanation?: string;
   target_direction?: string;
 }
 

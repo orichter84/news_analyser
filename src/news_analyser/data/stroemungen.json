@@ -1,0 +1,92 @@
+[
+  {
+    "id": "liberal",
+    "name": "liberal",
+    "doc": "liberal wirtschaftsliberal neoliberal marktwirtschaftlich klassisch-liberal freiheitlich individualistisch"
+  },
+  {
+    "id": "konservativ",
+    "name": "konservativ",
+    "doc": "konservativ wertkonservativ traditionsverbunden bewahrend rechtskonservativ"
+  },
+  {
+    "id": "christdemokratisch",
+    "name": "christdemokratisch",
+    "doc": "christdemokratisch christlich-sozial christlich-konservativ"
+  },
+  {
+    "id": "sozialdemokratisch",
+    "name": "sozialdemokratisch",
+    "doc": "sozialdemokratisch sozialliberal Sozialdemokratie"
+  },
+  {
+    "id": "gruen",
+    "name": "grün",
+    "doc": "grün ökologisch-links links-grün Umweltpolitik"
+  },
+  {
+    "id": "sozialistisch",
+    "name": "sozialistisch",
+    "doc": "sozialistisch demokratisch-sozialistisch Sozialismus links"
+  },
+  {
+    "id": "kommunistisch",
+    "name": "kommunistisch",
+    "doc": "kommunistisch marxistisch marxistisch-leninistisch Kommunismus"
+  },
+  {
+    "id": "nationalistisch",
+    "name": "nationalistisch",
+    "doc": "nationalistisch nationalgesinnt Nationalismus vaterlandsliebend"
+  },
+  {
+    "id": "nationalpopulistisch",
+    "name": "nationalpopulistisch",
+    "doc": "nationalpopulistisch rechtspopulistisch populistisch"
+  },
+  {
+    "id": "libertaer",
+    "name": "libertär",
+    "doc": "libertär libertarian anti-etatistisch minimalstaatlich"
+  },
+  {
+    "id": "faschistisch",
+    "name": "faschistisch",
+    "doc": "faschistisch neofaschistisch Faschismus"
+  },
+  {
+    "id": "anarchistisch",
+    "name": "anarchistisch",
+    "doc": "anarchistisch Anarchismus antiautoritär"
+  },
+  {
+    "id": "islamistisch",
+    "name": "islamistisch",
+    "doc": "islamistisch politischer Islam Islamismus"
+  },
+  {
+    "id": "zionistisch",
+    "name": "zionistisch",
+    "doc": "zionistisch Zionismus"
+  },
+  {
+    "id": "oekologisch",
+    "name": "ökologisch",
+    "doc": "ökologisch umweltbewegt Umweltschutz Klimabewegung"
+  },
+  {
+    "id": "feministisch",
+    "name": "feministisch",
+    "doc": "feministisch Feminismus Gleichstellungspolitik"
+  },
+  {
+    "id": "technokratisch",
+    "name": "technokratisch",
+    "doc": "technokratisch expertengeleitet pragmatisch-verwaltend"
+  },
+  {
+    "id": "neutral",
+    "name": "neutral",
+    "doc": "neutral sachlich ausgewogen unparteiisch"
+  }
+]

@@ -52,6 +52,10 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     technique_names = json.dumps(
         [t["technique"] for t in techniques], ensure_ascii=False
     )
+    # detected_techniques comes from the quote-stripped Pass 1 text, not the
+    # full article — normalize against that same text's length. Older records
+    # predating this field fall back to the full word_count.
+    bernays_denominator = analysis.get("pass1_word_count") or analysis.get("word_count", 0)
 
     return {
         "source_url":         analysis.get("source_url", ""),
@@ -61,6 +65,7 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "author":             analysis.get("author", ""),
         "published_at":       analysis.get("published_at", ""),
         "word_count":         int(analysis.get("word_count", 0)),
+        "pass1_word_count":   int(analysis.get("pass1_word_count", 0)),
         "orwell_index":         float(ft.get("orwell_index", 0.0)),
         "dunning_kruger_index": float(ft.get("dunning_kruger_index", 0.0)),
         "main_narrative":       ft.get("main_narrative", ""),
@@ -68,8 +73,8 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "intended_sentiment":   ft.get("intended_sentiment", ""),
         "technique_names":      technique_names,
         "bernays_score":        round(
-            len(techniques) / analysis.get("word_count", 1) * 1000, 2
-        ) if analysis.get("word_count", 0) > 0 else 0.0,
+            len(techniques) / bernays_denominator * 1000, 2
+        ) if bernays_denominator > 0 else 0.0,
         "politische_stroemung": json.dumps(
             _extract_stroemung_labels(analysis.get("politische_stroemung", ["neutral"])),
             ensure_ascii=False

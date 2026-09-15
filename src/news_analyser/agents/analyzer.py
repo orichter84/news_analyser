@@ -36,6 +36,7 @@ from .errors import raise_if_gemini_quota_error
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 from ..repositories.technique_store import normalize_technique, format_techniques_for_prompt
 from ..repositories.role_store import normalize_role, format_roles_for_prompt
+from ..repositories.stroemung_store import normalize_stroemung
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -89,6 +90,32 @@ def _validate_quote_grounding(
     return validated
 
 
+def _dedupe_techniques(techniques: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merges technique instances that became identical after canonical normalization.
+
+    Two different free-text labels the model used for the same passage (e.g.
+    "Emotional Appeal" and "Gefühlsbetonte Sprache") can both normalize to the
+    same canonical technique; kept separately, the same quote would count
+    twice towards the Bernays Score.
+    """
+    seen: set[tuple[str, str]] = set()
+    deduped = []
+    dropped = 0
+    for t in techniques:
+        key = (t.get("technique", ""), (t.get("quote") or "").strip())
+        if key in seen:
+            dropped += 1
+            continue
+        seen.add(key)
+        deduped.append(t)
+    if dropped:
+        logger.info(
+            "Dedup-Check: %d Technik-Instanz(en) nach Normalisierung als Duplikat entfernt.",
+            dropped,
+        )
+    return deduped
+
+
 def _validate_manipulation_target_grounding(
     targets: list[dict[str, Any]], source_text: str
 ) -> list[dict[str, Any]]:
@@ -131,6 +158,37 @@ def _validate_manipulation_target_grounding(
         logger.info(
             "Grounding-Check (manipulation_targets): %d Feld(er) entfernt, %d Entität(en) komplett entfernt.",
             dropped_fields, dropped_entities,
+        )
+    return validated
+
+
+def _validate_stroemung_grounding(
+    stroemung: list[Any], source_text: str
+) -> list[Any]:
+    """Drops an unverifiable `quote` from a politische_stroemung label.
+
+    Unlike `_validate_manipulation_target_grounding`, this keeps the label
+    itself — the classification is the model's judgement of the whole
+    article, not a claim that stands or falls on one exact sentence (the
+    prompt already allows "the most representative passage" when no single
+    sentence fits). Only the specific quote, which purports to be a verbatim
+    excerpt, is nulled when it can't be found.
+    """
+    validated = []
+    dropped = 0
+    for item in stroemung:
+        if not isinstance(item, dict):
+            validated.append(item)
+            continue
+        quote = (item.get("quote") or "").strip()
+        if quote and quote not in source_text:
+            item["quote"] = None
+            dropped += 1
+        validated.append(item)
+    if dropped:
+        logger.info(
+            "Grounding-Check (politische_stroemung): %d nicht belegte(s) Zitat(e) entfernt.",
+            dropped,
         )
     return validated
 
@@ -189,6 +247,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     # Pass 1 — anonymisierter Text → Orwell-Index (Extremismus), Techniken
     # ------------------------------------------------------------------
     pass1_text = _strip_quoted_material(anon["text"])
+    pass1_word_count = len(pass1_text.split())
     _write_debug("02b_pass1_input_quotes_stripped.txt", pass1_text)
 
     pass1_input = {
@@ -235,6 +294,10 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         if isinstance(t.get("technique"), str):
             t["technique"] = normalize_technique(t["technique"])
 
+    result1["detected_techniques"] = _dedupe_techniques(
+        result1.get("detected_techniques", [])
+    )
+
     # Rollen auf kanonische Namen normalisieren (Pass 1 hat keine Rollen)
     for t in result1.get("manipulation_targets", []):
         if isinstance(t.get("rolle"), str):
@@ -274,6 +337,15 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         result2.get("manipulation_targets", []), article.text
     )
 
+    # Freie Strömungs-Labels auf die kanonische Taxonomie normalisieren
+    for item in result2.get("politische_stroemung", []):
+        if isinstance(item, dict) and isinstance(item.get("label"), str):
+            item["label"] = normalize_stroemung(item["label"])
+
+    result2["politische_stroemung"] = _validate_stroemung_grounding(
+        result2.get("politische_stroemung", ["neutral"]), article.text
+    )
+
     # ------------------------------------------------------------------
     # Ergebnisse zusammenführen
     # ------------------------------------------------------------------
@@ -294,13 +366,15 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         **base_meta,
         "source_url":          result1.get("source_url", article.url),
         "timestamp":           result1.get("timestamp", base_meta["published_at"]),
+        "pass1_word_count":    pass1_word_count,
         "detected_techniques": result1.get("detected_techniques", []),
         "framing_target": {
             **result1.get("framing_target", {}),
             "orwell_index":              orwell,
             "orwell_index_structural":   orwell_structural,
             "quote_amplification_index": quote_amplification,
-            "dunning_kruger_index":      result2.get("dunning_kruger_index", 0.0),
+            "dunning_kruger_index":        result2.get("dunning_kruger_index", 0.0),
+            "dunning_kruger_explanation":  result2.get("dunning_kruger_explanation", ""),
             "target_direction":          result2.get("target_direction", ""),
         },
         "politische_stroemung":  stroemung,
