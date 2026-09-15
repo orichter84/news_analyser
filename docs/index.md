@@ -33,6 +33,13 @@ led to. See [`concepts/README.md`](concepts/README.md) for the full timeline.
 - [`planning/todo.md`](planning/todo.md) — roadmap: implemented vs. open features
 - [`planning/auswertungen.md`](planning/auswertungen.md) — catalogue of possible future analyses
 
+## Analyses
+
+- [`analyses/bernays_score_pipeline_analysis.md`](analyses/bernays_score_pipeline_analysis.md) — Stufenweise Untersuchung der Bernays-Score-Berechnung und Zitatvalidierung
+- [`analyses/orwell_index_pipeline_analysis.md`](analyses/orwell_index_pipeline_analysis.md) — Stufenweise Untersuchung der Orwell-Index-Bestimmung und Signalfusion
+- [`analyses/dunning_kruger_index_pipeline_analysis.md`](analyses/dunning_kruger_index_pipeline_analysis.md) — Stufenweise Untersuchung des Dunning-Kruger Index und epistemischer Begründungspflicht
+- [`analyses/politische_stroemung_pipeline_analysis.md`](analyses/politische_stroemung_pipeline_analysis.md) — Stufenweise Untersuchung der Politischen Strömung, Label-Taxonomie und Belegprüfung
+
 ## Archive
 
 - [`archive/`](archive/) — abandoned approaches, kept for historical record
