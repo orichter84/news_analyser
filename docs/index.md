@@ -39,6 +39,8 @@ led to. See [`concepts/README.md`](concepts/README.md) for the full timeline.
 - [`analyses/orwell_index_pipeline_analysis.md`](analyses/orwell_index_pipeline_analysis.md) — Stufenweise Untersuchung der Orwell-Index-Bestimmung und Signalfusion
 - [`analyses/dunning_kruger_index_pipeline_analysis.md`](analyses/dunning_kruger_index_pipeline_analysis.md) — Stufenweise Untersuchung des Dunning-Kruger Index und epistemischer Begründungspflicht
 - [`analyses/politische_stroemung_pipeline_analysis.md`](analyses/politische_stroemung_pipeline_analysis.md) — Stufenweise Untersuchung der Politischen Strömung, Label-Taxonomie und Belegprüfung
+- [`analyses/meta_validierung_gemini_analysen.md`](analyses/meta_validierung_gemini_analysen.md) — Claude-Meta-Validierung der vier Gemini-Indikator-Analysen
+- [`analyses/vorschlag_pipeline_haertung_todo.md`](analyses/vorschlag_pipeline_haertung_todo.md) — Strukturierter Maßnahmenplan und ToDo-Liste zur Pipeline-Härtung
 
 ## Archive
 
