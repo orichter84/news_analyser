@@ -282,6 +282,119 @@ empirically confirmed *effect*) in
 
 ---
 
+## Named techniques from the general literature: used, not used, or misapplied
+
+The patterns above are named for what they do in this codebase. Mapped onto vocabulary
+from the wider prompting-technique literature, the picture is uneven: some are central
+and already covered above, some are used but not yet named as such, some are
+deliberately avoided in favour of something related but different, and some aren't used
+at all — either by design choice or because the current adapter abstraction doesn't
+support them.
+
+### Grounding — used, already covered above
+This is the pipeline's dominant technique; see "Grounding-as-verification, not
+grounding-as-trust" and its scope note in the recalibration-era section, plus F0/F3
+above. Nothing new to add here.
+
+### Chain-of-Thought — not used; silent self-verification instead
+No prompt in `pass0.md`/`pass1.md`/`pass2.md` asks the model to reason step by step or
+show intermediate reasoning. What exists instead is narrower and produces no visible
+trace:
+- `pass1.md:6` — *"Before submitting your final analysis, **mentally** perform a
+  complete role-reversal test..."*
+- `pass1.md:12` — *"Before finalising each entry, **verify silently** that the exact
+  string is actually present in the text."*
+
+Both instruct an internal check, explicitly not a written one — consistent with the
+output contract being a single clean JSON object with no prose interleaved (CoT's usual
+form, a visible reasoning trace before the answer, would break that parsing contract
+unless separated out, which nothing here does).
+
+**Native CoT is actively discarded when a model produces it unprompted:**
+`_extract_json` (`analyzer.py:61`) strips `<think>...</think>` blocks before parsing —
+a Qwen-family model's own extended-thinking output. That reasoning is never logged,
+inspected, or used; it's pure overhead removed to get at the JSON underneath.
+
+**Open question, not yet tested:** the `explanation` fields added in
+[0009](../concepts/decisions/0009-pipeline-hardening-after-gemini-meta-review.md)/[0010](../concepts/decisions/0010-quote-amplification-grounding-and-debug-run-history.md)
+are positioned *after* their score in the JSON schema (`pass2.md:32-35`:
+`dunning_kruger_index` then `dunning_kruger_explanation`; `quote_amplification_index`
+then `quote_amplification_explanation`). For a model that fills JSON fields in
+schema order, this means committing to the number before writing any justification for
+it — the explanation becomes post-hoc rationalisation, not reasoning that could inform
+the score the way CoT's reason-then-conclude ordering does. Whether reordering the
+schema (explanation before score) would change the *score itself*, not just its
+legibility, is an untested hypothesis — would need a repeated-run comparison (same
+article, both field orders) using the debug-run archive from
+[0010](../concepts/decisions/0010-quote-amplification-grounding-and-debug-run-history.md)
+before concluding either way.
+
+### Prompt chaining — real, but narrower than "Pass 0/1/2" suggests
+The naming implies one linear chain; the actual dependency graph is one true chain plus
+one independent branch, merged in code:
+- **Pass 0 → Pass 1 is a genuine sequential chain.** `detect_groups()`'s output
+  (`group_terms`) is fed into `anonymize()`, whose output becomes Pass 1's input text
+  (`analyzer.py`) — Pass 1 cannot run without Pass 0's result shaping it first.
+- **Pass 1 and Pass 2 are *not* chained to each other.** `pass2_input` is built from
+  `base_meta` and `article.text` alone — it does not read `result1` at all. Both calls
+  could run concurrently; they're only combined afterwards, in code
+  (`orwell = max(orwell_structural, quote_amplification)`). Calling this a "Pass 1 →
+  Pass 2" chain would overstate the actual dependency.
+- **Two further chain-like steps exist outside the three named passes:** the RAG anchor
+  lookup (`anchor_store.get_similar_anchors()`, a ChromaDB query, not an LLM call)
+  splices retrieved text into the Pass 1 prompt *before* that call fires — retrieval-
+  augmented generation, strictly speaking, not model-to-model chaining. And
+  `normalize_technique`/`normalize_role`/`normalize_stroemung` run an embedding lookup
+  *after* Pass 1/2 return, mapping free-text output onto a canonical taxonomy — a
+  generate-then-normalize chain step with no LLM call in it at all.
+
+### Role/persona prompting — used in all three passes
+Each system prompt opens with an explicit role assignment: `pass0.md:1` — *"You are a
+text analysis assistant. Your only task is to identify group identifiers..."*;
+`pass1.md:1` — *"You are an expert media analyst specialising in rhetorical analysis,
+propaganda studies, and cognitive bias detection."*; `pass2.md:1` — *"You are an expert
+media analyst specialising in political science, ideology research, and
+epistemology."* Each persona is scoped to that pass's specific task rather than one
+generic "expert" framing reused across all three.
+
+### Structured output constraints — instruction-only, not provider-native JSON mode
+All three prompts end their format section with "Return ONLY a single, valid JSON
+object" (or equivalent). The `llm_adapter` package's `OpenAIAdapter` (used for the
+`gemini` provider) supports a `json_mode` config flag that requests the provider's
+native `response_format={"type": "json_object"}` constrained-decoding mode — the
+`gemini` adapter registration (`src/news_analyser/__init__.py`) does not set it, so it
+stays at its default, `False`. Compliance is instruction-only, backstopped by
+`_extract_json`'s markdown-fence stripping and `json_repair` fallback
+(`analyzer.py`) rather than enforced at the decoding level.
+
+### Sampling temperature — configured, not tuned per pass
+`OpenAIAdapter` defaults `temperature` to `0.2`; the `gemini` registration doesn't
+override it, so all three passes run at that value. The `cli` adapter (Claude) doesn't
+expose temperature as a controllable parameter at all — its own docstring states it
+"wird vom CLI nicht unterstützt und ignoriert" (not supported, ignored). Temperature is
+not varied per pass or per task in either case.
+
+### Self-consistency (multi-sample + aggregate) — not used
+Each pass calls `adapter.generate()` exactly once per article; there is no retry-and-
+vote or multi-sample aggregation anywhere in `analyzer.py`.
+
+### Tool use / ReAct — not used, not currently possible
+`LLMAdapter.generate()` (`llm_adapter/base.py`) takes a system prompt and input data
+and returns text — no function-calling or tool-use parameter exists in the interface.
+An agentic tool-use loop isn't a prompt-design choice that was skipped here; it's not
+representable in the current adapter abstraction at all.
+
+### Negative/exclusion prompting — a named category alongside contrastive pairs
+Distinct from pattern #5's contrastive ❌/✓ pairs (which anchor a boundary with a
+matched pair) is a simpler explicit exclusion list: `pass1.md`'s "What NOT to flag"
+section (grammatical errors, hedged claims, neutral group mentions, ordinary
+institutional criticism) and `pass0.md`'s *"Do NOT include political party names,
+ideological labels, or named individuals — those are handled separately."* Both name
+what the model should not do, without necessarily pairing it against a positive
+example of what it should do instead.
+
+---
+
 ## Where prompting hits its limit
 
 Not every failure mode is a prompting problem. The `normalize_stroemung` negation-collapse bug ([0009](../concepts/decisions/0009-pipeline-hardening-after-gemini-meta-review.md): `antifeministisch` → `feministisch` at cosine distance 0.18) lives in the embedding-similarity normalization layer, which no LLM ever sees or influences — no amount of prompt engineering in `pass1.md`/`pass2.md` could have prevented or fixed it. That distinction — is the failure in what the model is asked to judge, or in code that runs before/after the model — is itself worth checking first when a new instability shows up.
