@@ -85,14 +85,18 @@ manipulation techniques it uses (a plain count — poorly suited to asking the m
 a number directly, since that number becomes unauditable). Letting the model produce a
 list of instances that each carry a quote (see "Grounding-as-verification" below) and
 computing the density mechanically means every unit that feeds the count can at least
-be traced back to a specific, existence-checked location in the source text — a single
-requested float never offers that. **Precision, per review feedback:** this is
-auditability, not correctness-verification — grounding confirms a cited string exists
-in the source (and isn't over-counted), not that the `technique` label attached to it
+be traced back to a specific, existence-checked location in the text Pass 1 actually
+saw — a single requested float never offers that. **Precision, per review feedback
+(twice now):** (1) this is auditability, not correctness-verification — grounding
+confirms a cited string exists (and isn't over-counted), not that the `technique` label attached to it
 is the right one, and not that two overlapping quotes filed under different technique
 names aren't really the same rhetorical act double-counted twice (a real, still-open
 gap — see the "Substring-Lücke" in
-[`bernays_score_pipeline_analysis.md`](../analyses/bernays_score_pipeline_analysis.md)).
+[`bernays_score_pipeline_analysis.md`](../analyses/bernays_score_pipeline_analysis.md));
+(2) "the text Pass 1 actually saw" is `pass1_text` — the anonymised *and*
+quote-stripped version (`_strip_quoted_material`, `analyzer.py`) — not the original
+article. `_validate_quote_grounding` checks the model's quotes against that text, not
+against `article.text`.
 
 ### F4. Split a conflated concept into independently-scored outputs
 **Mechanism:** `orwell_index` (Pass 1) and `dunning_kruger_index` (Pass 2) are scored
@@ -155,10 +159,14 @@ apocalyptic/mobilisation. `quote_amplification_index` in `pass2.md` has the same
 four-tier shape. **`dunning_kruger_index` does not (correction, per review feedback):**
 `pass2.md` only anchors the two extremes — "Score HIGH (→1.0) when..." / "Score LOW
 (→0.0) when..." — with no defined middle bands. Worth noting as a real design
-difference, not an oversight to fix by analogy: DK's explanation requirement (pattern
-#2 below) already does the calibration work a middle band would otherwise do, by
-forcing the score to be justified against specific textual evidence each time rather
-than against a fixed numeric range.
+difference, not an oversight to fix by analogy. **Further correction, per review
+feedback:** an earlier version of this entry additionally claimed the DK explanation
+requirement (pattern #2 below) already substitutes for that missing middle-band
+calibration. It doesn't, technically — `dunning_kruger_explanation` is unvalidated free
+text: no quote is required, and nothing in `analyzer.py` checks that the explanation
+actually names a specific textual pattern rather than restating the score in words. It
+can improve transparency for whoever reads the result, but it is not a code-enforced
+substitute for a defined middle band the way the Orwell/quote-amplification bands are.
 **Why:** general technique, present from the original indicator design — an
 unanchored "return a float 0.0–1.0" invites arbitrary precision with no shared
 reference point across runs. Naming what each region of the scale *means* is also
@@ -180,7 +188,7 @@ to the model.
 ## Recalibration-era patterns (ADRs 0007–0010)
 
 ### 1. Grounding-as-verification, not grounding-as-trust
-**Mechanism:** require a verbatim quote for a claim, then check it in code before accepting it. The three validators don't all check the same thing: `_validate_quote_grounding` (`detected_techniques`) checks both that the string occurs at all *and* that it isn't claimed more times than it actually occurs in the text (`source_text.count(quote)`, `analyzer.py`); `_validate_manipulation_target_grounding` and `_validate_stroemung_grounding` only check existence (`quote in source_text`) — no occurrence-count inflation check for targets or `politische_stroemung` labels.
+**Mechanism:** require a verbatim quote for a claim, then check it in code before accepting it. The three validators don't all check the same thing, and don't all check against the same text: `_validate_quote_grounding` (`detected_techniques`) runs against `pass1_text` (anonymised, quote-stripped — see F3) and checks both that the string occurs at all *and* that it isn't claimed more times than it actually occurs (`source_text.count(quote)`, `analyzer.py`); `_validate_manipulation_target_grounding` and `_validate_stroemung_grounding` run against the full `article.text` and only check existence (`quote in source_text`) — no occurrence-count inflation check for targets or `politische_stroemung` labels.
 **Scope (precision, per review feedback):** this verifies that the cited *string* exists and isn't over-counted — it does not verify that the *label* attached to it (which technique, which role) is the correct one, and it does not catch two different labels citing overlapping-but-distinct quotes for what's really the same rhetorical instance. "Grounded" means existence-checked, not semantically correct.
 **Model attribution:** originated for **local models** (Qwen3/GPT-OSS) — the `_validate_quote_grounding` docstring names two hallucination patterns "observed with local models": fabricated quotes and inflated occurrence counts. Later found necessary for **Gemini** too, in a different failure mode: [0007](../concepts/decisions/0007-manipulation-target-grounding.md) found Gemini "never appeared to use" the permitted `null` fallback for an ungrounded classification — Claude did, correctly and conservatively. So the same mechanism catches two distinct failure modes from two different model families; neither model's prompt-level self-restraint could be trusted alone.
 
@@ -292,5 +300,21 @@ of what's actually checked/measured, not architectural errors:
 6. **F8** claimed quote_amplification_index and the DK-Index share "the same shape" of
    banded calibration; `pass2.md` only anchors DK's two extremes (HIGH/LOW), with no
    defined middle bands the way Orwell and quote_amplification_index have. Corrected,
-   and reframed as a deliberate design difference (the explanation requirement does
-   the calibration work instead) rather than an inconsistency to smooth over.
+   and reframed as a deliberate design difference rather than an inconsistency to
+   smooth over (see Round 3 below for a further correction to this same entry).
+
+**Round 3 (same reviewer, same day):** two more precision points, both confirmed:
+
+7. **F8** (again) — the corrected entry still claimed the DK explanation requirement
+   "does the calibration work" a middle band would otherwise do. Not technically true:
+   `dunning_kruger_explanation` is unvalidated free text — no quote required, nothing
+   in `analyzer.py` checks it names an actual pattern rather than just restating the
+   score. It can help a human reader, but it's not a code-enforced substitute for a
+   defined band.
+8. **F3** — "traced back to a specific, existence-checked location in the source text"
+   was ambiguous about *which* text. `_validate_quote_grounding` checks
+   `detected_techniques` quotes against `pass1_text` (anonymised and quote-stripped),
+   not the original article — now stated explicitly, and pattern #1's mechanism
+   description was tightened the same way (it runs against a different text than the
+   two grounding functions for `manipulation_targets`/`politische_stroemung`, which
+   check against the full `article.text`).
