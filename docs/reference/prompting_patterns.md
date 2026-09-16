@@ -101,9 +101,13 @@ as separate fields, never derived from one another.
 overconfidence is "grammatically/structurally determined, not tied to which group is
 discussed," a genuinely different axis from rhetorical extremism. A combined judgment
 would hide texts that are calm-but-overconfident or heated-but-well-sourced. Confirmed
-group-blind by construction *and* by measurement — zero difference between mirrored
-texts in symmetry testing, precisely because it doesn't ride on the anonymisation-
-sensitive axis at all.
+group-blind by construction, and largely by measurement, precisely because it doesn't
+ride on the anonymisation-sensitive axis at all — but "zero difference" overstates it
+(**correction, per review feedback**): [bias-validation.md](../concepts/validation/bias-validation.md)'s
+real-article tests (02, 03) show exactly 0.00 DK difference between mirrored texts, and
+the local models (Qwen3-14B, GPT-OSS-20B) show 0.00 on the synthetic Test 01 too — but
+Claude (CLI) shows a small Δ=-0.07 on that same synthetic Test 01. Accurate claim:
+consistently the most stable of the three metrics, not unconditionally zero everywhere.
 
 ### F5. Resist re-coupling axes you deliberately split apart
 **Mechanism:** none in the current code — this documents a change that was built and
@@ -147,8 +151,14 @@ the motivating article: 0 → 0.4, not 0 → 0.7+.
 ### F8. Anchor a continuous score to named qualitative bands
 **Mechanism:** `pass1.md`'s Orwell Index scale — 0.0–0.3 factual/slightly tendentious,
 0.4–0.6 clearly emotional/one-sided, 0.7–0.9 strong enemy images, 1.0
-apocalyptic/mobilisation. The same shape appears for `quote_amplification_index` and
-the Dunning-Kruger high/low bands in `pass2.md`.
+apocalyptic/mobilisation. `quote_amplification_index` in `pass2.md` has the same
+four-tier shape. **`dunning_kruger_index` does not (correction, per review feedback):**
+`pass2.md` only anchors the two extremes — "Score HIGH (→1.0) when..." / "Score LOW
+(→0.0) when..." — with no defined middle bands. Worth noting as a real design
+difference, not an oversight to fix by analogy: DK's explanation requirement (pattern
+#2 below) already does the calibration work a middle band would otherwise do, by
+forcing the score to be justified against specific textual evidence each time rather
+than against a fixed numeric range.
 **Why:** general technique, present from the original indicator design — an
 unanchored "return a float 0.0–1.0" invites arbitrary precision with no shared
 reference point across runs. Naming what each region of the scale *means* is also
@@ -170,7 +180,7 @@ to the model.
 ## Recalibration-era patterns (ADRs 0007–0010)
 
 ### 1. Grounding-as-verification, not grounding-as-trust
-**Mechanism:** require a verbatim quote for a claim, then check two things in code — does the exact string occur in the source text at all, and is it claimed more times than it actually occurs (`_validate_quote_grounding`, `_validate_manipulation_target_grounding`, `_validate_stroemung_grounding`) — dropping/nulling whatever fails either check.
+**Mechanism:** require a verbatim quote for a claim, then check it in code before accepting it. The three validators don't all check the same thing: `_validate_quote_grounding` (`detected_techniques`) checks both that the string occurs at all *and* that it isn't claimed more times than it actually occurs in the text (`source_text.count(quote)`, `analyzer.py`); `_validate_manipulation_target_grounding` and `_validate_stroemung_grounding` only check existence (`quote in source_text`) — no occurrence-count inflation check for targets or `politische_stroemung` labels.
 **Scope (precision, per review feedback):** this verifies that the cited *string* exists and isn't over-counted — it does not verify that the *label* attached to it (which technique, which role) is the correct one, and it does not catch two different labels citing overlapping-but-distinct quotes for what's really the same rhetorical instance. "Grounded" means existence-checked, not semantically correct.
 **Model attribution:** originated for **local models** (Qwen3/GPT-OSS) — the `_validate_quote_grounding` docstring names two hallucination patterns "observed with local models": fabricated quotes and inflated occurrence counts. Later found necessary for **Gemini** too, in a different failure mode: [0007](../concepts/decisions/0007-manipulation-target-grounding.md) found Gemini "never appeared to use" the permitted `null` fallback for an ungrounded classification — Claude did, correctly and conservatively. So the same mechanism catches two distinct failure modes from two different model families; neither model's prompt-level self-restraint could be trusted alone.
 
@@ -267,3 +277,20 @@ code and corrected in place above rather than left as a separate errata list:
 The review's overall assessment: the architecture description and code references hold
 up; the main weakness was evidence language — several claims generalised from a small
 number of runs without clearly separating "observed once" from "reproducibly tested."
+
+**Round 2 (same reviewer, same day):** three further issues, same pattern — precision
+of what's actually checked/measured, not architectural errors:
+
+4. **Pattern #1** still bundled all three grounding validators as checking both
+   existence and occurrence-count inflation; only `_validate_quote_grounding` (for
+   `detected_techniques`) checks the count. `_validate_manipulation_target_grounding`
+   and `_validate_stroemung_grounding` only check existence. Scoped per-validator now.
+5. **F4** claimed "zero difference between mirrored texts" for the DK-Index
+   unconditionally; `bias-validation.md`'s Test 01 shows Claude (CLI) at Δ=-0.07 on
+   that specific synthetic test, not 0.00 — only the local models hit exactly zero
+   there, though real-article tests 02/03 do show 0.00 for all models tested.
+6. **F8** claimed quote_amplification_index and the DK-Index share "the same shape" of
+   banded calibration; `pass2.md` only anchors DK's two extremes (HIGH/LOW), with no
+   defined middle bands the way Orwell and quote_amplification_index have. Corrected,
+   and reframed as a deliberate design difference (the explanation requirement does
+   the calibration work instead) rather than an inconsistency to smooth over.
