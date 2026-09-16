@@ -18,6 +18,7 @@ How the system currently works, kept in sync with the implementation.
 - [`reference/analyse_architektur.md`](reference/analyse_architektur.md) — indicator design rationale, Pass 0–2 pipeline
 - [`reference/web_architecture.md`](reference/web_architecture.md) — backend/frontend architecture, API endpoints
 - [`reference/publisher_profiling.md`](reference/publisher_profiling.md) — cross-article publisher analysis
+- [`reference/prompting_patterns.md`](reference/prompting_patterns.md) — general prompting techniques in `pass1.md`/`pass2.md`, with model attribution
 
 ## Concepts, Validation & Decisions
 

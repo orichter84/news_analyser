@@ -3,7 +3,8 @@
 This document covers the analysis output schema, indicators, paywall detection and the techniques database.
 
 For architecture and design decisions see [analyse_architektur.md](analyse_architektur.md).  
-For API endpoints and frontend structure see [web_architecture.md](web_architecture.md).
+For API endpoints and frontend structure see [web_architecture.md](web_architecture.md).  
+For the general prompting techniques behind `pass1.md`/`pass2.md` see [prompting_patterns.md](prompting_patterns.md).
 
 ---
 
