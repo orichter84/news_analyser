@@ -42,6 +42,7 @@ led to. See [`concepts/README.md`](concepts/README.md) for the full timeline.
 - [`analyses/politische_stroemung_pipeline_analysis.md`](analyses/politische_stroemung_pipeline_analysis.md) — Stufenweise Untersuchung der Politischen Strömung, Label-Taxonomie und Belegprüfung
 - [`analyses/meta_validierung_gemini_analysen.md`](analyses/meta_validierung_gemini_analysen.md) — Claude-Meta-Validierung der vier Gemini-Indikator-Analysen
 - [`analyses/vorschlag_pipeline_haertung_todo.md`](analyses/vorschlag_pipeline_haertung_todo.md) — Strukturierter Maßnahmenplan und ToDo-Liste zur Pipeline-Härtung
+- [`analyses/sampling_konfiguration_und_lauf_varianz.md`](analyses/sampling_konfiguration_und_lauf_varianz.md) — Temperature und JSON-Mode als bisher unbeachtete Stellschrauben, eingeordnet gegen die Lauf-zu-Lauf-Varianz aus ADR 0010
 
 ## Archive
 

@@ -155,3 +155,43 @@ Originaltext
    Speicherung des vollen Objekts `[{"label": "...", "quote": "..."}]` in den Metadaten bzw. strukturierte Rückgabe im Detail-Endpunkt `/articles/{id}`.
 4. **Visualisierung im Frontend:**  
    Im UI die Badges mit Tooltips oder Accordions ausstatten, die beim Hovern/Klicken das zugrundeliegende Originalzitat aus dem Artikel hervorheben.
+
+---
+
+## 5. Nachtrag (2026-09-16): Umgesetzt, aber Zitatpflicht weiterhin nur weich
+
+Empfehlungen 1–4 wurden umgesetzt — `_validate_stroemung_grounding`, `normalize_stroemung`
+(`stroemung_store.py`), Beleg-Erhalt im Detail-Endpunkt und die Frontend-Anzeige (siehe
+[ADR 0009](../concepts/decisions/0009-pipeline-hardening-after-gemini-meta-review.md),
+[Meta-Validierung §8](meta_validierung_gemini_analysen.md)). Beim direkten Vergleich
+von vier Qwen3-14B-Läufen desselben Artikels (siehe
+[`prompting_patterns.md`](../reference/prompting_patterns.md)-Diskussion vom selben Tag)
+zeigte sich aber eine Lücke, die über die ursprüngliche Empfehlung hinausgeht:
+
+**Es gibt weiterhin keine Pflicht, ein Label überhaupt mit einem Zitat zu belegen** —
+weder im Prompt noch im Code:
+
+- **Prompt (`pass2.md`):** *"For each label, provide the most characteristic verbatim
+  sentence... If no single sentence supports it, use the most representative
+  passage."* — eine Bitte, kein *"strictly enforced"* wie bei `detected_techniques`
+  (Grounding rule) oder `manipulation_targets` (General grounding requirement). Nur
+  für `neutral` ist `quote: null` explizit vorgesehen; für alle anderen Labels bleibt
+  offen, was passiert, wenn das Modell trotzdem `quote: null` liefert.
+- **Code (`_validate_stroemung_grounding`):** prüft ein Zitat nur, *wenn* eines
+  mitgeliefert wurde (`if quote and quote not in source_text`). Ist `quote` von
+  vornherein `null` oder leer, greift die Funktion gar nicht — das Label bleibt
+  unverändert stehen, unabhängig davon, wie stark es die Einordnung des Artikels
+  prägt (`sozialdemokratisch`, `faschistisch`, etc.).
+
+**Empirischer Beleg:** vier Qwen3-14B-Läufe desselben Artikels ergaben `["neutral"]`,
+`["konservativ", "sozialdemokratisch"]`, `["neutral"]`, `["sozialdemokratisch",
+"neutral"]` — eine über die Läufe hinweg instabile inhaltliche Einordnung, die von
+keinem der beiden Mechanismen (Prompt-Bitte, Code-Validierung) aufgefangen wird, weil
+beide nur bei *vorhandenem* Zitat greifen.
+
+**Ergänzende Empfehlung:** `pass2.md` auf dieselbe *"strictly enforced"*-Sprache wie
+bei den anderen Feldern umstellen (Zitat verpflichtend für jedes Label außer
+`neutral`), und `_validate_stroemung_grounding` um eine Prüfung erweitern, die ein
+fehlendes Zitat bei einem Nicht-neutral-Label als Grounding-Verstoß behandelt —
+analog zu `_validate_manipulation_target_grounding`, die ein Feld ohne belegtes
+Zitat aktiv auf `None` setzt, statt es unangetastet durchzureichen.
