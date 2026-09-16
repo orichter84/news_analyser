@@ -213,7 +213,7 @@ to the model.
 **Model attribution:** **Gemini**-specific finding in [0008](../concepts/decisions/0008-gemini-orwell-index-recalibration.md) — "passages were routinely double-counted once under a specific technique and again under 'Framing' for the same span."
 
 ### 7. Name genre exceptions explicitly, don't rely on generalisation
-**Mechanism:** interview format, survey/poll articles, pure-summary articles, and news-wire terse style each get their own named carve-out rather than one abstract rule expected to transfer across genres.
+**Mechanism:** interview format, survey/poll articles, and pure-summary articles each get their own named genre carve-out; terse factual reporting gets a general rule instead (not genre-named — "do not score high merely because settled facts are stated tersely and directly," `pass2.md`, applies to any terse factual sentence, not specifically to news-wire/agency text) — each rather than one abstract rule expected to transfer across cases unaided.
 **Model attribution:** the whole recalibration in [0008](../concepts/decisions/0008-gemini-orwell-index-recalibration.md) was triggered by **Gemini** scoring a routine derStandard interview at `orwell_index: 0.75` where **Claude (CLI)**, given the identical prompt, produced a "materially lower, more plausible score" — the genre-blindness was provider-specific, not inherent to the task.
 
 ### 8. Decouple correlated-but-independent fields with wrong-inference examples
@@ -318,3 +318,12 @@ of what's actually checked/measured, not architectural errors:
    description was tightened the same way (it runs against a different text than the
    two grounding functions for `manipulation_targets`/`politische_stroemung`, which
    check against the full `article.text`).
+
+**Round 4 (same reviewer, same day):** one more, confirmed:
+
+9. **Pattern #7** described "news-wire terse style" as its own named genre carve-out,
+   alongside interview/survey/pure-summary. It isn't one — `pass2.md`'s rule ("do not
+   score high merely because settled facts are stated tersely and directly") is a
+   general principle about terseness-vs-overconfidence, not a named exception scoped to
+   news-wire or agency text specifically. Corrected to "terse factual reporting" and
+   noted it's a general rule, not a genre carve-out like the other three.
