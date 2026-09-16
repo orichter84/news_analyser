@@ -1,8 +1,8 @@
-# Prompting Patterns: Lessons from `pass1.md`/`pass2.md`
+# Prompting Patterns: Lessons from `pass0.md`/`pass1.md`/`pass2.md`
 
 This document distills the general, model-agnostic prompting techniques embedded in
-`src/news_analyser/prompts/system/pass1.md` and `pass2.md`, isolated from the
-project-specific decisions that produced them. Each pattern names why it was
+`src/news_analyser/prompts/system/pass0.md`, `pass1.md` and `pass2.md`, isolated from
+the project-specific decisions that produced them. Each pattern names why it was
 introduced and where it lives, and — where known — which model's observed behaviour
 made it necessary. Two eras, covered in order:
 
@@ -29,6 +29,35 @@ and [bias-validation.md](../concepts/validation/bias-validation.md).
 ---
 
 ## Foundational patterns (ADRs 0001–0006)
+
+### F0. Let the model identify; let code replace
+**Mechanism:** Pass 0 (`pass0.md`, called from `group_detector.py`'s `detect_groups()`)
+has exactly one job: return a JSON list of `{"term", "type"}` group identifiers found
+in the *original* text. It never touches the text itself — the actual substitution
+into `Gruppe-A`/`Gruppe-B` placeholders happens entirely in
+`anonymizer/spacy_strategy.py`'s `replace_groups()`, deterministically, from that list.
+The module docstring states this as the design intent directly: *"Das LLM identifiziert
+nur — das Ersetzen erfolgt deterministisch durch den Anonymizer-Code, nicht durch das
+LLM."*
+**Why:** fuzzy judgment ("is 'schwarze Jugendliche' a group reference, while plain
+'schwarz' the colour is not?") is what an LLM is good at; exact, repeatable, load-
+bearing text substitution is exactly the kind of task worth taking out of the model's
+hands once the judgment call is made — the same reasoning as F3's "let the model
+enumerate, compute the aggregate in code," applied one step earlier in the pipeline.
+Splitting identification from replacement also means a Pass 0 mistake fails safe: a
+missed group term just isn't anonymised (Pass 1 sees it in clear text, same as any
+other imperfect NER catch), rather than corrupting the text with a malformed
+replacement.
+**Also notable:** `pass0.md` explicitly scopes itself against its two neighbours to
+avoid double-handling — *"Do NOT include political party names, ideological labels, or
+named individuals — those are handled separately"* (named individuals go through spaCy
+NER in the same `anonymizer` pipeline; ideological labels go through the lexical
+`normalize()` step, not Pass 0, see the correction to F1 below). And its type taxonomy
+(`racial | ethnic_origin | religious | gender_identity | sexual_orientation |
+national_origin`) is a closed enum with a contrastive disambiguation example built in —
+*"'schwarz' as a colour is NOT a group identifier. 'schwarze Jugendliche' IS"* — the
+same minimal-pair technique as pattern #5 below, here used for token-level
+classification rather than technique/role calibration.
 
 ### F1. Remove the bias structurally, don't ask the model to compensate for it
 **Mechanism:** three ordered preprocessing steps run before Pass 1 ever sees the text
