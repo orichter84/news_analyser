@@ -69,9 +69,14 @@ Historical examples for calibration:
 
 If the article is factual reporting without ideological promotion: [{"label": "neutral", "quote": null}]
 
-For each label, provide the most characteristic verbatim sentence (1–2 sentences max) that best
-supports the classification. If no single sentence supports it, use the most representative passage.
-Quotes must be copied verbatim — do not paraphrase or translate.
+**Grounding rule (strictly enforced):** every label except `neutral` must carry a
+verbatim quote — `quote: null` is only valid for `neutral`. Provide the most
+characteristic verbatim sentence (1–2 sentences max) that best supports the
+classification; if no single sentence supports it, use the most representative
+passage instead, but a quote must be present. Quotes must be copied verbatim — do not
+paraphrase or translate. If you cannot locate or construct a supporting excerpt for a
+label, that is a signal the label doesn't actually fit this article — reconsider the
+label rather than submit it ungrounded.
 
 ## Dunning-Kruger-Index
 

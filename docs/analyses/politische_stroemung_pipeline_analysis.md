@@ -195,3 +195,23 @@ bei den anderen Feldern umstellen (Zitat verpflichtend für jedes Label außer
 fehlendes Zitat bei einem Nicht-neutral-Label als Grounding-Verstoß behandelt —
 analog zu `_validate_manipulation_target_grounding`, die ein Feld ohne belegtes
 Zitat aktiv auf `None` setzt, statt es unangetastet durchzureichen.
+
+**Umgesetzt (2026-09-16):** `pass2.md` enthält jetzt eine *"Grounding rule (strictly
+enforced)"* für `politische_stroemung`; `_validate_stroemung_grounding` verwirft ein
+Nicht-neutral-Label komplett, wenn kein verifizierbares Zitat vorliegt (statt es
+unverändert durchzureichen).
+
+**Aber, wichtige Einschränkung — gegen die vier gespeicherten Qwen-Läufe getestet:**
+die neue, striktere Prüfung ändert an den vier oben dokumentierten Ergebnissen
+(`neutral` / `konservativ`+`sozialdemokratisch` / `neutral` / `sozialdemokratisch`+`neutral`)
+**nichts** — alle Nicht-neutral-Labels hatten in allen vier Läufen bereits ein reales,
+im Artikeltext auffindbares Zitat. Die beobachtete Instabilität war in diesem Fall also
+**kein Grounding-Problem**, sondern echte inhaltliche Uneinigkeit des Modells: dieselbe
+oder eine sehr ähnliche Passage ("Tech-Konzerne haben rein wirtschaftliche Interessen…")
+stützte in Lauf 2 das Label `konservativ`, in Lauf 4 eine fast identische Passage das
+Label `sozialdemokratisch`. Ein Zitat-Grounding-Check kann per Definition nur erkennen,
+*ob* ein Zitat existiert — nicht, *ob* das Modell diesem Zitat konsistent dieselbe
+ideologische Einordnung zuweist. Dieser Teil der Instabilität bleibt durch den
+implementierten Fix unadressiert; er schließt nur die separate, davon unabhängige
+Lücke (Label ganz ohne Beleg), die in diesem konkreten Vier-Läufe-Sample nicht auftrat,
+aber bei anderen Artikeln oder Modellen durchaus auftreten kann.

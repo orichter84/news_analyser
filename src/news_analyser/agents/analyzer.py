@@ -182,14 +182,18 @@ def _validate_manipulation_target_grounding(
 def _validate_stroemung_grounding(
     stroemung: list[Any], source_text: str
 ) -> list[Any]:
-    """Drops an unverifiable `quote` from a politische_stroemung label.
+    """Drops a politische_stroemung label that isn't backed by a verifiable quote.
 
-    Unlike `_validate_manipulation_target_grounding`, this keeps the label
-    itself — the classification is the model's judgement of the whole
-    article, not a claim that stands or falls on one exact sentence (the
-    prompt already allows "the most representative passage" when no single
-    sentence fits). Only the specific quote, which purports to be a verbatim
-    excerpt, is nulled when it can't be found.
+    `neutral` is exempt (the prompt explicitly allows `quote: null` there — it's
+    not a claim that needs evidence). Every other label is only as good as its
+    quote: pass2.md now requires one ("strictly enforced"), so a label that
+    arrives without one, or with one that doesn't actually occur in the article,
+    is an unevidenced claim, not a valid data point — the same reasoning
+    `_validate_manipulation_target_grounding` applies to rolle/direction, just
+    without a second field to fall back on here. Confirmed empirically: four
+    repeated runs of the same article produced four different stroemung label
+    sets, none of which the previous (quote-preserving) version of this
+    function could have caught.
     """
     validated = []
     dropped = 0
@@ -197,14 +201,17 @@ def _validate_stroemung_grounding(
         if not isinstance(item, dict):
             validated.append(item)
             continue
+        if item.get("label") == "neutral":
+            validated.append(item)
+            continue
         quote = (item.get("quote") or "").strip()
-        if quote and quote not in source_text:
-            item["quote"] = None
+        if not quote or quote not in source_text:
             dropped += 1
+            continue
         validated.append(item)
     if dropped:
         logger.info(
-            "Grounding-Check (politische_stroemung): %d nicht belegte(s) Zitat(e) entfernt.",
+            "Grounding-Check (politische_stroemung): %d Label ohne belegtes Zitat entfernt.",
             dropped,
         )
     return validated

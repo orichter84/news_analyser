@@ -108,10 +108,23 @@ class TestValidateStroemungGrounding:
         assert result == stroemung
         assert result[0]["label"] == "konservativ"
 
-    def test_nulls_unverifiable_quote_but_keeps_label(self):
+    def test_drops_label_with_unverifiable_quote(self):
         stroemung = [{"label": "grün", "quote": "Dieser Satz steht nirgends im Text."}]
         result = _validate_stroemung_grounding(stroemung, "Ein völlig anderer Artikeltext.")
-        assert result == [{"label": "grün", "quote": None}]
+        assert result == []
+
+    def test_drops_non_neutral_label_with_missing_quote(self):
+        stroemung = [{"label": "sozialdemokratisch", "quote": None}]
+        result = _validate_stroemung_grounding(stroemung, "irgendein Text")
+        assert result == []
+
+    def test_keeps_grounded_label_alongside_dropped_one(self):
+        stroemung = [
+            {"label": "konservativ", "quote": "Wir müssen jetzt handeln."},
+            {"label": "grün", "quote": "Nicht im Text vorhanden."},
+        ]
+        result = _validate_stroemung_grounding(stroemung, "Der Autor schreibt: Wir müssen jetzt handeln.")
+        assert result == [{"label": "konservativ", "quote": "Wir müssen jetzt handeln."}]
 
     def test_passes_through_plain_string_entries(self):
         result = _validate_stroemung_grounding(["neutral"], "irgendein Text")
