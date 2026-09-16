@@ -32,6 +32,7 @@ Return ONLY a single, valid JSON object – no markdown fences, no prose before 
   "dunning_kruger_index": <float 0.0 to 1.0>,
   "dunning_kruger_explanation": "<1-2 sentences justifying the score, in German>",
   "quote_amplification_index": <float 0.0 to 1.0>,
+  "quote_amplification_explanation": "<1-2 sentences naming which quote(s) drive the score, or null if the score is 0.0-0.3, in German>",
   "target_direction": "<who or what is elevated (+) or denigrated (-) and how>",
   "themenbereich": "<one of: Politik | Außenpolitik | Wirtschaft | Gesellschaft | Justiz | Gesundheit | Klima | Kultur | Technologie | Sonstiges>",
   "manipulation_targets": [
@@ -107,6 +108,8 @@ Ask: does the article prominently feature (headline, lead, standalone block, or 
 
 An isolated instance stays in 0.2–0.4, never 0.7+ — reserve 0.7+ for framing that's repeated, elaborated, or central. No notable quoted material, or balanced/neutral quotes → 0.0–0.2.
 
+For any score above 0.3, `quote_amplification_explanation` must name the specific quote(s) and say what makes them enemy-image/apocalyptic/dehumanising rather than pointed-but-ordinary criticism — see the institutional-motive-criticism carve-out under "General grounding requirement" below, which applies here too. If you can't name a specific quote, the score can't be above 0.3.
+
 ## Themenbereich
 
 Classify the article into exactly one topic area:
@@ -169,6 +172,12 @@ manipulation techniques — either as beneficiary or victim.
     - ✓ "Wieder spielt er die Opferkarte, um sich der Verantwortung zu entziehen"
       → `rolle: Opfer`, `direction: negativ`
       (correct — the quote itself frames the victimhood claim as manipulative)
+    - **Institutional-motive-criticism carve-out:** a single critical remark about an institution's motives, incentives, or track record — without dehumanising language or a "they are doing this TO us" narrative — is ordinary critical reporting, not a targeted `rolle`/`direction` and not grounds for `quote_amplification_index` above 0.3, regardless of whether the remark is the author's own or a quoted source's.
+      - ❌ "Sie haben rein wirtschaftliche Interessen. Daten sind Geld." (about a company) → `rolle: Bedrohung`, `direction: negativ`
+        (wrong — a mundane, widely-held concern about incentives, not evidence the entity is cast as an active threat)
+      - ✓ "Sie beuten gezielt die Ängste einsamer Kinder aus, um sie süchtig zu machen" (about a company)
+        → `rolle: Bedrohung`, `direction: negativ`
+        (correct — casts motive as predatory, not merely profit-driven)
 - **rolle**: The entity's narrative function — independent of how favourably it is presented:
 {{ROLES}}
 

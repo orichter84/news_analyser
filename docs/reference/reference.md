@@ -33,6 +33,7 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
     "orwell_index": 0.42,
     "orwell_index_structural": 0.2,
     "quote_amplification_index": 0.42,
+    "quote_amplification_explanation": "1-2 sentences naming which quote(s) drive the score, in German, or null below 0.3",
     "dunning_kruger_index": 0.35,
     "dunning_kruger_explanation": "1-2 sentence justification of the score, in German",
     "target_direction": "who or what is elevated (+) or denigrated (-) and how, in German"
@@ -66,6 +67,7 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 - `manipulation_targets` — `rolle`/`direction` without a verifiable supporting quote are cleared (`_validate_manipulation_target_grounding`); an entity with neither field grounded is dropped entirely.
 - `politische_stroemung` — labels are mapped onto the canonical taxonomy (`normalize_stroemung`, semantic match; labels built from a negation/critical marker like "anti-"/"-kritisch" are deliberately left unmapped rather than risking a match to the concept they oppose). A label's `quote` is nulled if it can't be found in the original article text (`_validate_stroemung_grounding`) — the label itself is kept even without a verified quote, since the classification reflects the whole article rather than one sentence.
 - `dunning_kruger_index` has no quote-grounding — it ships with a qualitative `dunning_kruger_explanation` instead (see Indicators below), not a verbatim excerpt requirement.
+- `quote_amplification_index` also has no code-level grounding: `quote_amplification_explanation` is a prompt instruction (required above 0.3), not a value `analyzer.py` validates or uses to cap the score.
 
 **Differences in the HTTP API:**
 - `politische_stroemung` is flattened to a plain list of label strings (`["konservativ", "nationalpopulistisch"]`) for `GET /articles` and `GET /search`. **`GET /articles/{id}` (detail) preserves the `{label, quote}` objects** from the stored `analysis_json` so the per-label quote evidence is available to the frontend.
@@ -80,6 +82,7 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 | `orwell_index` | 0.0 – 1.0 | Rhetorical extremism. 0 = factual, 1 = highly manipulative. `max(orwell_index_structural, quote_amplification_index)` — see below |
 | `orwell_index_structural` | 0.0 – 1.0 | Pass 1 sub-score: the author's own rhetorical voice, on anonymised/quote-stripped text |
 | `quote_amplification_index` | 0.0 – 1.0 | Pass 2 sub-score: how much the article's quote *selection* amplifies extreme or one-sided rhetoric, on the full original text |
+| `quote_amplification_explanation` | Free text (German) | Nested inside `framing_target`. Required (per the prompt) above 0.3: names the specific quote(s) driving the score. No code-level grounding check — a prompt instruction, not an enforced constraint |
 | `bernays_score` | 0.0 – ∞ | Manipulation techniques per 1000 words of the quote-stripped Pass 1 text (`pass1_word_count`) — computed downstream at storage time, not part of the LLM output itself (see below) |
 | `dunning_kruger_index` | 0.0 – 1.0 | How confidently a text is written without being backed by sources, subjunctive mood or qualifications |
 | `dunning_kruger_explanation` | Free text (German) | Nested inside `framing_target`. 1-2 sentence qualitative justification for the DK score — no quote-grounding requirement, since overconfidence is often a property of the article's overall tone rather than one sentence |

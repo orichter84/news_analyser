@@ -39,7 +39,8 @@ news_analyser/
 │
 ├── data/                    Laufzeit-Daten (nicht unter Versionskontrolle)
 │   ├── chroma_db/           ChromaDB-Persistenz
-│   └── debug_last_run/      Debug-Output des letzten Analyse-Laufs
+│   ├── debug_last_run/      Debug-Output des letzten Analyse-Laufs (feste Pfade, u.a. für Notebooks)
+│   └── debug_runs/<run_id>/ Archiv aller Läufe, für Vergleich wiederholter Analysen desselben Artikels
 │
 ├── docs/                    Dokumentation & Konzepte
 ├── config/                  Konfigurationsdateien (feeds.txt etc.)

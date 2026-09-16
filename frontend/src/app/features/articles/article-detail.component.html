@@ -26,6 +26,9 @@
             Struktur {{ a.framing_target.orwell_index_structural | number:'1.2-2' }}
             · Zitate {{ a.framing_target.quote_amplification_index | number:'1.2-2' }}
           </span>
+          @if (a.framing_target.quote_amplification_explanation) {
+            <span class="score-sub">{{ a.framing_target.quote_amplification_explanation }}</span>
+          }
         }
       </div>
       <div class="score-card">

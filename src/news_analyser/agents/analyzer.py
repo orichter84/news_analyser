@@ -7,6 +7,7 @@ Pass 2 (original text):   Politische Strömung (labels), DK-Index
 
 from __future__ import annotations
 
+import datetime
 import json
 import logging
 import os
@@ -19,12 +20,28 @@ from ..scraper import Article
 logger = logging.getLogger(__name__)
 
 _DEBUG_DIR = Path(__file__).resolve().parents[3] / "data" / "debug_last_run"
+_DEBUG_RUNS_DIR = Path(__file__).resolve().parents[3] / "data" / "debug_runs"
 
 
-def _write_debug(filename: str, content: str) -> None:
+def _new_debug_run_id(domain: str) -> str:
+    ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S%f")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", domain).strip("-") or "unknown"
+    return f"{ts}_{slug}"
+
+
+def _write_debug(filename: str, content: str, run_id: str | None = None) -> None:
+    """Writes to debug_last_run/ (always the latest run, fixed paths some
+    notebooks depend on) and, when run_id is given, additionally archives an
+    untouched copy under debug_runs/<run_id>/ so repeated runs of the same
+    article can be diffed instead of overwriting each other.
+    """
     try:
         _DEBUG_DIR.mkdir(parents=True, exist_ok=True)
         (_DEBUG_DIR / filename).write_text(content, encoding="utf-8")
+        if run_id:
+            run_dir = _DEBUG_RUNS_DIR / run_id
+            run_dir.mkdir(parents=True, exist_ok=True)
+            (run_dir / filename).write_text(content, encoding="utf-8")
     except Exception:
         pass
 from ..prompts import load_prompt
@@ -218,6 +235,7 @@ def _strip_quoted_material(text: str) -> str:
 def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str, Any] | None:
     provider = os.environ.get("LLM_PROVIDER", "openai")
     adapter  = llm_adapter.get_instance(provider)
+    debug_run_id = _new_debug_run_id(article.domain)
 
     kw = compute_keyword_signal(article.text)
 
@@ -226,11 +244,11 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     else:
         group_terms = detect_groups(article.text, adapter)
         anon        = anonymize(article.text, group_terms=group_terms)
-        _write_debug("01_detected_terms.json", json.dumps(group_terms, ensure_ascii=False, indent=2))
-        _write_debug("03_anonymization_mapping.json", json.dumps(anon["mapping"], ensure_ascii=False, indent=2))
+        _write_debug("01_detected_terms.json", json.dumps(group_terms, ensure_ascii=False, indent=2), debug_run_id)
+        _write_debug("03_anonymization_mapping.json", json.dumps(anon["mapping"], ensure_ascii=False, indent=2), debug_run_id)
 
-    _write_debug("00_original_text.txt", article.text)
-    _write_debug("02_anonymized_text.txt", anon["text"])
+    _write_debug("00_original_text.txt", article.text, debug_run_id)
+    _write_debug("02_anonymized_text.txt", anon["text"], debug_run_id)
 
     anchors = get_similar_anchors(anon["text"])
 
@@ -248,7 +266,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     # ------------------------------------------------------------------
     pass1_text = _strip_quoted_material(anon["text"])
     pass1_word_count = len(pass1_text.split())
-    _write_debug("02b_pass1_input_quotes_stripped.txt", pass1_text)
+    _write_debug("02b_pass1_input_quotes_stripped.txt", pass1_text, debug_run_id)
 
     pass1_input = {
         **base_meta,
@@ -280,7 +298,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         logger.error("Pass 1 error: %s", exc)
         return None
 
-    _write_debug("04_pass1_raw_response.txt", raw1)
+    _write_debug("04_pass1_raw_response.txt", raw1, debug_run_id)
     result1 = _extract_json(raw1)
     if result1 is None:
         return None
@@ -323,7 +341,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         logger.error("Pass 2 error: %s", exc)
         return None
 
-    _write_debug("05_pass2_raw_response.txt", raw2)
+    _write_debug("05_pass2_raw_response.txt", raw2, debug_run_id)
     result2 = _extract_json(raw2)
     if result2 is None:
         return None
@@ -370,9 +388,10 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         "detected_techniques": result1.get("detected_techniques", []),
         "framing_target": {
             **result1.get("framing_target", {}),
-            "orwell_index":              orwell,
-            "orwell_index_structural":   orwell_structural,
-            "quote_amplification_index": quote_amplification,
+            "orwell_index":                    orwell,
+            "orwell_index_structural":         orwell_structural,
+            "quote_amplification_index":       quote_amplification,
+            "quote_amplification_explanation": result2.get("quote_amplification_explanation", ""),
             "dunning_kruger_index":        result2.get("dunning_kruger_index", 0.0),
             "dunning_kruger_explanation":  result2.get("dunning_kruger_explanation", ""),
             "target_direction":          result2.get("target_direction", ""),
@@ -384,7 +403,7 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
         "llm_model":             adapter.model,
     }
 
-    _write_debug("06_final_result.json", json.dumps(result, ensure_ascii=False, indent=2))
+    _write_debug("06_final_result.json", json.dumps(result, ensure_ascii=False, indent=2), debug_run_id)
 
     # Artikel als Anker für zukünftige Analysen speichern
     add_anchor(
