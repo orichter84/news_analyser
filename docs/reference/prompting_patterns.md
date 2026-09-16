@@ -31,10 +31,14 @@ and [bias-validation.md](../concepts/validation/bias-validation.md).
 ## Foundational patterns (ADRs 0001–0006)
 
 ### F1. Remove the bias structurally, don't ask the model to compensate for it
-**Mechanism:** Pass 0 (`group_detector.py`) identifies human-group identifiers in the
-original text; combined with spaCy NER, both get replaced with neutral placeholders
-(`Akteur_A`, `Status_X`, …) via the `anonymizer/` package *before* Pass 1 ever sees the
-text.
+**Mechanism:** three ordered preprocessing steps run before Pass 1 ever sees the text
+(`anonymizer/strategy.py`'s `AnonymizationStrategy.anonymize()`): (1) `normalize()`
+rewrites ideologically loaded vocabulary to neutral synonyms in plain text — no
+placeholder, just a lexical substitution (`_normalizations.py`'s `IDEOLOGICAL_TERMS`,
+e.g. `"antifa"` → `"extremisten"`, `"kommunistisch"` → `"ideologisch"`); (2) `ner()`
+replaces spaCy-detected persons/organisations with typed, numbered placeholders
+(`Person-A`, `Org-A`, …); (3) `replace_groups()` replaces the Pass-0-detected group
+terms with `Gruppe-A`, `Gruppe-B`, ….
 **Why:** [0001](../concepts/decisions/0001-pass0-group-detection-and-quote-stripping.md)
 is explicit that this was a fallback, not the first attempt: *"Prompt-engineering alone
 ('please be unbiased') did not reliably fix this"* — the original 2026-05-26 symmetry
@@ -45,6 +49,15 @@ instruction to neutralise it.
 **Model attribution:** cross-model by design and by result — the later repeat tests in
 bias-validation.md (Claude CLI, Qwen3-14B, GPT-OSS-20B) all land near 0.00 difference
 after this structural fix, confirming it holds regardless of which model runs Pass 1.
+**Correction (caught in review by GPT-5.6 Terra, 2026-09-16):** an earlier version of
+this entry, and `pass1.md` itself, describe the placeholders as `Akteur_A`/`Status_X`.
+That naming doesn't exist anywhere in the current anonymizer — it produces `Person-A`,
+`Org-A`, `Gruppe-A`. `pass1.md`'s own example text is stale relative to its
+implementation, not just this doc; worth a follow-up fix to `pass1.md` itself (not done
+here). The earlier version of this entry also omitted the ideological-term
+normalization step entirely — a real gap, not just an imprecision, since it's a third,
+distinct mechanism (lexical substitution, no placeholder) alongside the two placeholder
+based steps.
 
 ### F2. An instructed self-check can replace structural anonymisation — for the *right* axis
 **Mechanism:** pass1.md's opening "Critical symmetry rule": mentally swap all
@@ -70,9 +83,16 @@ the original single `bias_score` conflated *how extreme* a text reads (inherentl
 graduated, qualitative judgment — well suited to a direct LLM float) with *how many*
 manipulation techniques it uses (a plain count — poorly suited to asking the model for
 a number directly, since that number becomes unauditable). Letting the model produce a
-list of individually-groundable instances (each with its own quote, see
-"Grounding-as-verification" below) and computing the density mechanically keeps the count checkable in a way a single
-requested float never could be.
+list of instances that each carry a quote (see "Grounding-as-verification" below) and
+computing the density mechanically means every unit that feeds the count can at least
+be traced back to a specific, existence-checked location in the source text — a single
+requested float never offers that. **Precision, per review feedback:** this is
+auditability, not correctness-verification — grounding confirms a cited string exists
+in the source (and isn't over-counted), not that the `technique` label attached to it
+is the right one, and not that two overlapping quotes filed under different technique
+names aren't really the same rhetorical act double-counted twice (a real, still-open
+gap — see the "Substring-Lücke" in
+[`bernays_score_pipeline_analysis.md`](../analyses/bernays_score_pipeline_analysis.md)).
 
 ### F4. Split a conflated concept into independently-scored outputs
 **Mechanism:** `orwell_index` (Pass 1) and `dunning_kruger_index` (Pass 2) are scored
@@ -150,7 +170,8 @@ to the model.
 ## Recalibration-era patterns (ADRs 0007–0010)
 
 ### 1. Grounding-as-verification, not grounding-as-trust
-**Mechanism:** require a verbatim quote for a claim, then verify it against the source text in code (`_validate_quote_grounding`, `_validate_manipulation_target_grounding`, `_validate_stroemung_grounding`) and drop/null whatever doesn't check out.
+**Mechanism:** require a verbatim quote for a claim, then check two things in code — does the exact string occur in the source text at all, and is it claimed more times than it actually occurs (`_validate_quote_grounding`, `_validate_manipulation_target_grounding`, `_validate_stroemung_grounding`) — dropping/nulling whatever fails either check.
+**Scope (precision, per review feedback):** this verifies that the cited *string* exists and isn't over-counted — it does not verify that the *label* attached to it (which technique, which role) is the correct one, and it does not catch two different labels citing overlapping-but-distinct quotes for what's really the same rhetorical instance. "Grounded" means existence-checked, not semantically correct.
 **Model attribution:** originated for **local models** (Qwen3/GPT-OSS) — the `_validate_quote_grounding` docstring names two hallucination patterns "observed with local models": fabricated quotes and inflated occurrence counts. Later found necessary for **Gemini** too, in a different failure mode: [0007](../concepts/decisions/0007-manipulation-target-grounding.md) found Gemini "never appeared to use" the permitted `null` fallback for an ungrounded classification — Claude did, correctly and conservatively. So the same mechanism catches two distinct failure modes from two different model families; neither model's prompt-level self-restraint could be trusted alone.
 
 ### 2. Match the evidence format to the nature of the judgment
@@ -185,9 +206,32 @@ to the model.
 **Mechanism:** *"If you can't name a specific quote, the score can't be above 0.3"* ([0010](../concepts/decisions/0010-quote-amplification-grounding-and-debug-run-history.md)) — converts a request for justification into a decision rule, without code enforcement.
 **Model attribution:** untested which model(s) this actually disciplines — added in response to an observed **Gemini** blackbox score, not yet re-run to confirm it changes Gemini's behaviour (see [0010](../concepts/decisions/0010-quote-amplification-grounding-and-debug-run-history.md)'s consequences section: "can only be confirmed by re-running it").
 
-### 10. Concrete calibration anchors, static and dynamic
-**Mechanism:** static historical examples (NSDAP/SED/AfD label sets in `pass2.md`) plus dynamic RAG anchors (`anchor_store.py`, k=3 similar prior analyses embedded into the Pass 1 prompt).
-**Model attribution:** motivated by a cross-model concern from the original problem statement in [analyse_architektur.md](analyse_architektur.md): *"Model drift: When switching models, calibration shifted without warning."* Confirmed empirically across all four tested models in [bias-validation.md](../concepts/validation/bias-validation.md) — raw scale bands (e.g. "0.4–0.6") land at different absolute severities per model (compare Qwen3's Orwell 1.00 vs. GPT-OSS's 0.80 on the identical synthetic Test 01), so anchoring is what keeps cross-model comparison meaningful at all.
+### 10. Concrete calibration anchors — static (curated) vs. dynamic (unvalidated)
+**Mechanism:** two mechanisms of a different character, bundled under one name:
+- **Static:** hand-written historical examples (NSDAP/SED/AfD label sets in `pass2.md`)
+  — fixed, human-authored, reviewed as part of writing the prompt.
+- **Dynamic (RAG):** `anchor_store.py` embeds the k=3 most similar *prior automated
+  analyses* into the Pass 1 prompt once the anchor collection holds ≥ `MIN_ANCHORS`
+  (5) entries. `add_anchor()` is called unconditionally after every single
+  `analyze_article()` run (`analyzer.py`) — there is no quality filter, human review,
+  or outlier check before a result becomes a future calibration reference.
+**Why (motivation, not a demonstrated fix — correction per review feedback):** the
+original problem statement in [analyse_architektur.md](analyse_architektur.md) names
+*"Model drift: When switching models, calibration shifted without warning"* as the
+motivating concern, and [bias-validation.md](../concepts/validation/bias-validation.md)
+does demonstrate the *problem* this is meant to address — the same qualitative band
+lands at different absolute severities per model (Qwen3's Orwell 1.00 vs. GPT-OSS's
+0.80 on identical synthetic Test 01). **What isn't demonstrated:** that RAG anchoring
+actually closes that gap — no test in this repo compares the same input with anchors
+on vs. off. Treat "anchoring improves cross-model comparability" as the hypothesis the
+mechanism was built to test, not a confirmed effect.
+**Known risk, not yet mitigated:** because dynamic anchors are unfiltered past model
+judgments, a single over- or under-scored analysis becomes a calibration reference for
+future similar articles — a feedback loop that could reinforce miscalibration instead
+of correcting it. Already flagged as a code-confirmed mechanism (if not yet an
+empirically confirmed *effect*) in
+[`meta_validierung_gemini_analysen.md`](../analyses/meta_validierung_gemini_analysen.md)
+§5 ("Anker-Feedback-Loop").
 
 ---
 
@@ -198,3 +242,28 @@ Not every failure mode is a prompting problem. The `normalize_stroemung` negatio
 ## A meta-pattern: symmetry/comparison testing as the diagnostic method
 
 Nearly every finding above came from the same methodology, not from reading the prompt and guessing: run the **identical** input through multiple models (or the same model repeatedly), diff the outputs, and only then hypothesise a cause. [bias-validation.md](../concepts/validation/bias-validation.md)'s group-substitution tests and [0008](../concepts/decisions/0008-gemini-orwell-index-recalibration.md)'s repeated-run variance table are both this same method applied to different axes (group identity vs. run-to-run stability). [0010](../concepts/decisions/0010-quote-amplification-grounding-and-debug-run-history.md)'s debug-run archive exists specifically so this method stays available going forward instead of losing its raw data after the next run.
+
+---
+
+## Review note (GPT-5.6 Terra, 2026-09-16)
+
+An external review of this document found three issues, all confirmed against the
+code and corrected in place above rather than left as a separate errata list:
+
+1. **F1** described stale placeholder names (`Akteur_A`/`Status_X`) that don't match
+   the current anonymizer (`Person-A`/`Org-A`/`Gruppe-A`), and omitted the ideological-
+   term normalization step entirely. The stale names also turned out to still be
+   present in `pass1.md` itself, not just in this doc — a real inconsistency worth a
+   follow-up fix there, not done as part of this correction.
+2. **Pattern #1 / F3** used "verify"/"auditable" language that implied more than the
+   grounding checks actually establish — they confirm a cited string exists (and isn't
+   over-counted), not that its label is the correct one. Scoped explicitly now.
+3. **Pattern #10** stated that RAG anchoring "keeps cross-model comparison meaningful"
+   as a confirmed effect, when the cited evidence only demonstrates the problem it's
+   meant to address, not that the mechanism solves it — reframed as a hypothesis, with
+   the dynamic anchors' unvalidated-feedback-loop risk made explicit rather than
+   implied only by omission.
+
+The review's overall assessment: the architecture description and code references hold
+up; the main weakness was evidence language — several claims generalised from a small
+number of runs without clearly separating "observed once" from "reproducibly tested."
