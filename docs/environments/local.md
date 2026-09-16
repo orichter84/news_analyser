@@ -109,6 +109,21 @@ Gemini is accessed through its OpenAI-compatible endpoint. When Gemini rejects a
 request because its quota is exhausted, the RSS watcher records a 24-hour
 cooldown in `data/` before trying further feed articles.
 
+### Option F: Mistral
+
+```
+LLM_PROVIDER=mistral
+MISTRAL_API_KEY=...  # from console.mistral.ai
+```
+
+Also accessed through an OpenAI-compatible endpoint (`https://api.mistral.ai/v1`).
+Default model is `mistral-medium-latest` — `mistral-large-latest` returned
+`403 tier_not_allowed` on the free "Experiment" tier when tested; check
+`GET /v1/models` with your own key to see what your tier actually unlocks.
+The free tier also rate-limits to ~1 request/second and ~500K tokens/minute —
+evaluation-only, not for feed/production volume. Override the model with
+`LLM_MODEL` if needed.
+
 ## 5. Start the application
 
 Start the full stack (ChromaDB + backend + frontend) with a single command:
