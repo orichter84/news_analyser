@@ -150,6 +150,14 @@ handling:
 
 Default model is `gemini-3.8-flash`; override with `LLM_MODEL` (e.g.
 `claude-sonnet-5`, `gpt-5.4`, `grok-4.6`, depending on your Copilot plan).
+
+> **`LLM_MODEL` is read by every CLI-style adapter, not just this one** — it's
+> also the model override for `LLM_PROVIDER=cli` (Option A). If you set
+> `LLM_MODEL` here for `copilot_cli` and later switch back to
+> `LLM_PROVIDER=cli`, the Claude CLI will get called with that same model
+> name and fail. Leave `LLM_MODEL` unset unless you're actively using the
+> provider it's meant for, or unset/change it when you switch providers.
+
 The CLI doesn't expose a `--list-models` flag — `copilot --model <invalid>`
 returns an error but not the valid list; asking the model itself (`copilot -p
 "List the exact model IDs selectable via --model"`) worked in practice, and

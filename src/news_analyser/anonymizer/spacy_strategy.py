@@ -7,7 +7,6 @@ import spacy
 
 from ._grammar import _match_case
 from ._normalizations import IDEOLOGICAL_TERMS, _ENTITY_BLOCKLIST
-from ._result import AnonymizationResult
 from .strategy import AnonymizationStrategy
 
 

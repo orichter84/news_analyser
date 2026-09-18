@@ -12,7 +12,6 @@ import logging
 import re
 from typing import Any
 
-import llm_adapter
 from ..prompts import load_prompt
 from .errors import raise_if_gemini_quota_error
 

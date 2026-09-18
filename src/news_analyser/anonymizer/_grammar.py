@@ -85,39 +85,7 @@ _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 _PERSON_PLACEHOLDER = re.compile(r"\bPerson-[A-Z]+\b")
 
 
-def fix_pronouns(text: str) -> str:
-    """Replace masculine pronouns throughout the text if any Person-X placeholder exists.
-
-    Pronouns frequently refer across sentence boundaries, so a global replacement
-    is more reliable than per-sentence matching.
-    """
-    if not _PERSON_PLACEHOLDER.search(text):
-        return text
-    for pattern, replacement in _PRONOUN_MAP:
-        text = pattern.sub(
-            lambda m, r=replacement: _match_case(m.group(0), r), text
-        )
-    return text
-
-
 def _match_case(original: str, replacement: str) -> str:
     if original[0].isupper():
         return replacement[0].upper() + replacement[1:]
     return replacement
-
-
-def fix_article_agreement(text: str) -> str:
-    """Replace wrong article forms before neuter kinship-replacement nouns."""
-    for pattern in ARTICLE_FIX_PATTERNS:
-        text = pattern.sub(_replace_article, text)
-    text = ERWACHSENER_ACC.sub(r"\1 Erwachsenen", text)
-    return text
-
-
-def _replace_article(m: re.Match[str]) -> str:
-    article = m.group(1)
-    noun = m.group(2)
-    correct = _MASC_TO_NEUT[article.lower()]
-    if article[0].isupper():
-        correct = correct[0].upper() + correct[1:]
-    return f"{correct} {noun}"

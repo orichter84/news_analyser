@@ -102,6 +102,7 @@
 - [ ] **Manually curated anchor corpus** — initial curation with verified reference articles for better cold-start calibration
 - [x] **Unit tests** — populate tests/: scraper mocks, JSON parser, adapter interface, Gemini quota-error classification, feed cooldown persistence (`pytest`, see `requirements-dev.txt`)
 - [ ] **Analysis validation** — verify that returned quote fields are actually present in the article text
+- [ ] **Automated dead-code scan** — a Claude Code skill/agent that runs `ruff`+`vulture` and then filters the raw findings against this codebase's known false-positive patterns (FastAPI route handlers, Pydantic schema fields, `initialize()` overrides required by the external `llm_adapter` interface, `__all__` exports, stale doc cross-references) before reporting. Plain lint rules alone are too noisy here to run unattended; see the manual pass done 2026-09-18 (removed `LLMConfig`, `fix_pronouns`/`fix_article_agreement`, `role_store.get_all_roles`/`get_role`, several unused imports).
 
 ### Language Models & Local Models
 - [ ] **Adapt local models for language specialisation**

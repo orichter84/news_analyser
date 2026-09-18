@@ -1,7 +1,5 @@
 """Unit tests for CopilotCliAdapter that don't require the real `copilot` binary."""
 
-from pathlib import Path
-
 from news_analyser.copilot_cli_adapter import CopilotCliAdapter
 
 

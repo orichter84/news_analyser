@@ -4,17 +4,8 @@ Note: .env is loaded by the news_analyser package __init__.py — no load_dotenv
 """
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-
-
-@dataclass(frozen=True)
-class LLMConfig:
-    provider: str
-
-    @classmethod
-    def from_env(cls) -> "LLMConfig":
-        return cls(provider=os.environ.get("LLM_PROVIDER", "openai"))
 
 
 @dataclass(frozen=True)

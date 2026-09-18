@@ -4,7 +4,6 @@ role_store — Verwaltet Rollen-Definitionen für Manipulation-Targets.
 Zweck:
   1. Prompt-Injection  — format_roles_for_prompt() erzeugt den Rollen-Block für pass2.md
   2. Normalisierung    — normalize_role() mappt LLM-Freitext auf kanonische Namen
-  3. Knowledge Base    — get_all_roles() liefert alle Rollen für die API
 
 Normalisierung (kein ChromaDB — die Liste ist kurz und besteht aus Einzelwörtern):
   1. Exakter Treffer
@@ -68,16 +67,3 @@ def format_roles_for_prompt() -> str:
             line += " *(correlates with elevated Dunning-Kruger-Index)*"
         lines.append(line)
     return "\n".join(lines)
-
-
-def get_all_roles() -> list[dict[str, Any]]:
-    """Gibt alle Rollen-Definitionen zurück (für die Knowledge-Base-API)."""
-    return _ROLES
-
-
-def get_role(role_id: str) -> dict[str, Any] | None:
-    """Gibt eine einzelne Rolle per ID zurück."""
-    for role in _ROLES:
-        if role["id"] == role_id:
-            return role
-    return None
