@@ -64,6 +64,10 @@ Then set in `.env`:
 LLM_PROVIDER=cli
 ```
 
+Default model is `claude-opus-4-5`, fixed as a project default in
+`src/news_analyser/__init__.py`; override with `CLAUDE_CLI_MODEL` if needed
+(provider-specific — doesn't affect other providers).
+
 ### Option B: Anthropic API
 
 ```
@@ -109,6 +113,9 @@ Gemini is accessed through its OpenAI-compatible endpoint. When Gemini rejects a
 request because its quota is exhausted, the RSS watcher records a 24-hour
 cooldown in `data/` before trying further feed articles.
 
+Default model is `gemini-2.5-flash`, fixed as a project default in
+`src/news_analyser/__init__.py`; override with `GEMINI_MODEL` if needed.
+
 ### Option F: Mistral
 
 ```
@@ -117,12 +124,13 @@ MISTRAL_API_KEY=...  # from console.mistral.ai
 ```
 
 Also accessed through an OpenAI-compatible endpoint (`https://api.mistral.ai/v1`).
-Default model is `mistral-medium-latest` — `mistral-large-latest` returned
+Default model is `mistral-medium-latest`, fixed as a project default in
+`src/news_analyser/__init__.py` — `mistral-large-latest` returned
 `403 tier_not_allowed` on the free "Experiment" tier when tested; check
 `GET /v1/models` with your own key to see what your tier actually unlocks.
 The free tier also rate-limits to ~1 request/second and ~500K tokens/minute —
 evaluation-only, not for feed/production volume. Override the model with
-`LLM_MODEL` if needed.
+`MISTRAL_MODEL` if needed.
 
 ### Option G: GitHub Copilot CLI
 
@@ -148,15 +156,20 @@ handling:
   no found flag to disable it — the adapter assigns its own `--session-id` per
   call and deletes exactly that directory afterward.
 
-Default model is `gemini-3.8-flash`; override with `LLM_MODEL` (e.g.
+Default model is `gemini-3.8-flash`, fixed as a project default in
+`src/news_analyser/__init__.py`; override with `COPILOT_MODEL` (e.g.
 `claude-sonnet-5`, `gpt-5.4`, `grok-4.6`, depending on your Copilot plan).
 
-> **`LLM_MODEL` is read by every CLI-style adapter, not just this one** — it's
-> also the model override for `LLM_PROVIDER=cli` (Option A). If you set
-> `LLM_MODEL` here for `copilot_cli` and later switch back to
-> `LLM_PROVIDER=cli`, the Claude CLI will get called with that same model
-> name and fail. Leave `LLM_MODEL` unset unless you're actively using the
-> provider it's meant for, or unset/change it when you switch providers.
+> **Model selection is provider-specific, not global.** Each provider that
+> ships with a project default (`gemini`, `mistral`, `cli`, `copilot_cli`) has
+> its own override variable (`GEMINI_MODEL`, `MISTRAL_MODEL`,
+> `CLAUDE_CLI_MODEL`, `COPILOT_MODEL`) instead of sharing the generic
+> `LLM_MODEL`/`OPENAI_MODEL` — this used to bite people switching
+> `LLM_PROVIDER`: a model set for one provider silently applied to whichever
+> provider was selected next. `LLM_MODEL`/`OPENAI_MODEL` still exist as the
+> fallback for providers without a project default (`openai`, `anthropic`,
+> `lm_studio`, `copilot`, `m365_copilot` — Options B/C/D), where the model is
+> expected to be a per-deployment choice rather than a tested project default.
 
 The CLI doesn't expose a `--list-models` flag — `copilot --model <invalid>`
 returns an error but not the valid list; asking the model itself (`copilot -p
