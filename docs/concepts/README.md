@@ -29,6 +29,7 @@ commit messages and scattered conversations.
 | [0009](decisions/0009-pipeline-hardening-after-gemini-meta-review.md) | Pipeline hardening: stroemung grounding/normalization, technique dedup, Bernays denominator, DK explanation | 2026-09-15 | Active |
 | [0010](decisions/0010-quote-amplification-grounding-and-debug-run-history.md) | Quote Amplification grounding, institutional-motive carve-out, debug run history | 2026-09-16 | Active |
 | [0011](decisions/0011-strict-stroemung-grounding.md) | Require a verifiable quote for every non-`neutral` politische_stroemung label | 2026-09-16 | Active |
+| [0012](decisions/0012-technique-negation-guard-and-anchor-stroemung-flattening.md) | Extend the negation guard to technique normalization; fix anchor politische_stroemung storage | 2026-09-18 | Active |
 
 Not every historical decision is captured yet — this started 2026-09-13 with a
 handful of foundational and recent milestones rather than a full retroactive rewrite

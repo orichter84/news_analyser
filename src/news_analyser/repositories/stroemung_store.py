@@ -21,6 +21,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 from .chroma_client import get_client
+from .negation_guard import is_oppositional
 
 logger = logging.getLogger(__name__)
 
@@ -31,21 +32,6 @@ _EMBED_FN = embedding_functions.SentenceTransformerEmbeddingFunction(
 )
 # Cosine distance threshold: < 0.35 -> accept canonical mapping
 _MATCH_THRESHOLD = 0.35
-
-# Sentence-transformer embeddings don't reliably separate a term from its
-# negation for short German compounds — "islamkritisch" (critical of Islam)
-# lands at cosine distance ~0.09 from "islamistisch" (Islamist), and
-# "antifeministisch" at ~0.18 from "feministisch": well inside the match
-# threshold despite being near-opposite stances. Any label built from one of
-# these markers is a critical/oppositional stance on the root concept, not a
-# spelling variant of it, so it must skip semantic matching entirely rather
-# than risk being collapsed onto the concept it opposes.
-_NEGATION_MARKERS = ["anti", "kritisch", "gegner", "feindlich", "skeptisch", "ablehnend"]
-
-
-def _is_oppositional(label: str) -> bool:
-    lower = label.lower()
-    return any(marker in lower for marker in _NEGATION_MARKERS)
 
 
 def _load_stroemungen() -> list[dict[str, Any]]:
@@ -87,7 +73,7 @@ def normalize_stroemung(label: str) -> str:
         return label
     if label in _CANONICAL_NAMES:
         return label
-    if _is_oppositional(label):
+    if is_oppositional(label):
         return label
 
     col = _get_collection()

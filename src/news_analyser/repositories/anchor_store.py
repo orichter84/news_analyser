@@ -20,6 +20,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 from .chroma_client import get_client
+from .db_storage import _extract_stroemung_labels
 
 _COLLECTION = "orwell_anchors"
 _EMBED_FN   = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -56,9 +57,17 @@ def get_similar_anchors(text: str, k: int = K_RESULTS) -> list[dict[str, Any]]:
 
     anchors = []
     for i, meta in enumerate(results["metadatas"][0]):
+        raw_stroemung = meta.get("politische_stroemung", '["neutral"]')
+        try:
+            parsed = json.loads(raw_stroemung) if isinstance(raw_stroemung, str) else raw_stroemung
+        except Exception:
+            parsed = [raw_stroemung]
+        # Anchors written before this fix may still hold the unflattened
+        # list[dict] format — _extract_stroemung_labels handles both.
+        labels = _extract_stroemung_labels(parsed) if isinstance(parsed, list) else [str(parsed)]
         anchors.append({
             "orwell_index":         meta.get("orwell_index", 0.0),
-            "politische_stroemung": meta.get("politische_stroemung", "neutral"),
+            "politische_stroemung": ", ".join(labels) if labels else "neutral",
             "domain":               meta.get("domain", ""),
             "excerpt":              results["documents"][0][i][:300],
             "similarity":           round(1 - results["distances"][0][i], 3),
@@ -69,18 +78,25 @@ def get_similar_anchors(text: str, k: int = K_RESULTS) -> list[dict[str, Any]]:
 def add_anchor(
     text: str,
     orwell_index: float,
-    politische_stroemung: list[str],
+    politische_stroemung: list[Any],
     domain: str,
     source_url: str,
 ) -> None:
-    """Speichert einen analysierten Artikel als Anker-Referenz."""
+    """Speichert einen analysierten Artikel als Anker-Referenz.
+
+    `politische_stroemung` kommt aus analyzer.py als das ungefilterte Pass-2-Feld
+    (list[dict] mit {label, quote} im aktuellen pass2.md-Schema, nicht list[str])
+    -- vor dem Speichern auf reine Label-Strings flatten, sonst landet der rohe
+    JSON-Blob samt Zitattext im Pass-1-Kalibrierungstext (`format_anchors_for_prompt`).
+    Dieselbe Flatten-Logik wie db_storage.py's Top-Level-Metadaten.
+    """
     col = _get_collection()
     col.upsert(
         ids=[source_url],
         documents=[text],
         metadatas=[{
             "orwell_index":         orwell_index,
-            "politische_stroemung": json.dumps(politische_stroemung, ensure_ascii=False),
+            "politische_stroemung": json.dumps(_extract_stroemung_labels(politische_stroemung), ensure_ascii=False),
             "domain":               domain,
             "source_url":           source_url,
         }],

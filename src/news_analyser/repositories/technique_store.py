@@ -20,6 +20,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 from .chroma_client import get_client
+from .negation_guard import is_oppositional
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +80,18 @@ def format_techniques_for_prompt() -> str:
 
 def normalize_technique(name: str) -> str:
     """Sucht den semantisch naechsten kanonischen Techniken-Namen.
-    Gibt den Original-Namen zurueck wenn keine gute Uebereinstimmung gefunden wird."""
+    Gibt den Original-Namen zurueck wenn keine gute Uebereinstimmung gefunden wird.
+
+    Skips semantic matching for negated/critical labels (e.g. "anti-Appeal to
+    Fear", "Emotional Manipulation-kritisch") — same embedding-similarity
+    collapse fixed for normalize_stroemung in ADR 0009, confirmed here via
+    notebooks/normalization_check.ipynb.
+    """
+    if not name:
+        return name
+    if is_oppositional(name):
+        return name
+
     col = _get_collection()
     _ensure_seeded(col)
 
