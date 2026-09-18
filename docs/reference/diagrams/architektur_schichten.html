@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News Analyser Architektur</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --surface:#ffffff;
+    --band-bg:#eef1f5;
+    --band-bg-core:#e3f4f1;
+    --border:#d5dbe2;
+    --border-strong:#b7c1cc;
+    --ink:#1b2430;
+    --ink-soft:#5c6672;
+    --ink-mute:#8994a1;
+    --accent:#0d7a71;
+    --accent-soft:#d7f0ec;
+    --accent-ink:#075048;
+    --path-read:#8b96a3;
+    --shadow: 0 1px 2px rgba(20,30,40,.06), 0 8px 24px rgba(20,30,40,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e141b;
+      --surface:#141b24;
+      --band-bg:#182029;
+      --band-bg-core:#12312e;
+      --border:#2a323d;
+      --border-strong:#3c4956;
+      --ink:#e8ecf1;
+      --ink-soft:#aab4c0;
+      --ink-mute:#7c8794;
+      --accent:#3ddbc9;
+      --accent-soft:rgba(61,219,201,.14);
+      --accent-ink:#8ff0e3;
+      --path-read:#5c6772;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e141b;
+    --surface:#141b24;
+    --band-bg:#182029;
+    --band-bg-core:#12312e;
+    --border:#2a323d;
+    --border-strong:#3c4956;
+    --ink:#e8ecf1;
+    --ink-soft:#aab4c0;
+    --ink-mute:#7c8794;
+    --accent:#3ddbc9;
+    --accent-soft:rgba(61,219,201,.14);
+    --accent-ink:#8ff0e3;
+    --path-read:#5c6772;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.35);
+  }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+    padding:32px 20px 48px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+  }
+  .wrap{ width:100%; max-width:1080px; display:flex; flex-direction:column; gap:22px; }
+
+  header h1{
+    font-size:clamp(22px,4vw,30px);
+    font-weight:700;
+    letter-spacing:-.01em;
+    margin:0 0 8px;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:15px;
+    line-height:1.55;
+    max-width:64ch;
+  }
+  header code{
+    font-family:"IBM Plex Mono", monospace;
+    background:var(--band-bg);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1px 5px;
+    font-size:.92em;
+    color:var(--ink);
+  }
+
+  figure{ margin:0; }
+  .diagram-scroll{
+    overflow-x:auto;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:var(--surface);
+    box-shadow:var(--shadow);
+    padding:8px;
+  }
+  svg{ display:block; min-width:920px; max-width:100%; height:auto; }
+  figcaption{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--ink-mute);
+    line-height:1.5;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px 28px;
+    padding:14px 18px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .legend-item{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  .legend-item svg{ min-width:0; }
+
+  .detail{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:14px;
+  }
+  .detail .card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .detail .card h3{
+    margin:0 0 6px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--accent-ink);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .detail .card p{
+    margin:0;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+  }
+  .detail .card code{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.9em;
+    color:var(--ink);
+  }
+
+  /* SVG text defaults */
+  svg text{ font-family:"IBM Plex Sans", system-ui, sans-serif; fill:var(--ink); }
+  .mono{ font-family:"IBM Plex Mono", monospace; }
+  .band-title{ font-size:14px; font-weight:600; fill:var(--ink); }
+  .band-sub{ font-size:11px; fill:var(--ink-mute); }
+  .chip-title{ font-size:12.5px; font-weight:600; fill:var(--ink); }
+  .chip-file{ font-size:10.5px; fill:var(--ink-soft); }
+  .chip-note{ font-size:9.5px; fill:var(--ink-mute); }
+  .edge-label{ font-size:10px; fill:var(--ink-soft); }
+  .edge-label-accent{ font-size:10px; fill:var(--accent-ink); font-weight:500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>News Analyser — Architektur in Schichten</h1>
+    <p>
+      Fünf Schichten von den Einstiegspunkten bis zu den externen Systemen, gezeichnet
+      aus den tatsächlichen Imports von <code>backend/</code> und <code>src/news_analyser/</code>.
+      Der auffälligste Fund: Lesezugriffe (<code>GET</code>) umgehen die Analyse-Pipeline komplett
+      und sprechen die Repositories direkt an — nur <code>POST /analyse</code>, die CLI und der
+      Feed-Loop durchlaufen sie vollständig.
+    </p>
+  </header>
+
+  <figure>
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1180 1090" role="img" aria-label="Schichtendiagramm des News-Analyser-Python-Codes: Schnittstellen (FastAPI, CLI, Feed-Loop) oben, darunter Vorverarbeitung, Analyse-Pipeline, Repositories und externe Systeme (ChromaDB, LLM-Provider) unten; links ein Querschnitts-Streifen für Bootstrap, Config, Logging und Fehlerklassifikation. Ein durchgezogener Pfad zeigt die vollständige Analyse-Pipeline, ein gestrichelter Pfad zeigt, wie Lese-Endpunkte die Pipeline umgehen und Repositories direkt lesen.">
+
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- ============ Querschnitt rail ============ -->
+        <rect x="20" y="70" width="140" height="946" rx="12" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 4"/>
+        <text x="90" y="94" text-anchor="middle" class="band-sub" style="font-weight:600; letter-spacing:.03em;">QUERSCHNITT</text>
+        <text x="90" y="108" text-anchor="middle" class="chip-note">genutzt von allen Schichten</text>
+
+        <!-- cross-cutting chips -->
+        <g>
+          <rect x="32" y="130" width="116" height="46" rx="7" fill="var(--band-bg)" stroke="var(--border-strong)"/>
+          <text x="90" y="149" text-anchor="middle" class="chip-title">Bootstrap</text>
+          <text x="90" y="163" text-anchor="middle" class="chip-file mono">__init__.py</text>
+        </g>
+        <g>
+          <rect x="32" y="188" width="116" height="46" rx="7" fill="var(--band-bg)" stroke="var(--border-strong)"/>
+          <text x="90" y="207" text-anchor="middle" class="chip-title">Config</text>
+          <text x="90" y="221" text-anchor="middle" class="chip-file mono">config.py</text>
+        </g>
+        <g>
+          <rect x="32" y="246" width="116" height="46" rx="7" fill="var(--band-bg)" stroke="var(--border-strong)"/>
+          <text x="90" y="265" text-anchor="middle" class="chip-title">Logging</text>
+          <text x="90" y="279" text-anchor="middle" class="chip-file mono">logging_config.py</text>
+        </g>
+        <g>
+          <rect x="32" y="304" width="116" height="52" rx="7" fill="var(--band-bg)" stroke="var(--border-strong)"/>
+          <text x="90" y="323" text-anchor="middle" class="chip-title">Fehler-</text>
+          <text x="90" y="337" text-anchor="middle" class="chip-title">klassifikation</text>
+          <text x="90" y="350" text-anchor="middle" class="chip-file mono">agents/errors.py</text>
+        </g>
+
+        <!-- ============ Layer 1: Schnittstellen (y 70-230) ============ -->
+        <rect x="180" y="70" width="980" height="160" rx="12" fill="var(--band-bg)" stroke="var(--border)"/>
+        <text x="198" y="94" class="band-title">1 · Schnittstellen</text>
+        <text x="198" y="110" class="band-sub">Entry Points — nehmen Anfragen entgegen</text>
+
+        <!-- L1 chip 1: FastAPI Backend -->
+        <rect x="198" y="122" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="350.5" y="144" text-anchor="middle" class="chip-title">FastAPI Backend</text>
+        <text x="350.5" y="160" text-anchor="middle" class="chip-file mono">backend/main.py + routers/</text>
+        <text x="350.5" y="176" text-anchor="middle" class="chip-note">+ schemas/ (Pydantic-DTOs)</text>
+        <text x="350.5" y="194" text-anchor="middle" class="chip-note">articles · analyse · stats · search</text>
+        <text x="350.5" y="207" text-anchor="middle" class="chip-note">techniques · status</text>
+
+        <!-- L1 chip 2: CLI -->
+        <rect x="517" y="122" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="669.5" y="144" text-anchor="middle" class="chip-title">CLI · Einzelartikel</text>
+        <text x="669.5" y="160" text-anchor="middle" class="chip-file mono">main.py</text>
+        <text x="669.5" y="180" text-anchor="middle" class="chip-note">run(url) — fetch → analyse → store</text>
+
+        <!-- L1 chip 3: Feed -->
+        <rect x="836" y="122" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="988.5" y="144" text-anchor="middle" class="chip-title">RSS Feed-Loop</text>
+        <text x="988.5" y="160" text-anchor="middle" class="chip-file mono">feed.py</text>
+        <text x="988.5" y="180" text-anchor="middle" class="chip-note">ruft main.run() je Feed-Eintrag</text>
+
+        <!-- feed -> cli intra-layer arrow -->
+        <path d="M836,167 L825,167" stroke="var(--ink-mute)" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+        <text x="830" y="118" text-anchor="end" class="chip-note">run()</text>
+
+        <!-- ============ Layer 2: Vorverarbeitung (y 264-404) ============ -->
+        <rect x="180" y="264" width="980" height="140" rx="12" fill="var(--band-bg)" stroke="var(--border)"/>
+        <text x="198" y="288" class="band-title">2 · Vorverarbeitung</text>
+        <text x="198" y="304" class="band-sub">bereitet Rohtext für die Pipeline auf</text>
+
+        <rect x="198" y="316" width="465" height="72" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="430.5" y="338" text-anchor="middle" class="chip-title">Scraper</text>
+        <text x="430.5" y="354" text-anchor="middle" class="chip-file mono">scraper.py</text>
+        <text x="430.5" y="370" text-anchor="middle" class="chip-note">fetch_article() — trafilatura + BS4-Fallback</text>
+
+        <rect x="677" y="316" width="465" height="72" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="909.5" y="338" text-anchor="middle" class="chip-title">Themen-Filter</text>
+        <text x="909.5" y="354" text-anchor="middle" class="chip-file mono">topic_filter.py</text>
+        <text x="909.5" y="370" text-anchor="middle" class="chip-note">is_relevant() — keywordbasiert, ohne LLM</text>
+
+        <!-- ============ Layer 3: Analyse-Pipeline (y 438-638) ============ -->
+        <rect x="180" y="438" width="980" height="200" rx="12" fill="var(--band-bg)" stroke="var(--border)"/>
+        <text x="198" y="462" class="band-title">3 · Analyse-Pipeline</text>
+        <text x="198" y="478" class="band-sub">Orchestrierung — der eigentliche Zwei-Pass-Kern</text>
+
+        <!-- core row -->
+        <rect x="198" y="490" width="305" height="64" rx="8" fill="var(--band-bg-core)" stroke="var(--accent)"/>
+        <text x="350.5" y="510" text-anchor="middle" class="chip-title">Pass 0 · Gruppen</text>
+        <text x="350.5" y="525" text-anchor="middle" class="chip-file mono">agents/group_detector.py</text>
+        <text x="350.5" y="539" text-anchor="middle" class="chip-note">identifiziert Gruppenmarker</text>
+
+        <rect x="517" y="490" width="305" height="64" rx="8" fill="var(--band-bg-core)" stroke="var(--accent)"/>
+        <text x="669.5" y="510" text-anchor="middle" class="chip-title">Pass 1+2 · Analyse</text>
+        <text x="669.5" y="525" text-anchor="middle" class="chip-file mono">agents/analyzer.py</text>
+        <text x="669.5" y="539" text-anchor="middle" class="chip-note">anonymisiert + Original → Scores</text>
+
+        <rect x="836" y="490" width="305" height="64" rx="8" fill="var(--band-bg-core)" stroke="var(--accent)"/>
+        <text x="988.5" y="510" text-anchor="middle" class="chip-title">Statistik-Report</text>
+        <text x="988.5" y="525" text-anchor="middle" class="chip-file mono">stats.py</text>
+        <text x="988.5" y="539" text-anchor="middle" class="chip-note">Pandas-Aggregation über ChromaDB</text>
+
+        <!-- helper row -->
+        <rect x="198" y="574" width="235" height="54" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="315.5" y="593" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Anonymisierung</text>
+        <text x="315.5" y="607" text-anchor="middle" class="chip-file mono" style="font-size:9.5px;">anonymizer/</text>
+        <text x="315.5" y="619" text-anchor="middle" class="chip-note">spaCy NER · Gruppen-Ersetzung</text>
+
+        <rect x="445" y="574" width="235" height="54" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="562.5" y="593" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Keyword-Signal</text>
+        <text x="562.5" y="607" text-anchor="middle" class="chip-file mono" style="font-size:9.5px;">keywords.py</text>
+        <text x="562.5" y="619" text-anchor="middle" class="chip-note">Extremismus-Vorsignal (~20–30%)</text>
+
+        <rect x="692" y="574" width="235" height="54" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="809.5" y="593" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Prompts</text>
+        <text x="809.5" y="607" text-anchor="middle" class="chip-file mono" style="font-size:9.5px;">prompts/</text>
+        <text x="809.5" y="619" text-anchor="middle" class="chip-note">pass1.md / pass2.md laden</text>
+
+        <text x="669.5" y="571" text-anchor="middle" class="chip-note" style="font-size:9px;">nutzt intern</text>
+
+        <!-- bracket: Pass1+2 -> helper row -->
+        <path d="M669.5,554 L669.5,562 L315.5,562 L315.5,574 M669.5,562 L562.5,562 L562.5,574 M669.5,562 L809.5,562 L809.5,574"
+              stroke="var(--ink-mute)" stroke-width="1.25" fill="none"/>
+
+        <!-- ============ Layer 4: Repositories (y 672-822) ============ -->
+        <rect x="180" y="672" width="980" height="150" rx="12" fill="var(--band-bg)" stroke="var(--border)"/>
+        <text x="198" y="696" class="band-title">4 · Repositories</text>
+        <text x="198" y="712" class="band-sub">Datenzugriff — jede Collection ein Store, gebündelt über chroma_client.py</text>
+
+        <!-- 5 chips -->
+        <rect x="198" y="724" width="178" height="80" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="287" y="744" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Artikel</text>
+        <text x="287" y="758" text-anchor="middle" class="chip-file mono" style="font-size:9px;">db_storage.py</text>
+        <text x="287" y="772" text-anchor="middle" class="chip-note" style="font-size:8.5px;">store_result()</text>
+        <text x="287" y="784" text-anchor="middle" class="chip-note" style="font-size:8.5px;">query_similar()</text>
+
+        <rect x="390" y="724" width="178" height="80" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="479" y="744" text-anchor="middle" class="chip-title" style="font-size:11.5px;">RAG-Anker</text>
+        <text x="479" y="758" text-anchor="middle" class="chip-file mono" style="font-size:9px;">anchor_store.py</text>
+        <text x="479" y="772" text-anchor="middle" class="chip-note" style="font-size:8.5px;">Kalibrierungs-</text>
+        <text x="479" y="784" text-anchor="middle" class="chip-note" style="font-size:8.5px;">referenzen</text>
+
+        <rect x="582" y="724" width="178" height="80" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="671" y="744" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Techniken</text>
+        <text x="671" y="758" text-anchor="middle" class="chip-file mono" style="font-size:9px;">technique_store.py</text>
+        <text x="671" y="772" text-anchor="middle" class="chip-note" style="font-size:8.5px;">24 Manipulations-</text>
+        <text x="671" y="784" text-anchor="middle" class="chip-note" style="font-size:8.5px;">techniken</text>
+
+        <rect x="774" y="724" width="178" height="80" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="863" y="744" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Rollen</text>
+        <text x="863" y="758" text-anchor="middle" class="chip-file mono" style="font-size:9px;">role_store.py</text>
+        <text x="863" y="772" text-anchor="middle" class="chip-note" style="font-size:8.5px;">10 Manipulation-</text>
+        <text x="863" y="784" text-anchor="middle" class="chip-note" style="font-size:8.5px;">Targets</text>
+
+        <rect x="966" y="724" width="176" height="80" rx="7" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="1054" y="744" text-anchor="middle" class="chip-title" style="font-size:11.5px;">Strömungen</text>
+        <text x="1054" y="758" text-anchor="middle" class="chip-file mono" style="font-size:9px;">stroemung_store.py</text>
+        <text x="1054" y="772" text-anchor="middle" class="chip-note" style="font-size:8.5px;">politische</text>
+        <text x="1054" y="784" text-anchor="middle" class="chip-note" style="font-size:8.5px;">Strömungen</text>
+
+        <!-- ============ Layer 5: Externe Systeme (y 856-1016) ============ -->
+        <rect x="180" y="856" width="980" height="160" rx="12" fill="var(--band-bg)" stroke="var(--border)"/>
+        <text x="198" y="880" class="band-title">5 · Externe Systeme</text>
+        <text x="198" y="896" class="band-sub">verlassen den Python-Prozess</text>
+
+        <rect x="198" y="908" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="350.5" y="930" text-anchor="middle" class="chip-title">ChromaDB</text>
+        <text x="350.5" y="946" text-anchor="middle" class="chip-file mono">HTTP · localhost:8001</text>
+        <text x="350.5" y="964" text-anchor="middle" class="chip-note">articles · orwell_anchors</text>
+        <text x="350.5" y="977" text-anchor="middle" class="chip-note">techniques</text>
+
+        <rect x="517" y="908" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="669.5" y="930" text-anchor="middle" class="chip-title">LLM-Adapter</text>
+        <text x="669.5" y="946" text-anchor="middle" class="chip-file mono">llm_adapter (Package)</text>
+        <text x="669.5" y="964" text-anchor="middle" class="chip-note">+ copilot_cli_adapter.py</text>
+        <text x="669.5" y="977" text-anchor="middle" class="chip-note">(projekteigen)</text>
+
+        <rect x="836" y="908" width="305" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)"/>
+        <text x="988.5" y="930" text-anchor="middle" class="chip-title">LLM-Provider / CLIs</text>
+        <text x="988.5" y="948" text-anchor="middle" class="chip-note">Claude CLI · Copilot CLI · Gemini</text>
+        <text x="988.5" y="962" text-anchor="middle" class="chip-note">Mistral · OpenAI · Anthropic</text>
+        <text x="988.5" y="976" text-anchor="middle" class="chip-note">LM Studio</text>
+
+        <!-- ============ Accent path: volle Pipeline (Schicht-zu-Schicht, entlang der Zwischenräume) ============ -->
+        <g style="color:var(--accent)">
+          <!-- beide Einstiege (FastAPI /analyse und CLI) münden in denselben Trichter -->
+          <path d="M350.5,212 L350.5,240 M669.5,212 L669.5,240 L350.5,240" stroke="currentColor" stroke-width="2.25" fill="none"/>
+          <path d="M430.5,240 L430.5,316" stroke="currentColor" stroke-width="2.25" fill="none" marker-end="url(#arrow)"/>
+          <path d="M430.5,388 L430.5,410 L669.5,410 L669.5,490" stroke="currentColor" stroke-width="2.25" fill="none" marker-end="url(#arrow)"/>
+          <path d="M669.5,554 L669.5,562 L1000,562 L1000,724" stroke="currentColor" stroke-width="2.25" fill="none" marker-end="url(#arrow)"/>
+        </g>
+        <text x="486" y="234" class="edge-label-accent">fetch_article()</text>
+        <text x="486" y="406" class="edge-label-accent">Artikeltext → analyze_article()</text>
+        <text x="1008" y="600" class="edge-label-accent">Kalibrierung /</text>
+        <text x="1008" y="612" class="edge-label-accent">Normalisierung</text>
+
+        <!-- repositories -> ChromaDB (ein Sammel-Pfeil für die ganze Schicht, via chroma_client.py) -->
+        <path d="M670,822 L670,836 L350.5,836 L350.5,908" stroke="var(--ink-soft)" stroke-width="1.75" fill="none" marker-end="url(#arrow)"/>
+        <text x="510" y="831" text-anchor="middle" class="edge-label">via chroma_client.py</text>
+
+        <!-- LLM-Adapter -> Provider -->
+        <path d="M822,953 L836,953" stroke="var(--ink-soft)" stroke-width="1.75" fill="none" marker-end="url(#arrow)"/>
+        <text x="829" y="943" text-anchor="middle" class="chip-note" style="font-size:8px;">subprocess/HTTPS</text>
+
+        <!-- ============ Dashed read-path (thesis) — geführt im Rand außerhalb der Bänder ============ -->
+        <!-- GET /articles, /search, /techniques, /status: links am Querschnitt-Streifen vorbei direkt in Schicht 4 -->
+        <path d="M320,212 L320,222 L170,222 L170,700 L180,700"
+              stroke="var(--path-read)" stroke-width="2.25" fill="none" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+        <text x="170" y="470" text-anchor="middle" class="edge-label" fill="var(--path-read)" transform="rotate(-90 170 470)">GET /articles · /search · /techniques · /status — liest direkt</text>
+
+        <!-- GET /stats: rechts am Rand vorbei direkt zum Statistik-Report-Chip in Schicht 3 -->
+        <path d="M382,212 L382,222 L1152,222 L1152,476 L988.5,476 L988.5,490"
+              stroke="var(--path-read)" stroke-width="2" fill="none" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+        <text x="1152" y="350" text-anchor="middle" class="edge-label" fill="var(--path-read)" transform="rotate(-90 1152 350)">GET /stats — ohne LLM-Pipeline</text>
+
+      </svg>
+    </div>
+    <figcaption>
+      Fünf Schichten des Python-Codes (<code style="font-family:'IBM Plex Mono',monospace">backend/</code> +
+      <code style="font-family:'IBM Plex Mono',monospace">src/news_analyser/</code>), abgeleitet aus den
+      tatsächlichen <code style="font-family:'IBM Plex Mono',monospace">import</code>-Anweisungen. Teal/durchgezogen =
+      vollständige Analyse-Pipeline (<code style="font-family:'IBM Plex Mono',monospace">POST /analyse</code>, CLI, Feed-Loop);
+      grau/gestrichelt = Lese-Endpunkte, die die Pipeline umgehen und Repositories (bzw. bei <code style="font-family:'IBM Plex Mono',monospace">/stats</code>
+      die Aggregation) direkt ansprechen.
+    </figcaption>
+  </figure>
+
+  <div class="legend">
+    <div class="legend-item">
+      <svg width="28" height="12" viewBox="0 0 28 12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--accent)" stroke-width="2.5"/></svg>
+      volle Analyse-Pipeline (schreibend)
+    </div>
+    <div class="legend-item">
+      <svg width="28" height="12" viewBox="0 0 28 12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--path-read)" stroke-width="2.5" stroke-dasharray="5 4"/></svg>
+      direkter Lesezugriff, umgeht die Pipeline
+    </div>
+    <div class="legend-item">
+      <svg width="28" height="12" viewBox="0 0 28 12"><line x1="1" y1="6" x2="27" y2="6" stroke="var(--ink-soft)" stroke-width="1.75"/></svg>
+      interner Aufruf innerhalb/zwischen Schichten
+    </div>
+    <div class="legend-item">
+      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="3" fill="var(--band-bg-core)" stroke="var(--accent)"/></svg>
+      Kern der Analyse-Pipeline
+    </div>
+  </div>
+
+  <div class="detail">
+    <div class="card">
+      <h3>Warum zwei Pfade?</h3>
+      <p>Nur <code>analyse.py</code> (Submit-Formular) stößt die LLM-Pipeline an. Die restlichen fünf Router liefern
+      bereits gespeicherte Analysen aus — dafür braucht es kein erneutes Scraping oder LLM-Calls, nur einen
+      ChromaDB-Read.</p>
+    </div>
+    <div class="card">
+      <h3>Querschnitt statt eigener Schicht</h3>
+      <p><code>__init__.py</code>, <code>config.py</code>, <code>logging_config.py</code> und <code>agents/errors.py</code>
+      werden von Modulen in mehreren Schichten gleichzeitig importiert (CLI, Feed, Analyzer) — sie gehören keiner
+      Schicht exklusiv an.</p>
+    </div>
+    <div class="card">
+      <h3>Adapter als Fassade</h3>
+      <p>Die Analyse-Pipeline kennt nur <code>llm_adapter.get_instance(provider)</code> — welcher Provider (CLI,
+      Copilot, Gemini, Mistral, …) dahintersteckt, entscheidet allein die Registrierung in <code>__init__.py</code>.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

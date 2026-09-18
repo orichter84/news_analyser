@@ -19,6 +19,7 @@ How the system currently works, kept in sync with the implementation.
 - [`reference/web_architecture.md`](reference/web_architecture.md) — backend/frontend architecture, API endpoints
 - [`reference/publisher_profiling.md`](reference/publisher_profiling.md) — cross-article publisher analysis
 - [`reference/prompting_patterns.md`](reference/prompting_patterns.md) — general prompting techniques in `pass1.md`/`pass2.md`, with model attribution
+- [`reference/diagrams/`](reference/diagrams/) — visual diagrams of the codebase (open the `.html` files in a browser)
 
 ## Concepts, Validation & Decisions
 
