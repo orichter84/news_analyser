@@ -28,3 +28,10 @@ llm_adapter.register_adapter("mistral", llm_adapter.OpenAIAdapter, {
     "model":        "mistral-medium-latest",
     "max_tokens":   8192,
 })
+
+# GitHub Copilot CLI (`@github/copilot`) als Subprocess — Auth über `copilot`/
+# `/login` oder headless via COPILOT_GITHUB_TOKEN/GH_TOKEN/GITHUB_TOKEN.
+# Eigene Adapter-Klasse (kein Drop-in über CLAUDE_CLI_PATH), siehe
+# copilot_cli_adapter.py für Details zu Tool-Sperre und Session-Cleanup.
+from .copilot_cli_adapter import CopilotCliAdapter
+llm_adapter.register_adapter("copilot_cli", CopilotCliAdapter, {})

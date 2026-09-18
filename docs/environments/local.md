@@ -124,6 +124,34 @@ The free tier also rate-limits to ~1 request/second and ~500K tokens/minute —
 evaluation-only, not for feed/production volume. Override the model with
 `LLM_MODEL` if needed.
 
+### Option G: GitHub Copilot CLI
+
+```
+LLM_PROVIDER=copilot_cli
+```
+
+Requires a GitHub Copilot subscription and the `copilot` CLI installed
+(`npm install -g @github/copilot`) and authenticated — either interactively
+(`copilot`, then `/login`) or headless via `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/
+`GITHUB_TOKEN` (a Fine-Grained PAT; the practical option for a server, since
+`/login` needs a browser).
+
+Uses a project-specific adapter (`src/news_analyser/copilot_cli_adapter.py`),
+not the generic OpenAI-compatible pattern the other providers use — the
+Copilot CLI is an unofficial-endpoint-free, officially supported agentic
+coding tool (not a plain chat-completions API), which needs its own subprocess
+handling:
+- Tool/shell/file/URL access is locked down via `--available-tools` (no
+  argument), since the pipeline sends unvalidated scraped article text as
+  model input.
+- Each call writes ~64 KB of session state to `~/.copilot/session-state/` with
+  no found flag to disable it — the adapter assigns its own `--session-id` per
+  call and deletes exactly that directory afterward.
+
+Default model is `gpt-5.4`; override with `LLM_MODEL` (e.g.
+`claude-sonnet-4.5`, depending on your Copilot plan — see `copilot --model`
+for what's available to you).
+
 ## 5. Start the application
 
 Start the full stack (ChromaDB + backend + frontend) with a single command:
