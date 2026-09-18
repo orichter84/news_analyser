@@ -33,7 +33,9 @@ per Pipe gelesen, als Vorsichtsmassnahme gegen dasselbe fd-Inheritance-Problem
 innerhalb eines laufenden Claude-Code-Prozesses aufgerufen wird.
 
 Config keys (passed to initialize):
-    model   — Modellname, wird per --model an die CLI uebergeben (default: "gpt-5.4")
+    model   — Modellname, wird per --model an die CLI uebergeben (default: "gemini-3.8-flash";
+              verfuegbare IDs haengen vom Copilot-Abo ab, siehe `copilot --model <bogus>`
+              fuer eine Fehlermeldung oder frag das Modell selbst danach)
     timeout — Sekunden, bevor der Subprocess-Aufruf abgebrochen wird (default: 180)
 
 ENV fallbacks (wenn nicht im config dict):
@@ -65,7 +67,7 @@ class CopilotCliAdapter(LLMAdapter):
     """Adapter der die lokale `copilot`-CLI (GitHub Copilot CLI) per Subprocess aufruft."""
 
     _DEFAULTS: dict = {
-        "model": "gpt-5.4",
+        "model": "gemini-3.8-flash",
         "timeout": 180,
     }
 

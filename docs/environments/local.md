@@ -148,9 +148,12 @@ handling:
   no found flag to disable it — the adapter assigns its own `--session-id` per
   call and deletes exactly that directory afterward.
 
-Default model is `gpt-5.4`; override with `LLM_MODEL` (e.g.
-`claude-sonnet-4.5`, depending on your Copilot plan — see `copilot --model`
-for what's available to you).
+Default model is `gemini-3.8-flash`; override with `LLM_MODEL` (e.g.
+`claude-sonnet-5`, `gpt-5.4`, `grok-4.6`, depending on your Copilot plan).
+The CLI doesn't expose a `--list-models` flag — `copilot --model <invalid>`
+returns an error but not the valid list; asking the model itself (`copilot -p
+"List the exact model IDs selectable via --model"`) worked in practice, and
+each candidate can be confirmed by actually passing it to `--model`.
 
 ## 5. Start the application
 
