@@ -19,7 +19,7 @@ from pathlib import Path
 from .logging_config import setup_logging
 from .scraper import Article, fetch_article
 from .agents import analyze_article
-from .agents.errors import GeminiQuotaExceededError
+from .agents.errors import AnalysisAbortedError, GeminiQuotaExceededError
 from .repositories.db_storage import store_result
 from .stats import print_report
 
@@ -38,10 +38,10 @@ def run(url: str) -> None:
         return
 
     logger.info("Analyzing (%d chars) …", len(article.text))
-    result = analyze_article(article)
-    if not result:
-        logger.warning("Analysis failed – no JSON returned.")
-        return
+    try:
+        result = analyze_article(article)
+    except AnalysisAbortedError:
+        return  # Grund + URL bereits in analyze_article geloggt
 
     store_result(article.text, result, url=article.url)
     ft = result["framing_target"]
@@ -77,10 +77,10 @@ def run_text_file(path: str, domain: str, source_url: str) -> None:
         "Analyzing text file '%s' (%d chars, %d Wörter) …",
         path, len(text), article.word_count,
     )
-    result = analyze_article(article)
-    if not result:
-        logger.warning("Analysis failed – no JSON returned.")
-        return
+    try:
+        result = analyze_article(article)
+    except AnalysisAbortedError:
+        return  # Grund + URL bereits in analyze_article geloggt
 
     store_result(article.text, result, url=article.url)
     ft = result["framing_target"]

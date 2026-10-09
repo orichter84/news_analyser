@@ -8,14 +8,11 @@ erfolgt deterministisch durch den Anonymizer-Code, nicht durch das LLM.
 from __future__ import annotations
 
 import json
-import logging
 import re
 from typing import Any
 
 from ..prompts import load_prompt
-from .errors import raise_if_gemini_quota_error
-
-logger = logging.getLogger(__name__)
+from .errors import AnalysisAbortedError, raise_if_gemini_quota_error
 
 
 def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
@@ -23,15 +20,17 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
 
     Returns:
         Liste von {"term": str, "type": str} — nur Identifikation, kein Ersetzen.
-        Bei Fehler: leere Liste (Analyse läuft ohne Pass-0-Ergebnisse weiter).
+
+    Raises:
+        AnalysisAbortedError: bei Fehler oder abgeschnittener/unbrauchbarer Antwort —
+            ohne vollständiges Pass-0-Ergebnis wäre die Anonymisierung lückenhaft.
     """
     prompt = load_prompt("system", "pass0")
     try:
         raw = adapter.generate(system_prompt=prompt, input_data={"text": text})
     except Exception as exc:
         raise_if_gemini_quota_error(exc)
-        logger.error("Fehler bei Gruppenidentifikation: %s", exc)
-        return []
+        raise AnalysisAbortedError("Pass 0", str(exc)) from exc
 
     cleaned = re.sub(r"<think>.*?</think>", "", raw.strip(), flags=re.DOTALL)
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned.strip(), flags=re.IGNORECASE)
@@ -39,15 +38,17 @@ def detect_groups(text: str, adapter: Any) -> list[dict[str, str]]:
     try:
         result = json.loads(cleaned)
     except Exception:
+        # Abgeschnittene Liste nicht reparieren — siehe _extract_json in analyzer.py.
+        if not cleaned.endswith("]"):
+            raise AnalysisAbortedError("Pass 0", "Antwort abgeschnitten (endet nicht mit ']')")
         try:
             from json_repair import repair_json
             result = json.loads(repair_json(cleaned))
         except Exception as exc:
-            logger.error("JSON-Fehler: %s", exc)
-            return []
+            raise AnalysisAbortedError("Pass 0", f"JSON nicht lesbar (auch nach Reparatur): {exc}") from exc
 
     if not isinstance(result, list):
-        return []
+        raise AnalysisAbortedError("Pass 0", f"Antwort ist keine Liste ({type(result).__name__})")
 
     return [
         {"term": str(item["term"]).lower(), "type": str(item["type"])}

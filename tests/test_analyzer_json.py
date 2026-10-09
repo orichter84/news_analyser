@@ -1,5 +1,7 @@
 """Unit tests for the JSON extraction and quote-grounding helpers in analyzer.py."""
 
+import pytest
+
 from news_analyser.agents.analyzer import (
     _dedupe_techniques,
     _extract_json,
@@ -23,19 +25,34 @@ class TestExtractJson:
     def test_array_wrapped_result_takes_first_element(self):
         assert _extract_json('[{"a": 1}, {"a": 2}]') == {"a": 1}
 
-    def test_empty_array_returns_none(self):
-        assert _extract_json("[]") is None
+    def test_empty_array_raises(self):
+        with pytest.raises(ValueError):
+            _extract_json("[]")
 
     def test_malformed_json_is_repaired(self):
         # trailing comma — invalid JSON, but json_repair should fix it
         raw = '{"a": 1, "b": 2,}'
         assert _extract_json(raw) == {"a": 1, "b": 2}
 
-    def test_unparseable_garbage_returns_none(self):
-        assert _extract_json("this is not json at all, just prose.") is None
+    def test_truncated_json_is_not_repaired(self):
+        # Token-Limit mitten im Objekt — json_repair würde das schließen und ein
+        # unvollständiges Ergebnis liefern
+        raw = '{"detected_techniques": [{"technique": "x", "quote": "abc"}], "framing_target": {"orw'
+        with pytest.raises(ValueError, match="abgeschnitten"):
+            _extract_json(raw)
 
-    def test_non_dict_non_list_result_returns_none(self):
-        assert _extract_json("42") is None
+    def test_truncated_json_inside_code_fence_is_not_repaired(self):
+        raw = '```json\n{"a": 1, "b": [1, 2'
+        with pytest.raises(ValueError, match="abgeschnitten"):
+            _extract_json(raw)
+
+    def test_unparseable_garbage_raises(self):
+        with pytest.raises(ValueError):
+            _extract_json("this is not json at all, just prose.")
+
+    def test_non_dict_non_list_result_raises(self):
+        with pytest.raises(ValueError, match="kein JSON-Objekt"):
+            _extract_json("42")
 
 
 class TestValidateQuoteGrounding:

@@ -8,10 +8,15 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 import llm_adapter
 
+# Gemini und Mistral laufen über StrictOpenAIAdapter statt llm_adapter.OpenAIAdapter:
+# eine wegen max_tokens o.ä. abgeschnittene Antwort ist ein Fehler, keine Warnung
+# (siehe strict_openai_adapter.py).
+from .strict_openai_adapter import StrictOpenAIAdapter
+
 # Gemini via OpenAI-compatible endpoint — nutzt OPENAI_API_KEY.
 # Überschreibbar via GEMINI_MODEL (providerspezifisch statt LLM_MODEL/OPENAI_MODEL,
 # die auch andere Provider mitbeeinflussen würden — siehe Kommentar bei "cli" unten).
-llm_adapter.register_adapter("gemini", llm_adapter.OpenAIAdapter, {
+llm_adapter.register_adapter("gemini", StrictOpenAIAdapter, {
     "api_key_env":  "OPENAI_API_KEY",
     "base_url":     "https://generativelanguage.googleapis.com/v1beta/openai/",
     "adapter_name": "gemini",
@@ -24,7 +29,7 @@ llm_adapter.register_adapter("gemini", llm_adapter.OpenAIAdapter, {
 # mit dem eigenen Key prüfen); mistral-large-latest ist z.B. auf dem
 # kostenfreien Tier nicht freigeschaltet, mistral-medium-latest/-small-latest schon.
 # Überschreibbar via MISTRAL_MODEL (providerspezifisch, siehe Kommentar bei "cli" unten).
-llm_adapter.register_adapter("mistral", llm_adapter.OpenAIAdapter, {
+llm_adapter.register_adapter("mistral", StrictOpenAIAdapter, {
     "api_key_env":  "MISTRAL_API_KEY",
     "base_url":     "https://api.mistral.ai/v1",
     "adapter_name": "mistral",

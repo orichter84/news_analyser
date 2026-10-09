@@ -49,14 +49,15 @@ import llm_adapter
 from ..keywords import compute_keyword_signal
 from ..anonymizer import anonymize
 from .group_detector import detect_groups
-from .errors import raise_if_gemini_quota_error
+from .errors import AnalysisAbortedError, raise_if_gemini_quota_error
 from ..repositories.anchor_store import get_similar_anchors, add_anchor, format_anchors_for_prompt
 from ..repositories.technique_store import normalize_technique, format_techniques_for_prompt
 from ..repositories.role_store import normalize_role, format_roles_for_prompt
 from ..repositories.stroemung_store import normalize_stroemung
 
 
-def _extract_json(raw: str) -> dict[str, Any] | None:
+def _extract_json(raw: str) -> dict[str, Any]:
+    """Parses a pass response into a dict. Raises ValueError with the reason otherwise."""
     # Strip Qwen-style thinking tokens before any other processing
     cleaned = re.sub(r"<think>.*?</think>", "", raw.strip(), flags=re.DOTALL)
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned.strip(), flags=re.IGNORECASE)
@@ -64,16 +65,22 @@ def _extract_json(raw: str) -> dict[str, Any] | None:
     try:
         parsed = json.loads(cleaned)
     except json.JSONDecodeError:
+        # Abgeschnittene Antwort (Token-Limit, Timeout …) nicht reparieren: json_repair
+        # würde offene Strukturen schließen und ein gültiges, aber unvollständiges
+        # Ergebnis liefern. Kleine Formfehler (trailing comma etc.) repariert es weiter.
+        if not cleaned.endswith(("}", "]")):
+            raise ValueError("Antwort abgeschnitten (endet nicht mit '}' oder ']')")
         try:
             from json_repair import repair_json
             parsed = json.loads(repair_json(cleaned))
         except Exception as exc:
-            logger.error("JSON parse error (auch nach Reparatur): %s", exc)
-            return None
+            raise ValueError(f"JSON nicht lesbar (auch nach Reparatur): {exc}") from exc
     # Manche Modelle wrappen das Ergebnis in ein Array — erstes Element nehmen
     if isinstance(parsed, list):
         parsed = parsed[0] if parsed else None
-    return parsed if isinstance(parsed, dict) else None
+    if not isinstance(parsed, dict):
+        raise ValueError(f"Antwort ist kein JSON-Objekt ({type(parsed).__name__})")
+    return parsed
 
 
 def _validate_quote_grounding(
@@ -239,7 +246,38 @@ def _strip_quoted_material(text: str) -> str:
     return stripped
 
 
-def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str, Any] | None:
+def _run_pass(adapter: Any, stage: str, system_prompt: str, input_data: dict[str, Any],
+              debug_file: str, debug_run_id: str) -> dict[str, Any]:
+    """One LLM call plus JSON parsing; any failure becomes AnalysisAbortedError(stage)."""
+    try:
+        raw = adapter.generate(system_prompt=system_prompt, input_data=input_data)
+    except Exception as exc:
+        raise_if_gemini_quota_error(exc)
+        raise AnalysisAbortedError(stage, str(exc)) from exc
+
+    _write_debug(debug_file, raw, debug_run_id)
+    try:
+        return _extract_json(raw)
+    except ValueError as exc:
+        raise AnalysisAbortedError(stage, str(exc)) from exc
+
+
+def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str, Any]:
+    """Runs Pass 0–2 and returns the merged result.
+
+    Raises:
+        AnalysisAbortedError: a pass failed (error, timeout, truncated or unparseable
+            output) — the article must not be stored. Already logged here, with URL.
+        GeminiQuotaExceededError: Gemini quota exhausted (callers start the cooldown).
+    """
+    try:
+        return _analyze_article(article, skip_anonymize)
+    except AnalysisAbortedError as exc:
+        logger.error("Analyse abgebrochen, nichts gespeichert — %s — %s", article.url, exc)
+        raise
+
+
+def _analyze_article(article: Article, skip_anonymize: bool) -> dict[str, Any]:
     provider = os.environ.get("LLM_PROVIDER", "openai")
     adapter  = llm_adapter.get_instance(provider)
     debug_run_id = _new_debug_run_id(article.domain)
@@ -295,20 +333,8 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
     if anchor_section:
         pass1_prompt = pass1_prompt + "\n\n" + anchor_section
 
-    try:
-        raw1 = adapter.generate(
-            system_prompt=pass1_prompt,
-            input_data=pass1_input,
-        )
-    except Exception as exc:
-        raise_if_gemini_quota_error(exc)
-        logger.error("Pass 1 error: %s", exc)
-        return None
-
-    _write_debug("04_pass1_raw_response.txt", raw1, debug_run_id)
-    result1 = _extract_json(raw1)
-    if result1 is None:
-        return None
+    result1 = _run_pass(adapter, "Pass 1", pass1_prompt, pass1_input,
+                        "04_pass1_raw_response.txt", debug_run_id)
 
     result1["detected_techniques"] = _validate_quote_grounding(
         result1.get("detected_techniques", []), pass1_text
@@ -338,20 +364,8 @@ def analyze_article(article: Article, skip_anonymize: bool = False) -> dict[str,
 
     pass2_prompt = load_prompt("system", "pass2", context={"ROLES": format_roles_for_prompt()})
 
-    try:
-        raw2 = adapter.generate(
-            system_prompt=pass2_prompt,
-            input_data=pass2_input,
-        )
-    except Exception as exc:
-        raise_if_gemini_quota_error(exc)
-        logger.error("Pass 2 error: %s", exc)
-        return None
-
-    _write_debug("05_pass2_raw_response.txt", raw2, debug_run_id)
-    result2 = _extract_json(raw2)
-    if result2 is None:
-        return None
+    result2 = _run_pass(adapter, "Pass 2", pass2_prompt, pass2_input,
+                        "05_pass2_raw_response.txt", debug_run_id)
 
     # Rollen aus Pass 2 normalisieren
     for t in result2.get("manipulation_targets", []):

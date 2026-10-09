@@ -360,12 +360,17 @@ generic "expert" framing reused across all three.
 ### Structured output constraints — instruction-only, not provider-native JSON mode
 All three prompts end their format section with "Return ONLY a single, valid JSON
 object" (or equivalent). The `llm_adapter` package's `OpenAIAdapter` (used for the
-`gemini` provider) supports a `json_mode` config flag that requests the provider's
+`gemini` provider via the project-local `StrictOpenAIAdapter` subclass) supports a
+`json_mode` config flag that requests the provider's
 native `response_format={"type": "json_object"}` constrained-decoding mode — the
 `gemini` adapter registration (`src/news_analyser/__init__.py`) does not set it, so it
 stays at its default, `False`. Compliance is instruction-only, backstopped by
 `_extract_json`'s markdown-fence stripping and `json_repair` fallback
-(`analyzer.py`) rather than enforced at the decoding level.
+(`analyzer.py`) rather than enforced at the decoding level. The `json_repair` fallback
+only covers formatting slips. Output that doesn't end in `}`/`]` (i.e. truncated) is
+rejected, not repaired, and `StrictOpenAIAdapter` already raises on
+`finish_reason != "stop"`; see
+[0013](../concepts/decisions/0013-reject-incomplete-analyses.md).
 
 ### Sampling temperature — configured, not tuned per pass
 `OpenAIAdapter` defaults `temperature` to `0.2`; the `gemini` registration doesn't

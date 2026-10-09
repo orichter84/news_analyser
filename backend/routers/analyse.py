@@ -1,3 +1,4 @@
+import logging
 import sys
 import uuid
 from pathlib import Path
@@ -7,10 +8,14 @@ from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from news_analyser.scraper import fetch_article
-from news_analyser.agents import analyze_article
+from news_analyser.agents import AnalysisAbortedError, analyze_article
 from news_analyser.repositories.db_storage import store_result, is_known_url
 
 router = APIRouter(prefix="/analyse", tags=["analyse"])
+
+# Unter dem news_analyser-Logger, damit es im selben Log-File landet (setup_logging
+# konfiguriert nur diesen Logger-Baum).
+logger = logging.getLogger("news_analyser.api.analyse")
 
 _jobs: dict[str, dict] = {}
 
@@ -29,13 +34,16 @@ def _run_analysis(job_id: str, url: str) -> None:
         if article.is_paywall:
             _jobs[job_id] = {"status": "paywall", "message": "Artikel befindet sich hinter einer Paywall."}
             return
-        result = analyze_article(article)
-        if result is None:
-            _jobs[job_id] = {"status": "error", "message": "Analyse fehlgeschlagen"}
+        try:
+            result = analyze_article(article)
+        except AnalysisAbortedError as exc:
+            # bereits in analyze_article mit URL geloggt
+            _jobs[job_id] = {"status": "error", "message": f"Analyse abgebrochen ({exc}) – nichts gespeichert."}
             return
         store_result(article.text, result, url=article.url)
         _jobs[job_id] = {"status": "done", "result": result}
     except Exception as exc:
+        logger.exception("API-Analyse fehlgeschlagen, nichts gespeichert — %s", url)
         _jobs[job_id] = {"status": "error", "message": str(exc)}
 
 

@@ -14,6 +14,20 @@ class GeminiQuotaExceededError(RuntimeError):
     """Raised when Gemini rejects a request because its quota is exhausted."""
 
 
+class AnalysisAbortedError(RuntimeError):
+    """Raised when an analysis pass fails and the article must not be stored.
+
+    Covers adapter errors, timeouts, truncated or unparseable output — anything
+    except an exhausted Gemini quota, which keeps its own error type because it
+    triggers the feed cooldown.
+    """
+
+    def __init__(self, stage: str, reason: str) -> None:
+        super().__init__(f"{stage}: {reason}")
+        self.stage = stage
+        self.reason = reason
+
+
 def is_gemini_quota_error(exc: Exception) -> bool:
     """Return whether an adapter error indicates Gemini's exhausted quota."""
     if os.environ.get("LLM_PROVIDER", "openai").lower() != "gemini":

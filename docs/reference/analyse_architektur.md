@@ -207,6 +207,15 @@ in the original text. The spaCy anonymizer then replaces these terms together wi
 persons and organisations with neutral placeholders. Pass 0 only identifies terms;
 replacement remains deterministic preprocessing.
 
+Every step is mandatory. If Pass 0, 1 or 2 fails (adapter error, quota, timeout,
+unparseable output, or output truncated by the token limit), the article is
+aborted and nothing is stored: no DB row and no anchor. `analyze_article` raises
+`AnalysisAbortedError` and logs one ERROR line with URL, pass and reason. There is no
+degraded
+fallback, such as running Pass 1 without Pass 0's group terms, and truncated JSON
+is never repaired into a partial result
+([0013](../concepts/decisions/0013-reject-incomplete-analyses.md)).
+
 ```
 Original text
     │

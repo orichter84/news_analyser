@@ -4,7 +4,7 @@ real LLM or network calls."""
 
 import pytest
 
-from news_analyser.agents.errors import GeminiQuotaExceededError
+from news_analyser.agents.errors import AnalysisAbortedError, GeminiQuotaExceededError
 from news_analyser.agents.group_detector import detect_groups
 
 
@@ -41,20 +41,34 @@ def test_ignores_non_dict_items_in_response():
     assert result == [{"term": "a", "type": "b"}]
 
 
-def test_non_list_response_returns_empty_list():
+def test_empty_list_response_returns_empty_list():
+    adapter = _FakeAdapter(response="[]")
+    assert detect_groups("text", adapter) == []
+
+
+def test_non_list_response_aborts():
     adapter = _FakeAdapter(response='{"not": "a list"}')
-    assert detect_groups("text", adapter) == []
+    with pytest.raises(AnalysisAbortedError, match="Pass 0: Antwort ist keine Liste"):
+        detect_groups("text", adapter)
 
 
-def test_unparseable_response_returns_empty_list():
+def test_unparseable_response_aborts():
     adapter = _FakeAdapter(response="not json at all")
-    assert detect_groups("text", adapter) == []
+    with pytest.raises(AnalysisAbortedError, match="Pass 0"):
+        detect_groups("text", adapter)
 
 
-def test_adapter_error_returns_empty_list_when_not_quota_related(monkeypatch):
+def test_truncated_response_aborts_instead_of_repairing():
+    adapter = _FakeAdapter(response='[{"term": "Ausländer", "type": "ethnic_origin"}, {"term": "Mus')
+    with pytest.raises(AnalysisAbortedError, match="Pass 0: Antwort abgeschnitten"):
+        detect_groups("text", adapter)
+
+
+def test_adapter_error_aborts_with_reason_when_not_quota_related(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "openai")
     adapter = _FakeAdapter(error=RuntimeError("network hiccup"))
-    assert detect_groups("text", adapter) == []
+    with pytest.raises(AnalysisAbortedError, match="Pass 0: network hiccup"):
+        detect_groups("text", adapter)
 
 
 def test_adapter_gemini_quota_error_propagates_as_domain_error(monkeypatch):

@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from news_analyser.scraper import Article
-from news_analyser.agents.analyzer import analyze_article
+from news_analyser.agents import AnalysisAbortedError, analyze_article
 
 BASE = Path(__file__).parent / "bias-test-cases"
 
@@ -37,9 +37,10 @@ def make_article(path: Path, url: str) -> Article:
 
 def run(label: str, article: Article, skip_anonymize: bool = False) -> dict:
     print(f"  Analysiere: {label} ...", flush=True)
-    result = analyze_article(article, skip_anonymize=skip_anonymize)
-    if result is None:
-        print(f"  [!] Fehler bei {label}")
+    try:
+        result = analyze_article(article, skip_anonymize=skip_anonymize)
+    except AnalysisAbortedError as exc:
+        print(f"  [!] Abgebrochen bei {label}: {exc}")
         return {}
     ft = result.get("framing_target", {})
     techniques = result.get("detected_techniques", [])
