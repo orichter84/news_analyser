@@ -34,6 +34,18 @@
       <div class="score-card">
         <span class="score-value">{{ a.bernays_score | number:'1.2-2' }}</span>
         <span class="score-label">Bernays Score</span>
+        @if (a.technique_validation; as v) {
+          <span class="score-sub">
+            {{ v.accepted }} von {{ v.reported }} gemeldeten Techniken belegt
+          </span>
+          @if (v.rejected.length > 0) {
+            <span class="score-sub rejection-rate" [class.high]="rejectionRate(v) >= 0.3">
+              {{ v.rejected.length }} verworfen ({{ rejectionRate(v) | percent:'1.0-0' }})
+            </span>
+          }
+        } @else {
+          <span class="score-sub">Nachprüfung nicht erfasst (ältere Auswertung)</span>
+        }
       </div>
       @if (a.dunning_kruger_index != null) {
         <div class="score-card">
@@ -117,6 +129,26 @@
           <blockquote class="quote">{{ t.quote }}</blockquote>
           <p class="explanation">{{ t.explanation }}</p>
         </div>
+      }
+
+      @if (a.technique_validation?.rejected?.length) {
+        <details class="rejected-techniques">
+          <summary>
+            Verworfene Techniken ({{ a.technique_validation!.rejected.length }})
+            – zählen nicht zum Bernays Score
+          </summary>
+          @for (r of a.technique_validation!.rejected; track $index) {
+            <div class="technique-card rejected">
+              <div class="technique-header">
+                <span class="technique-name">{{ r.technique || '(ohne Namen)' }}</span>
+                <span class="rejection-reason">{{ rejectionLabel(r.reason) }}</span>
+              </div>
+              @if (r.quote.trim()) {
+                <blockquote class="quote">{{ r.quote }}</blockquote>
+              }
+            </div>
+          }
+        </details>
       }
     </section>
 

@@ -3,7 +3,18 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { ArticleDetail } from '../../core/models/article.model';
-import type { PolitischeStroemung } from '../../core/models/article.model';
+import type {
+  PolitischeStroemung,
+  TechniqueRejectionReason,
+  TechniqueValidation,
+} from '../../core/models/article.model';
+
+const REJECTION_REASON_LABELS: Record<TechniqueRejectionReason, string> = {
+  empty_quote: 'Kein Zitat angegeben',
+  quote_not_found: 'Zitat nicht im Text gefunden',
+  occurrence_exceeded: 'Zitat öfter gemeldet, als es im Text vorkommt',
+  duplicate: 'Duplikat nach Normalisierung',
+};
 
 @Component({
   selector: 'app-article-detail',
@@ -21,6 +32,15 @@ export class ArticleDetailComponent implements OnInit {
 
   toTechniqueId(name: string): string {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  rejectionLabel(reason: TechniqueRejectionReason): string {
+    return REJECTION_REASON_LABELS[reason] ?? reason;
+  }
+
+  /** Anteil der gemeldeten Techniken, die in der Nachprüfung verworfen wurden. */
+  rejectionRate(v: TechniqueValidation): number {
+    return v.reported > 0 ? v.rejected.length / v.reported : 0;
   }
 
   isStroemungObject(s: string | PolitischeStroemung): s is PolitischeStroemung {

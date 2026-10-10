@@ -4,6 +4,25 @@ export interface DetectedTechnique {
   explanation: string;
 }
 
+export type TechniqueRejectionReason =
+  | 'empty_quote'
+  | 'quote_not_found'
+  | 'occurrence_exceeded'
+  | 'duplicate';
+
+export interface RejectedTechnique {
+  technique: string;
+  quote: string;
+  reason: TechniqueRejectionReason;
+}
+
+/** Nachprüfung der von Pass 1 gemeldeten Techniken (fehlt bei älteren Artikeln). */
+export interface TechniqueValidation {
+  reported: number;
+  accepted: number;
+  rejected: RejectedTechnique[];
+}
+
 export interface FramingTarget {
   main_narrative: string;
   intended_sentiment: string;
@@ -47,6 +66,7 @@ export interface ArticleDetail extends ArticleListItem {
   word_count: number;
   timestamp: string;
   detected_techniques: DetectedTechnique[];
+  technique_validation?: TechniqueValidation;
   framing_target: FramingTarget;
   themenbereich?: string;
   manipulation_targets?: ManipulationTarget[];

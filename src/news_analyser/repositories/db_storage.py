@@ -55,6 +55,9 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
     # full article — normalize against that same text's length. Older records
     # predating this field fall back to the full word_count.
     bernays_denominator = analysis.get("pass1_word_count") or analysis.get("word_count", 0)
+    # Fehlt bei Artikeln vor ADR 0014 — dann -1 statt 0, damit "nicht erfasst"
+    # von "nichts verworfen" unterscheidbar bleibt.
+    tv = analysis.get("technique_validation")
 
     return {
         "source_url":         analysis.get("source_url", ""),
@@ -71,6 +74,8 @@ def _flatten_metadata(analysis: dict[str, Any]) -> dict[str, Any]:
         "target_direction":     ft.get("target_direction", ""),
         "intended_sentiment":   ft.get("intended_sentiment", ""),
         "technique_names":      technique_names,
+        "techniques_reported":  int(tv["reported"]) if tv else -1,
+        "techniques_rejected":  len(tv["rejected"]) if tv else -1,
         "bernays_score":        round(
             len(techniques) / bernays_denominator * 1000, 2
         ) if bernays_denominator > 0 else 0.0,

@@ -196,10 +196,11 @@ GET  /config   → { "submit_enabled": true|false }   (reads SUBMIT_ENABLED env 
 - Columns: title, domain, date, Orwell Index, Bernays Score, techniques
 
 ### Article Detail `/articles/{encoded_url}`
-- Score cards: Orwell Index, Bernays Score, DK Index
+- Score cards: Orwell Index, Bernays Score, DK Index. The Bernays card also shows "X von Y gemeldeten Techniken belegt" and the number and rate of rejected techniques (highlighted from 30 %), from `technique_validation`, or "Nachprüfung nicht erfasst" for older records
 - Framing: narrative, sentiment, political leaning, topic area
 - Manipulation targets: entity, direction (▲ positive / ▼ negative / ● neutral), role — with optional quote evidence for direction and role
 - Detected techniques with quote and explanation — technique names link to `/techniques/:id`
+- Collapsible "Verworfene Techniken" list below them: each rejected instance with its quote and the rejection reason in German
 
 ### Statistics `/stats`
 Four sub-pages under a shared layout:

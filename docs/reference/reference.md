@@ -28,6 +28,14 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
       "explanation": "explanation of the effect"
     }
   ],
+  "technique_validation": {
+    "reported": 3,
+    "accepted": 1,
+    "rejected": [
+      {"technique": "Loaded Language", "quote": "quote not found in the text", "reason": "quote_not_found"},
+      {"technique": "Appeal to Fear", "quote": "exact text quote", "reason": "duplicate"}
+    ]
+  },
   "framing_target": {
     "main_narrative": "Central thesis of the article",
     "intended_sentiment": "Fear | Outrage | Approval | …",
@@ -64,7 +72,7 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 - `orwell_index = max(orwell_index_structural, quote_amplification_index)` — an article can score as extreme through its quoting choices alone, even if the author's own sentences are neutral
 
 **Grounding & normalization applied between the passes and storage** (`analyzer.py`):
-- `detected_techniques` — quotes are verified against the quote-stripped Pass 1 text (`_validate_quote_grounding`); unverifiable instances are dropped. Technique names are then mapped onto the canonical list (`normalize_technique`; labels built from a negation/critical marker like "anti-"/"-kritisch" are deliberately left unmapped, same guard as `normalize_stroemung` — see `repositories/negation_guard.py`), and instances that became identical `(technique, quote)` pairs only after that mapping are collapsed (`_dedupe_techniques`) so a passage isn't double-counted under two raw labels that normalize to the same technique.
+- `detected_techniques` — quotes are verified against the quote-stripped Pass 1 text (`_validate_quote_grounding`); unverifiable instances are dropped. Technique names are then mapped onto the canonical list (`normalize_technique`; labels built from a negation/critical marker like "anti-"/"-kritisch" are deliberately left unmapped, same guard as `normalize_stroemung` — see `repositories/negation_guard.py`), and instances that became identical `(technique, quote)` pairs only after that mapping are collapsed (`_dedupe_techniques`) so a passage isn't double-counted under two raw labels that normalize to the same technique. Every instance dropped by either check is recorded in `technique_validation.rejected` with a reason code (`empty_quote`, `quote_not_found`, `occurrence_exceeded`, `duplicate`). It doesn't count towards `bernays_score`, but `reported`/`accepted`/`rejected` give the rejection rate as a reliability signal for the technique detection ([0014](../concepts/decisions/0014-record-rejected-techniques.md)). Stored records also carry flat `techniques_reported`/`techniques_rejected` metadata, which is `-1` for records analysed before this was recorded.
 - `manipulation_targets` — `rolle`/`direction` without a verifiable supporting quote are cleared (`_validate_manipulation_target_grounding`); an entity with neither field grounded is dropped entirely.
 - `politische_stroemung` — labels are mapped onto the canonical taxonomy (`normalize_stroemung`, semantic match; labels built from a negation/critical marker like "anti-"/"-kritisch" are deliberately left unmapped rather than risking a match to the concept they oppose). Every label except `neutral` must carry a quote verifiable in the original article text (`_validate_stroemung_grounding`) — a non-`neutral` label with no quote, or one that doesn't occur in the text, is dropped entirely, not just stripped of its quote. Grounding checks existence only, not whether the model applied the label *consistently* — repeated runs of the same article have produced different labels for the same or a near-identical quoted passage; the fix doesn't address that.
 - `dunning_kruger_index` has no quote-grounding — it ships with a qualitative `dunning_kruger_explanation` instead (see Indicators below), not a verbatim excerpt requirement.
@@ -85,6 +93,7 @@ This is the raw output of `analyze_article()` (`src/news_analyser/agents/analyze
 | `quote_amplification_index` | 0.0 – 1.0 | Pass 2 sub-score: how much the article's quote *selection* amplifies extreme or one-sided rhetoric, on the full original text |
 | `quote_amplification_explanation` | Free text (German) | Nested inside `framing_target`. Required (per the prompt) above 0.3: names the specific quote(s) driving the score. No code-level grounding check — a prompt instruction, not an enforced constraint |
 | `bernays_score` | 0.0 – ∞ | Manipulation techniques per 1000 words of the quote-stripped Pass 1 text (`pass1_word_count`) — computed downstream at storage time, not part of the LLM output itself (see below) |
+| `technique_validation` | Counts + list | `reported` (raw Pass 1), `accepted` (counted in `bernays_score`), `rejected[]` (`{technique, quote, reason}`). Rejection rate = reliability signal for technique detection, not part of any score |
 | `dunning_kruger_index` | 0.0 – 1.0 | How confidently a text is written without being backed by sources, subjunctive mood or qualifications |
 | `dunning_kruger_explanation` | Free text (German) | Nested inside `framing_target`. 1-2 sentence qualitative justification for the DK score — no quote-grounding requirement, since overconfidence is often a property of the article's overall tone rather than one sentence |
 | `politische_stroemung` | Labels + quote | Ideological classification (multiple possible), normalized onto a canonical taxonomy (`liberal`, `konservativ`, `sozialdemokratisch`, `sozialistisch`, `nationalistisch`, `grün`, … — see `src/news_analyser/data/stroemungen.json`; the LLM may still coin new labels the taxonomy doesn't cover). Every label except `neutral` requires a verbatim quote; a label without one (or with one that doesn't verify) is dropped, not kept — see [`politische_stroemung_pipeline_analysis.md`](../analyses/politische_stroemung_pipeline_analysis.md) §5 for why this doesn't fully explain observed cross-run label instability. Flattened to plain labels only in the list/search HTTP API, preserved in the detail endpoint |

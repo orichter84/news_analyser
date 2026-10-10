@@ -83,14 +83,28 @@ def _extract_json(raw: str) -> dict[str, Any]:
     return parsed
 
 
+def _reject(rejected: list[dict[str, Any]] | None, t: dict[str, Any], reason: str) -> None:
+    if rejected is not None:
+        rejected.append({
+            "technique": t.get("technique", ""),
+            "quote":     t.get("quote") or "",
+            "reason":    reason,
+        })
+
+
 def _validate_quote_grounding(
-    techniques: list[dict[str, Any]], source_text: str
+    techniques: list[dict[str, Any]], source_text: str,
+    rejected: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Drops technique instances whose quote can't be verified against the source text.
 
     Catches two hallucination patterns observed with local models: fabricated quotes that
     never appear in the text, and inflated occurrence counts (the same quote reported as a
     "2nd/3rd/4th instance" more often than it actually occurs in the text).
+
+    Dropped instances are appended to `rejected` (if given) with a reason code —
+    they don't count towards the Bernays Score, but the rejection rate is kept as
+    a reliability signal for the technique detection (see ADR 0014).
     """
     quote_counts: dict[str, int] = {}
     validated = []
@@ -99,14 +113,17 @@ def _validate_quote_grounding(
         quote = (t.get("quote") or "").strip()
         if not quote:
             dropped += 1
+            _reject(rejected, t, "empty_quote")
             continue
         occurrences = source_text.count(quote)
         if occurrences == 0:
             dropped += 1
+            _reject(rejected, t, "quote_not_found")
             continue
         quote_counts[quote] = quote_counts.get(quote, 0) + 1
         if quote_counts[quote] > occurrences:
             dropped += 1
+            _reject(rejected, t, "occurrence_exceeded")
             continue
         validated.append(t)
     if dropped:
@@ -114,7 +131,10 @@ def _validate_quote_grounding(
     return validated
 
 
-def _dedupe_techniques(techniques: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _dedupe_techniques(
+    techniques: list[dict[str, Any]],
+    rejected: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Merges technique instances that became identical after canonical normalization.
 
     Two different free-text labels the model used for the same passage (e.g.
@@ -129,6 +149,7 @@ def _dedupe_techniques(techniques: list[dict[str, Any]]) -> list[dict[str, Any]]
         key = (t.get("technique", ""), (t.get("quote") or "").strip())
         if key in seen:
             dropped += 1
+            _reject(rejected, t, "duplicate")
             continue
         seen.add(key)
         deduped.append(t)
@@ -336,17 +357,20 @@ def _analyze_article(article: Article, skip_anonymize: bool) -> dict[str, Any]:
     result1 = _run_pass(adapter, "Pass 1", pass1_prompt, pass1_input,
                         "04_pass1_raw_response.txt", debug_run_id)
 
+    reported_techniques = [t for t in result1.get("detected_techniques", []) if isinstance(t, dict)]
+    rejected_techniques: list[dict[str, Any]] = []
     result1["detected_techniques"] = _validate_quote_grounding(
-        result1.get("detected_techniques", []), pass1_text
+        reported_techniques, pass1_text, rejected_techniques
     )
 
-    # Techniken auf kanonische Namen normalisieren
-    for t in result1.get("detected_techniques", []):
-        if isinstance(t.get("technique"), str):
+    # Techniken auf kanonische Namen normalisieren — verworfene ebenfalls, damit die
+    # Verwurfsstatistik pro Technik aggregierbar ist
+    for t in result1.get("detected_techniques", []) + rejected_techniques:
+        if isinstance(t.get("technique"), str) and t["technique"]:
             t["technique"] = normalize_technique(t["technique"])
 
     result1["detected_techniques"] = _dedupe_techniques(
-        result1.get("detected_techniques", [])
+        result1.get("detected_techniques", []), rejected_techniques
     )
 
     # Rollen auf kanonische Namen normalisieren (Pass 1 hat keine Rollen)
@@ -407,6 +431,13 @@ def _analyze_article(article: Article, skip_anonymize: bool) -> dict[str, Any]:
         "timestamp":           result1.get("timestamp", base_meta["published_at"]),
         "pass1_word_count":    pass1_word_count,
         "detected_techniques": result1.get("detected_techniques", []),
+        # Nachprüfung der von Pass 1 gemeldeten Techniken: reported = Rohantwort,
+        # accepted = zählt für den Bernays Score, rejected = verworfen mit Grund
+        "technique_validation": {
+            "reported": len(reported_techniques),
+            "accepted": len(result1.get("detected_techniques", [])),
+            "rejected": rejected_techniques,
+        },
         "framing_target": {
             **result1.get("framing_target", {}),
             "orwell_index":                    orwell,

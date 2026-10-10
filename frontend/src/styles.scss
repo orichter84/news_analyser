@@ -405,6 +405,15 @@ td.date { white-space: nowrap; color: var(--muted); }
 .technique-name { font-weight: 600; color: var(--accent-hi); font-size: 0.85rem; }
 .quote { font-style: italic; color: var(--muted); margin: 0.4rem 0; font-size: 0.85rem; border-left: none; padding-left: 0; }
 .explanation { font-size: 0.85rem; }
+.rejection-rate.high { color: var(--high); }
+.rejected-techniques {
+  margin-top: 1rem;
+  summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
+  .technique-card.rejected { border-left-color: var(--muted); background: rgba(122,125,150,0.06); }
+  .technique-card.rejected .technique-name { color: var(--muted); }
+  .technique-header { display: flex; gap: 0.75rem; align-items: baseline; flex-wrap: wrap; }
+  .rejection-reason { font-size: 0.75rem; color: var(--high); }
+}
 .source-link { margin-top: 1rem; a { color: var(--accent-hi); text-decoration: none; &:hover { text-decoration: underline; } } }
 
 /* ---- States ---- */

@@ -31,6 +31,7 @@ commit messages and scattered conversations.
 | [0011](decisions/0011-strict-stroemung-grounding.md) | Require a verifiable quote for every non-`neutral` politische_stroemung label | 2026-09-16 | Active |
 | [0012](decisions/0012-technique-negation-guard-and-anchor-stroemung-flattening.md) | Extend the negation guard to technique normalization; fix anchor politische_stroemung storage | 2026-09-18 | Active |
 | [0013](decisions/0013-reject-incomplete-analyses.md) | Reject incomplete analyses (truncated output, Pass 0 failure) instead of repairing or degrading them | 2026-10-09 | Active |
+| [0014](decisions/0014-record-rejected-techniques.md) | Record techniques rejected by grounding/dedup as a reliability signal; show them in the article detail view | 2026-10-09 | Active |
 
 Not every historical decision is captured yet — this started 2026-09-13 with a
 handful of foundational and recent milestones rather than a full retroactive rewrite

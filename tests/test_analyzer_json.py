@@ -118,6 +118,37 @@ class TestDedupeTechniques:
         assert result == techniques
 
 
+class TestRejectedTechniquesAreRecorded:
+    def test_grounding_records_reason_per_dropped_instance(self):
+        techniques = [
+            {"technique": "a", "quote": "hi"},
+            {"technique": "b", "quote": "  "},
+            {"technique": "c", "quote": "never said"},
+            {"technique": "d", "quote": "hi"},  # "hi" occurs only once
+        ]
+        rejected = []
+        kept = _validate_quote_grounding(techniques, "hi there", rejected)
+        assert [t["technique"] for t in kept] == ["a"]
+        assert [(r["technique"], r["reason"]) for r in rejected] == [
+            ("b", "empty_quote"),
+            ("c", "quote_not_found"),
+            ("d", "occurrence_exceeded"),
+        ]
+        assert rejected[0]["quote"] == "  "
+
+    def test_dedupe_records_duplicates(self):
+        techniques = [
+            {"technique": "x", "quote": "q"},
+            {"technique": "x", "quote": "q"},
+        ]
+        rejected = []
+        assert len(_dedupe_techniques(techniques, rejected)) == 1
+        assert rejected == [{"technique": "x", "quote": "q", "reason": "duplicate"}]
+
+    def test_collector_is_optional(self):
+        assert _validate_quote_grounding([{"technique": "x", "quote": "zz"}], "abc") == []
+
+
 class TestValidateStroemungGrounding:
     def test_keeps_quote_present_in_source(self):
         stroemung = [{"label": "konservativ", "quote": "Wir müssen jetzt handeln."}]
